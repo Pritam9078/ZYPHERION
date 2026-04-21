@@ -1,70 +1,142 @@
 openapi: 3.0.0
 info:
-  title: Zypherion API
-  description: SDK-first APIs for trustless cross-chain automation.
+  title: Zypherion Protocol API
+  description: |
+    ### Trustless Cross-Chain State Attestation & Automation
+    
+    The Zypherion API provides the underlying infrastructure for developers to interact with the Zypherion Protocol programmatically. 
+    It enables:
+    - **Cryptographic Authentication**: Secure wallet-based signing handshake.
+    - **Logic Rule Management**: Deploy and manage cross-chain automation rules.
+    - **Proof Generation**: Generate zero-knowledge proofs of state attestations.
+    - **Webhooks**: Subscribe to protocol events for real-time integration.
   version: 1.0.0
+  contact:
+    name: Zypherion Support
+    url: https://zypherion.io/docs
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
 servers:
   - url: http://localhost:5001/v1
-    description: Development server
+    description: Development Sandbox
   - url: https://api.zypherion.io/v1
-    description: Production server
+    description: Mainnet Production
+
+tags:
+  - name: Authentication
+    description: Wallet-based signing and JWT management
+  - name: Rules
+    description: Logic Rule deployment and lifecycle management
+  - name: Proofs
+    description: Cryptographic proof generation and verification
+  - name: Execution
+    description: Manual and automated rule execution triggering
+  - name: Webhooks
+    description: Event-driven integration for third-party apps
+  - name: Administration
+    description: Elevated protocol governance and metrics
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Rule:
+      type: object
+      properties:
+        id: { type: string, example: "rule_8f23..." }
+        name: { type: string, example: "High Balance Trigger" }
+        condition: { type: string, example: "balance > 1000" }
+        action: { type: string, example: "notify_slack" }
+        status: { type: string, enum: [pending, active, disabled] }
+    Proof:
+      type: object
+      properties:
+        id: { type: string, example: "proof_912a..." }
+        ruleId: { type: string }
+        status: { type: string, enum: [pending, verified, failed] }
+        data: { type: string, description: "Base64 encoded proof data" }
+
 paths:
+  # --- AUTHENTICATION ---
   /auth/request-message:
     get:
-      summary: Request a signature message
+      tags: [Authentication]
+      summary: Step 1 - Request Signature Challenge
+      description: Returns a unique cryptographic message that must be signed by the user's wallet.
       parameters:
         - name: wallet
           in: query
           required: true
+          description: Public address of the Stellar/Soroban wallet
           schema:
             type: string
       responses:
         '200':
-          description: Message generated
+          description: Challenge generated
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                  nonce:
-                    type: string
-                  expiresIn:
-                    type: integer
+                  message: { type: string }
+                  nonce: { type: string }
+                  expiresIn: { type: integer, description: "Seconds until challenge expiry" }
+
   /auth/verify-signature:
     post:
-      summary: Verify signature to get JWT token
+      tags: [Authentication]
+      summary: Step 2 - Verify Signature & Get Token
+      description: Exchanges a wallet signature for a JWT access token.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [wallet, signature, message, nonce]
               properties:
-                wallet:
-                  type: string
-                signature:
-                  type: string
-                message:
-                  type: string
-                nonce:
-                  type: string
+                wallet: { type: string }
+                signature: { type: string, description: "Base64 encoded signature" }
+                message: { type: string, description: "The original message that was signed" }
+                nonce: { type: string }
       responses:
         '200':
-          description: Token generated
+          description: Successfully authenticated
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  token:
-                    type: string
-                  role:
-                    type: string
+                  token: { type: string }
+                  role: { type: string }
+
+  # --- RULES ---
+  /rules/list:
+    get:
+      tags: [Rules]
+      security: [{ bearerAuth: [] }]
+      summary: List Logic Rules
+      description: Retrieve all rules associated with the authenticated wallet.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Rule' }
+
   /rules/create:
     post:
-      summary: Create a logic rule
+      tags: [Rules]
+      security: [{ bearerAuth: [] }]
+      summary: Deploy Logic Rule
+      description: Deploy a new rule to the protocol. Requires action signature for security.
       requestBody:
         required: true
         content:
@@ -72,60 +144,51 @@ paths:
             schema:
               type: object
               properties:
-                name:
-                  type: string
-                condition:
-                  type: string
-                action:
-                  type: string
-                signature:
-                  type: string
-                nonce:
-                  type: string
-                timestamp:
-                  type: integer
+                name: { type: string }
+                condition: { type: string }
+                action: { type: string }
+                signature: { type: string }
+                nonce: { type: string }
+                timestamp: { type: integer }
       responses:
         '201':
-          description: Rule created
-  /rules/list:
-    get:
-      summary: List all rules for the authenticated wallet
-      responses:
-        '200':
-          description: List of rules
+          description: Rule deployed successfully
+
   /rules/update/{id}:
     put:
-      summary: Update a rule
+      tags: [Rules]
+      security: [{ bearerAuth: [] }]
+      summary: Modify Rule
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
+          schema: { type: string }
       responses:
         '200':
           description: Rule updated
+
   /rules/delete/{id}:
     delete:
-      summary: Delete a rule
+      tags: [Rules]
+      security: [{ bearerAuth: [] }]
+      summary: Decommission Rule
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: { type: string }
       responses:
         '200':
           description: Rule deleted
+
+  # --- PROOFS ---
   /proof/generate:
     post:
-      summary: Generate a proof
+      tags: [Proofs]
+      security: [{ bearerAuth: [] }]
+      summary: Initiate Proof Generation
+      description: Triggers the ZK-proof generation engine for a specific rule.
       requestBody:
         required: true
         content:
@@ -133,56 +196,43 @@ paths:
             schema:
               type: object
               properties:
-                ruleId:
-                  type: string
-                signature:
-                  type: string
-                nonce:
-                  type: string
-                timestamp:
-                  type: integer
+                ruleId: { type: string }
+                signature: { type: string }
+                nonce: { type: string }
+                timestamp: { type: integer }
       responses:
         '200':
-          description: Proof generated
-  /proof/submit:
-    post:
-      summary: Submit a proof on-chain
-      responses:
-        '200':
-          description: Proof submitted
+          description: Generation process started
+
   /proof/status/{id}:
     get:
-      summary: Get proof status
+      tags: [Proofs]
+      summary: Check Proof Validity
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: { type: string }
       responses:
         '200':
-          description: Proof status
+          description: Current status of the proof artifact
+
+  # --- EXECUTION ---
   /execute/trigger:
     post:
-      summary: Trigger rule execution manually
+      tags: [Execution]
+      security: [{ bearerAuth: [] }]
+      summary: Manual Override Trigger
       responses:
         '200':
-          description: Execution triggered
-  /execute/status/{id}:
-    get:
-      summary: Get execution status
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Execution status
+          description: Execution intent broadcasted
+
+  # --- WEBHOOKS ---
   /webhooks/register:
     post:
-      summary: Register a webhook
+      tags: [Webhooks]
+      security: [{ bearerAuth: [] }]
+      summary: Register Notification Endpoint
       requestBody:
         required: true
         content:
@@ -190,30 +240,22 @@ paths:
             schema:
               type: object
               properties:
-                url:
-                  type: string
+                url: { type: string, example: "https://api.myapp.com/v1/webhook" }
                 events:
                   type: array
                   items:
                     type: string
+                    enum: [RULE_DEPLOYED, PROOF_GENERATED, EXECUTION_SUCCESS, EXECUTION_FAILED]
       responses:
         '200':
-          description: Webhook registered
-  /admin/users:
-    get:
-      summary: Get users
-      responses:
-        '200':
-          description: List of users
-  /admin/rules:
-    get:
-      summary: Get rules
-      responses:
-        '200':
-          description: List of rules
+          description: Registered successfully
+
+  # --- ADMIN ---
   /admin/metrics:
     get:
-      summary: Get metrics
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: Protocol Health Metrics
       responses:
         '200':
-          description: System metrics
+          description: Real-time telemetry data
