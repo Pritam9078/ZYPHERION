@@ -95,7 +95,7 @@ export default function DeveloperDashboard() {
                     <div className="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-1 group-hover:text-blue-300">Swagger UI</div>
                     <div className="text-xs text-slate-500">Interactive API documentation</div>
                   </a>
-                  <a href="https://github.com/Pritam9078/ZYPHERION" target="_blank" rel="noreferrer" className="block p-4 bg-black/20 hover:bg-black/40 border border-white/5 rounded-2xl transition-all group">
+                  <a href="https://github.com/Pritam9078/ZYPHERION/tree/main/sdk" target="_blank" rel="noreferrer" className="block p-4 bg-black/20 hover:bg-black/40 border border-white/5 rounded-2xl transition-all group">
                     <div className="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-1 group-hover:text-blue-300">NPM Package</div>
                     <div className="text-xs text-slate-500">zypherion-sdk (TypeScript)</div>
                   </a>
