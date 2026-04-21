@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build output
+dist/
+build/
+*.js.map
+
+# Next.js build cache
+frontend/.next/
+frontend/out/
+
+# SDK build
+sdk/dist/
+
+# Rust build artifacts
+contracts/target/
+
+# Environment files (NEVER commit these)
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Sample app (not for public distribution)
+sample-app/node_modules/

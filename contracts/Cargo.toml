@@ -1,0 +1,15 @@
+[workspace]
+resolver = "2"
+members = [
+    "logic_registry",
+    "proof_verifier",
+    "execution_router",
+]
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = false
+panic = "abort"
+lto = true
+codegen-units = 1

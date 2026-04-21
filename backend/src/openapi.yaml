@@ -1,0 +1,219 @@
+openapi: 3.0.0
+info:
+  title: Zypherion API
+  description: SDK-first APIs for trustless cross-chain automation.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5001/v1
+    description: Development server
+  - url: https://api.zypherion.io/v1
+    description: Production server
+paths:
+  /auth/request-message:
+    get:
+      summary: Request a signature message
+      parameters:
+        - name: wallet
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  nonce:
+                    type: string
+                  expiresIn:
+                    type: integer
+  /auth/verify-signature:
+    post:
+      summary: Verify signature to get JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                signature:
+                  type: string
+                message:
+                  type: string
+                nonce:
+                  type: string
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  role:
+                    type: string
+  /rules/create:
+    post:
+      summary: Create a logic rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                condition:
+                  type: string
+                action:
+                  type: string
+                signature:
+                  type: string
+                nonce:
+                  type: string
+                timestamp:
+                  type: integer
+      responses:
+        '201':
+          description: Rule created
+  /rules/list:
+    get:
+      summary: List all rules for the authenticated wallet
+      responses:
+        '200':
+          description: List of rules
+  /rules/update/{id}:
+    put:
+      summary: Update a rule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Rule updated
+  /rules/delete/{id}:
+    delete:
+      summary: Delete a rule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rule deleted
+  /proof/generate:
+    post:
+      summary: Generate a proof
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ruleId:
+                  type: string
+                signature:
+                  type: string
+                nonce:
+                  type: string
+                timestamp:
+                  type: integer
+      responses:
+        '200':
+          description: Proof generated
+  /proof/submit:
+    post:
+      summary: Submit a proof on-chain
+      responses:
+        '200':
+          description: Proof submitted
+  /proof/status/{id}:
+    get:
+      summary: Get proof status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proof status
+  /execute/trigger:
+    post:
+      summary: Trigger rule execution manually
+      responses:
+        '200':
+          description: Execution triggered
+  /execute/status/{id}:
+    get:
+      summary: Get execution status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution status
+  /webhooks/register:
+    post:
+      summary: Register a webhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                events:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Webhook registered
+  /admin/users:
+    get:
+      summary: Get users
+      responses:
+        '200':
+          description: List of users
+  /admin/rules:
+    get:
+      summary: Get rules
+      responses:
+        '200':
+          description: List of rules
+  /admin/metrics:
+    get:
+      summary: Get metrics
+      responses:
+        '200':
+          description: System metrics
