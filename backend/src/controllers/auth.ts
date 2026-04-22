@@ -20,20 +20,16 @@ export const login = async (req: Request, res: Response) => {
     const keypair = Keypair.fromPublicKey(address);
     let isValid = false;
 
-    // Standard Stellar message prefix
-    const prefix = "Stellar Signed Message: ";
-    const fullerMessage = prefix + message;
-    
-    const dataToVerify = Buffer.from(message);
-    const prefixedDataToVerify = Buffer.from(fullerMessage);
-
     try {
       const sigBuffer = Buffer.from(signature, 'base64');
-      isValid = keypair.verify(dataToVerify, sigBuffer);
+      
+      // Try raw message
+      isValid = keypair.verify(Buffer.from(message), sigBuffer);
       
       if (!isValid) {
-        console.log('[Auth] Raw failed, trying prefixed verification...');
-        isValid = keypair.verify(prefixedDataToVerify, sigBuffer);
+        // Try with Stellar prefix
+        const prefix = "Stellar Signed Message: ";
+        isValid = keypair.verify(Buffer.from(prefix + message), sigBuffer);
       }
 
       console.log('[Auth] Verification result:', isValid);
