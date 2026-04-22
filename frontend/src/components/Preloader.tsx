@@ -19,9 +19,8 @@ const Preloader = () => {
             transition={{ duration: 3, repeat: Infinity }}
             className="absolute inset-0 bg-blue-500 rounded-full blur-2xl"
           />
-          <div className="relative z-10 w-full h-full border-2 border-blue-400 rounded-2xl rotate-45 flex items-center justify-center overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 opacity-20" />
-            <span className="absolute -rotate-45 font-black text-2xl text-white">Z</span>
+          <div className="relative z-10 w-full h-full rounded-2xl flex items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt="Zypherion Loading" className="w-full h-full object-contain" />
           </div>
         </div>
         

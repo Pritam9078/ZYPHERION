@@ -426,9 +426,6 @@ export default function Dashboard() {
           {/* Main Workspace Area */}
           <div className="lg:col-span-3 space-y-12">
             
-            {/* Global Network Visualization */}
-            <NetworkMap />
-            
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
                 <motion.div 
@@ -437,6 +434,9 @@ export default function Dashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-12"
                 >
+                  {/* Global Network Visualization */}
+                  <NetworkMap />
+                  
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {stats.map((stat, i) => (
                       <div key={i} className="p-10 rounded-[3rem] glass-premium border-white/[0.03] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
