@@ -11,8 +11,8 @@ const Navbar = () => {
     <nav className="px-8 py-4 flex justify-between items-center border-b border-white/[0.05] bg-zypher-bg/80 backdrop-blur-xl sticky top-0 z-40">
       <div className="flex items-center gap-12">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 border border-blue-500 rounded-lg rotate-45 flex items-center justify-center group-hover:bg-blue-500/10 transition-colors">
-            <span className="-rotate-45 font-bold text-xs">Z</span>
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+            <img src="/logo.png" alt="Zypherion Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-lg font-bold tracking-widest text-white group-hover:text-blue-400 transition-colors">
             ZYPHERION
