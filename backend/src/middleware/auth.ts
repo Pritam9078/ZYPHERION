@@ -9,6 +9,10 @@ export interface AuthRequest extends Request {
     tier?: 'Free' | 'Basic' | 'Pro' | 'Enterprise';
     approved?: boolean;
   };
+  body: any;
+  query: any;
+  params: any;
+  headers: any;
 }
 
 export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
