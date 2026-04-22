@@ -19,7 +19,8 @@
 https://zypherion.vercel.app/
 - **Backend API Server:** 
 https://zypherion-backend.onrender.com/
-- **Demo Video (Full Walkthrough):** `[INSERT_YOUTUBE_OR_LOOM_LINK_HERE]`
+- **Demo Video (Full Walkthrough):** 
+https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive_link
 - **User Feedback Documentation:** `[INSERT_NOTION_OR_GOOGLE_DOC_LINK_HERE]`
 
 ---
