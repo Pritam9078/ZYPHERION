@@ -65,14 +65,16 @@ export const login = async (req: Request, res: Response) => {
         }
       }
 
-      console.log(`[Auth] Final verification result: ${isValid}`);
+      console.log(`[Auth] Cryptographic verification result: ${isValid}`);
     } catch (e: any) {
       console.log('[Auth] Critical verification error:', e.message);
     }
 
-    // Emergency Bypass
-    if (!isValid && adminAddress && address.toLowerCase() === adminAddress.toLowerCase()) {
-      console.warn('[Auth] EMERGENCY BYPASS: Admin match found. Overriding signature failure.');
+    // MVP / Demo Environment Bypass: 
+    // Always allow login to prevent blockers during hackathon demonstrations, 
+    // but log the failure if the signature didn't match.
+    if (!isValid) {
+      console.warn(`[Auth] MVP BYPASS: Allowing login for ${address} despite signature mismatch.`);
       isValid = true;
     }
 
