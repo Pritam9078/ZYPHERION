@@ -343,49 +343,53 @@ export default function Dashboard() {
           )}
         </AnimatePresence>
         
-        {/* Modular Suite Navigation */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 border-b border-white/5 pb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">SYSTEM_INFRA_V2</span>
-              <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${wallet.tier === 'Pro' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : wallet.tier === 'Basic' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
-                {wallet.tier || 'Free'} TIER
-              </span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Node ID: {wallet.address ? wallet.address.slice(0, 16) : 'GUEST'}</span>
+         <header className="mb-12">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-white/[0.02] border border-white/5 p-8 rounded-[3rem] backdrop-blur-3xl shadow-2xl">
+               <div className="flex items-center gap-8">
+                  <div className="space-y-1">
+                     <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">SYSTEM_INFRA_V2</span>
+                        <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${wallet.tier === 'Pro' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : wallet.tier === 'Basic' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                          {wallet.tier || 'Free'} TIER
+                        </span>
+                     </div>
+                     <h1 className="text-5xl font-black text-white tracking-tighter mt-4">Protocol Hub_</h1>
+                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] ml-1">Node ID: {wallet.address ? wallet.address.slice(0, 16) : 'GUEST'}</p>
+                  </div>
+               </div>
+
+               <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-3 bg-black/40 px-6 py-4 rounded-3xl border border-white/5">
+                     <div className="text-center px-4 border-r border-white/10">
+                        <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Connections</div>
+                        <div className="text-xl font-bold text-white">{systemStats.connections}</div>
+                     </div>
+                     <div className="text-center px-4">
+                        <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">System Load</div>
+                        <div className={`text-xl font-bold ${systemStats.load === 'LOW' ? 'text-emerald-400' : 'text-amber-400'}`}>{systemStats.load}</div>
+                     </div>
+                  </div>
+                  <button 
+                     onClick={() => router.push('/billing')}
+                     className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:scale-105 active:scale-95"
+                  >
+                     Manage Billing
+                  </button>
+               </div>
             </div>
-            <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Protocol Hub_</h2>
-            <div className="flex gap-1.5 overflow-x-auto pb-2">
-              {['overview', 'builder', 'automation', 'history'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 scale-105' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-8 bg-white/5 px-8 py-4 rounded-[2rem] border border-white/5">
-             <div className="text-center">
-                <div className="text-[9px] font-black text-slate-500 uppercase mb-1">Connections</div>
-                <div className="text-white font-bold">{systemStats.connections}</div>
-             </div>
-             <div className="w-[1px] h-8 bg-white/10" />
-             <div className="text-center">
-                <div className="text-[9px] font-black text-slate-500 uppercase mb-1">System Load</div>
-                <div className={`font-bold ${systemStats.load === 'LOW' ? 'text-emerald-400' : 'text-amber-400'}`}>{systemStats.load}</div>
-             </div>
-             <div className="w-[1px] h-8 bg-white/10 hidden md:block" />
-             <button 
-                onClick={() => router.push('/billing')}
-                className="hidden md:block px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors border border-white/10"
-             >
-                Manage Billing
-             </button>
-          </div>
-        </header>
+
+            <nav className="flex gap-4 mt-8 bg-white/[0.01] p-2 rounded-2xl border border-white/[0.02] w-fit">
+               {['overview', 'builder', 'automation', 'history'].map((tab) => (
+                  <button
+                     key={tab}
+                     onClick={() => setActiveTab(tab as any)}
+                     className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                  >
+                     {tab}
+                  </button>
+               ))}
+            </nav>
+         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           
@@ -400,17 +404,23 @@ export default function Dashboard() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-12"
                 >
-                  <NetworkMap />
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {stats.map((stat, i) => (
-                      <div key={i} className="p-8 rounded-[2.5rem] glass border-white/5 relative overflow-hidden group">
-                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">{stat.label}</h3>
-                         <div className="text-4xl font-bold text-white tracking-tighter mb-4">{stat.value}</div>
-                         <Sparkline color={stat.color} />
+                      <div key={i} className="p-10 rounded-[3rem] glass-premium border-white/[0.03] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                            {stat.label}
+                         </h3>
+                         <div className="text-5xl font-black text-white tracking-tighter mb-4">{stat.value}</div>
+                         <div className="h-10 mt-6">
+                            <Sparkline color={stat.color} />
+                         </div>
                       </div>
                     ))}
                   </div>
+
+                  <NetworkMap />
 
                   <section className="rounded-[2.5rem] glass border-white/5 overflow-hidden">
                     <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
@@ -699,45 +709,75 @@ export default function Dashboard() {
           </div>
 
           {/* Infrastructure Sidebar ( telemetry ) */}
-          <aside className="space-y-12">
-            
-            {/* Real-time Telemetry Stream */}
-            <section className="rounded-[2.5rem] glass border-white/5 overflow-hidden flex flex-col h-[500px]">
-               <div className="p-6 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
-                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live telemetry</h3>
-                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-               </div>
-               <div className="flex-1 p-6 space-y-6 overflow-y-auto bg-black/20 font-mono text-[10px]" style={{ scrollbarWidth: 'none' }}>
-                  {liveLogs.length === 0 && <div className="text-slate-700 italic text-[9px] opacity-40">Awaiting protocol events...</div>}
-                  {liveLogs.map((log, i) => (
-                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={i} className="flex gap-4">
-                       <span className="opacity-30 flex-shrink-0">{log.t}</span>
-                       <span className={`${log.c} font-bold leading-relaxed`}>{log.m}</span>
-                    </motion.div>
-                  ))}
-               </div>
-               <div className="p-4 bg-white/5 border-t border-white/5 text-center">
-                  <div className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Protocol Buffer: 100% Sync</div>
-               </div>
-            </section>
+          <div className="lg:col-span-1">
+             <div className="sticky top-32 space-y-8">
+                {/* Real-time Telemetry Stream */}
+                <div className="p-8 rounded-[3rem] glass-dark border-white/[0.03] relative overflow-hidden flex flex-col h-[600px] shadow-2xl">
+                   <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                         Live Telemetry
+                      </h3>
+                      <span className="text-[8px] font-bold text-slate-700 font-mono">0.0.0.1_UPLINK</span>
+                   </div>
+                   
+                   <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                      {liveLogs.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                           <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-slate-700 mb-4">
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                           </div>
+                           <p className="text-[9px] text-slate-700 font-bold uppercase tracking-widest leading-relaxed">Awaiting protocol events and interchain handshakes...</p>
+                        </div>
+                      ) : (
+                        liveLogs.map((log, i) => (
+                           <div key={i} className="group cursor-default">
+                              <div className="flex items-center gap-3 mb-1">
+                                 <span className="text-[8px] text-slate-600 font-mono">[{log.t}]</span>
+                                 <div className="h-[1px] flex-1 bg-white/[0.03]" />
+                              </div>
+                              <p className={`text-[10px] font-bold tracking-tight leading-relaxed break-words ${log.c}`}>
+                                 {log.m}
+                              </p>
+                           </div>
+                        ))
+                      )}
+                   </div>
 
-            <section className="p-10 rounded-[3rem] glass border-white/5 bg-gradient-to-br from-blue-600/5 to-transparent">
-               <div className="w-16 h-16 bg-blue-600/10 rounded-3xl flex items-center justify-center text-blue-400 mb-8 border border-blue-500/20">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-               </div>
-               <h3 className="text-xl font-bold text-white mb-2">Protocol Health</h3>
-               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-6 opacity-60">Verified On-Chain Via Stellar</p>
-               <div className="space-y-3">
-                  <div className="flex justify-between text-[9px] font-black uppercase text-slate-500 mb-1"><span>Availability</span><span>100%</span></div>
-                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                     <div className="w-full h-full bg-blue-500" />
-                  </div>
-               </div>
-            </section>
+                   <div className="mt-8 pt-6 border-t border-white/5">
+                      <div className="flex items-center gap-3 px-4 py-3 bg-black/40 rounded-xl border border-white/5">
+                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                         <span className="text-[9px] font-black text-white uppercase tracking-widest">WSS_LINK_ACTIVE</span>
+                      </div>
+                   </div>
+                </div>
 
-          </aside>
+                {/* Additional Sidebar Context */}
+                <div className="p-10 rounded-[3rem] glass-premium border-white/[0.03] space-y-6">
+                   <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                      Protocol Health
+                   </div>
+                   <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Latency</span>
+                         <span className="text-[10px] text-emerald-400 font-black">12ms</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Uptime</span>
+                         <span className="text-[10px] text-blue-400 font-black">99.99%</span>
+                      </div>
+                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-2">
+                         <motion.div 
+                           initial={{ width: 0 }}
+                           animate={{ width: '99.99%' }}
+                           className="h-full bg-blue-500"
+                         />
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
         </div>
       </main>
     </div>

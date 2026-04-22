@@ -3,22 +3,42 @@
 @tailwind utilities;
 
 body {
-  @apply bg-zypher-bg text-slate-200 antialiased;
+  @apply bg-[#020617] text-slate-200 antialiased;
 }
 
 .glass {
-  @apply bg-white/[0.03] backdrop-blur-md border border-white/[0.05];
+  @apply bg-white/[0.03] backdrop-blur-3xl border border-white/[0.05];
+}
+
+.glass-premium {
+  @apply bg-white/[0.02] backdrop-blur-[100px] border border-white/[0.04] shadow-2xl;
+}
+
+.glass-dark {
+  @apply bg-black/40 backdrop-blur-3xl border border-white/[0.05];
 }
 
 .glass-blue {
-  @apply bg-blue-500/[0.03] backdrop-blur-xl border border-blue-500/10;
+  @apply bg-blue-500/[0.03] backdrop-blur-3xl border border-blue-500/10;
 }
 
 .blueprint-bg {
-  background-image: radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 .text-gradient-blue {
   @apply bg-clip-text text-transparent bg-gradient-to-br from-blue-400 via-blue-200 to-white;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20;
 }
