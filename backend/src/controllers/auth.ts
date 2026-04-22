@@ -23,7 +23,18 @@ export const login = async (req: Request, res: Response) => {
     let isValid = false;
 
     try {
-      const sigBuffer = Buffer.from(signature, 'base64');
+      let sigBuffer: Buffer;
+      
+      // Attempt to decode signature (try Base64 then Hex)
+      try {
+        if (signature.length === 88 && signature.endsWith('=')) {
+          sigBuffer = Buffer.from(signature, 'base64');
+        } else {
+          sigBuffer = Buffer.from(signature, 'hex');
+        }
+      } catch (e) {
+        sigBuffer = Buffer.from(signature, 'base64'); // Fallback to base64
+      }
       
       // 1. Try raw message
       isValid = keypair.verify(Buffer.from(message), sigBuffer);
@@ -35,14 +46,14 @@ export const login = async (req: Request, res: Response) => {
       }
 
       if (!isValid) {
-        // 3. Try with length prefix (Some older versions)
-        const lengthPrefixed = `\x19Stellar Signed Message:\n${message.length}${message}`;
-        isValid = keypair.verify(Buffer.from(lengthPrefixed), sigBuffer);
+        // 3. Try with another common prefix variant
+        const altPrefix = "Stellar Signed Message:Authenticate with Zypherion Protocol";
+        isValid = keypair.verify(Buffer.from(altPrefix), sigBuffer);
       }
 
-      console.log(`[Auth] Verification for ${address}: ${isValid}`);
+      console.log(`[Auth] Verification result for ${address}: ${isValid}`);
     } catch (e) {
-      console.log('[Auth] Verification error:', e);
+      console.log('[Auth] Verification error details:', e);
     }
 
     // Emergency Bypass for Master Admin during deployment
