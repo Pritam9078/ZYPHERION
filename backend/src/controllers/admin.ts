@@ -157,7 +157,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
 
   const verification = await verifyActionIntent(adminAddress, message, signature, nonce, 'APPROVE_USER');
   if (!verification.success) {
-    return res.status(401).json({ message: verification.message });
+    return res.status(403).json({ message: verification.message });
   }
 
   try {
@@ -202,7 +202,7 @@ export const approveDeposit = async (req: AuthRequest, res: Response) => {
 
   const verification = await verifyActionIntent(adminAddress, message, signature, nonce, 'APPROVE_DEPOSIT');
   if (!verification.success) {
-    return res.status(401).json({ message: verification.message });
+    return res.status(403).json({ message: verification.message });
   }
 
   try {
@@ -283,7 +283,7 @@ export const toggleProtocolHalt = async (req: AuthRequest, res: Response) => {
 
   const verification = await verifyActionIntent(adminAddress, message, signature, nonce, 'TOGGLE_PROTOCOL_HALT');
   if (!verification.success) {
-    return res.status(401).json({ message: verification.message });
+    return res.status(403).json({ message: verification.message });
   }
 
   try {

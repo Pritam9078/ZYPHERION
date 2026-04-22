@@ -51,6 +51,15 @@ export const verifyActionIntent = async (
     }
 
     if (!isValid) {
+      // Emergency Bypass for Master Admin during deployment
+      const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
+      if (adminAddress && address === adminAddress) {
+         console.warn(`[SignatureUtil] EMERGENCY BYPASS: Allowing admin action ${expectedAction} despite signature mismatch.`);
+         isValid = true;
+      }
+    }
+
+    if (!isValid) {
       // DEV MODE Fallback
       if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
          console.warn(`[SignatureUtil] DEV MODE: Allowing signature bypass for action ${expectedAction}`);

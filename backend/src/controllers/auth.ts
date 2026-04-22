@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { Keypair } from '@stellar/stellar-sdk';
 import User from '../models/User';
 
+const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
+
 export const login = async (req: Request, res: Response) => {
   const { address, signature, message, accountType } = req.body;
 
@@ -44,7 +46,6 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Emergency Bypass for Master Admin during deployment
-    const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
     if (!isValid && adminAddress && address === adminAddress) {
       console.warn('[Auth] EMERGENCY BYPASS: Allowing admin login despite signature mismatch.');
       isValid = true;
