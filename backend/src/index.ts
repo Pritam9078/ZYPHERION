@@ -63,8 +63,19 @@ app.use((req: any, res: any, next: any) => {
   next();
 });
 
-// Load Swagger YAML
-const swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yaml'));
+// Load Swagger YAML with absolute path fallback
+let swaggerDocument;
+try {
+  swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yaml'));
+} catch (e) {
+  try {
+    // Fallback to project root / src if dist copy failed or running in dev
+    swaggerDocument = YAML.load(path.join(process.cwd(), 'src', 'openapi.yaml'));
+  } catch (e2) {
+    console.error('[Zypherion] Failed to load openapi.yaml from dist or src');
+    swaggerDocument = {}; // Fallback to empty doc to prevent crash
+  }
+}
 app.use('/api-docs', ...swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Legacy Routes
