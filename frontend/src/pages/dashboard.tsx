@@ -402,6 +402,9 @@ export default function Dashboard() {
           {/* Main Workspace Area */}
           <div className="lg:col-span-3 space-y-12">
             
+            {/* Global Network Visualization */}
+            <NetworkMap />
+            
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
                 <motion.div 
@@ -425,8 +428,6 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
-
-                  <NetworkMap />
 
                   <section className="rounded-[2.5rem] glass border-white/5 overflow-hidden">
                     <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
