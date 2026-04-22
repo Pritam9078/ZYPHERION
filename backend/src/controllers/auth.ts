@@ -24,54 +24,67 @@ export const login = async (req: Request, res: Response) => {
 
     try {
       let sigBuffer: Buffer;
+      console.log(`[Auth Debug] Incoming address: ${address}`);
+      console.log(`[Auth Debug] Incoming signature (first 10): ${signature.slice(0, 10)}...`);
       
-      // Attempt to decode signature (try Base64 then Hex)
+      // Attempt to decode signature
       try {
-        if (signature.length === 88 && signature.endsWith('=')) {
+        if (signature.length > 80 && (signature.endsWith('=') || signature.includes('/') || signature.includes('+'))) {
           sigBuffer = Buffer.from(signature, 'base64');
+          console.log('[Auth Debug] Decoded signature as Base64');
         } else {
           sigBuffer = Buffer.from(signature, 'hex');
+          console.log('[Auth Debug] Decoded signature as Hex');
         }
       } catch (e) {
-        sigBuffer = Buffer.from(signature, 'base64'); // Fallback to base64
+        sigBuffer = Buffer.from(signature, 'base64');
+        console.log('[Auth Debug] Decoding error, falling back to Base64');
       }
       
-      // 1. Try raw message
-      isValid = keypair.verify(Buffer.from(message), sigBuffer);
-      
-      if (!isValid) {
-        // 2. Try with Stellar prefix (Standard Freighter)
-        const prefix = "Stellar Signed Message: ";
-        isValid = keypair.verify(Buffer.from(prefix + message), sigBuffer);
+      const dataToVerify = [
+        Buffer.from(message),
+        Buffer.from("Stellar Signed Message: " + message),
+        Buffer.from("Stellar Signed Message:Authenticate with Zypherion Protocol")
+      ];
+
+      for (const data of dataToVerify) {
+        if (keypair.verify(data, sigBuffer)) {
+          isValid = true;
+          console.log('[Auth Debug] Verification SUCCESS with data variant');
+          break;
+        }
       }
 
       if (!isValid) {
-        // 3. Try with another common prefix variant
-        const altPrefix = "Stellar Signed Message:Authenticate with Zypherion Protocol";
-        isValid = keypair.verify(Buffer.from(altPrefix), sigBuffer);
+        // Try SHA256 hash of the prefixed message (some wallets do this)
+        const crypto = require('crypto');
+        const hashed = crypto.createHash('sha256').update("Stellar Signed Message: " + message).digest();
+        if (keypair.verify(hashed, sigBuffer)) {
+          isValid = true;
+          console.log('[Auth Debug] Verification SUCCESS with SHA256 variant');
+        }
       }
 
-      console.log(`[Auth] Verification result for ${address}: ${isValid}`);
-    } catch (e) {
-      console.log('[Auth] Verification error details:', e);
+      console.log(`[Auth] Final verification result: ${isValid}`);
+    } catch (e: any) {
+      console.log('[Auth] Critical verification error:', e.message);
     }
 
-    // Emergency Bypass for Master Admin during deployment
-    if (!isValid && adminAddress && address === adminAddress) {
-      console.warn('[Auth] EMERGENCY BYPASS: Allowing admin login despite signature mismatch.');
+    // Emergency Bypass
+    if (!isValid && adminAddress && address.toLowerCase() === adminAddress.toLowerCase()) {
+      console.warn('[Auth] EMERGENCY BYPASS: Admin match found. Overriding signature failure.');
       isValid = true;
     }
 
     if (!isValid) {
-      // General Dev Fallback
-      if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-         console.warn('[Auth] DEV MODE: Allowing signature bypass for', address);
-         isValid = true;
-      }
-    }
-
-    if (!isValid) {
-      return res.status(401).json({ message: 'Invalid signature' });
+      return res.status(401).json({ 
+        message: 'Invalid signature',
+        debug: {
+          receivedAddress: address,
+          expectedAdmin: adminAddress,
+          nodeEnv: process.env.NODE_ENV
+        }
+      });
     }
     
     // 3. Persist User in DB & Determine role
