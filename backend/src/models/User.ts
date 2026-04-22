@@ -15,6 +15,11 @@ export interface IUser extends Document {
   proofsUsedThisMonth: number;
   creditsBalance: number;
   gasBalance: number; // For Gas Abstraction Service
+  
+  // Phase 3: Decentralized Identity
+  did?: string;
+  didDocument?: any;
+  isDIDVerified: boolean;
 
   createdAt: Date;
 }
@@ -33,6 +38,11 @@ const UserSchema: Schema = new Schema({
   proofsUsedThisMonth: { type: Number, default: 0 },
   creditsBalance: { type: Number, default: 0 },
   gasBalance: { type: Number, default: 0 },
+
+  // Phase 3: Decentralized Identity
+  did: { type: String },
+  didDocument: { type: Schema.Types.Mixed },
+  isDIDVerified: { type: Boolean, default: false },
 
   createdAt: { type: Date, default: Date.now },
 });

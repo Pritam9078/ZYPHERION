@@ -31,6 +31,7 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
 };
 
 export const authenticateToken = protect;
+export const authenticate = protect;
 
 export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

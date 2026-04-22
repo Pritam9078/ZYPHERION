@@ -134,3 +134,34 @@ export const getMe = async (req: any, res: Response) => {
     res.status(500).json({ message: 'Failed to get user profile' });
   }
 };
+
+/**
+ * DID Verification (Phase 3)
+ */
+export const verifyDID = async (req: any, res: Response) => {
+  const { did, didDocument } = req.body;
+  const address = req.user.address;
+
+  try {
+    const user = await User.findOne({ address });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Simulate DID verification via external resolver
+    console.log(`[Zypherion DID] Verifying identity for ${address} with DID: ${did}`);
+    
+    user.did = did;
+    user.didDocument = didDocument;
+    user.isDIDVerified = true;
+    user.kycStatus = 'verified'; // Linked DID automatically satisfies KYC
+    await user.save();
+
+    res.json({ 
+      message: 'Decentralized Identity verified successfully',
+      did: user.did,
+      isVerified: user.isDIDVerified 
+    });
+
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};

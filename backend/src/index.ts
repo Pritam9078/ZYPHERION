@@ -12,6 +12,7 @@ import logicRuleRoutes from './routes/logicRules';
 import adminRoutes from './routes/admin';
 import { webhookRoutes } from './routes/webhooks';
 import billingRoutes from './routes/billing';
+import governanceRoutes from './routes/governance';
 import { initAutomationWorker } from './services/AutomationWorker';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
@@ -85,6 +86,7 @@ app.use('/api/advanced', advancedRoutes);
 app.use('/api/rules', logicRuleRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/governance', governanceRoutes);
 
 // SDK-First v1 Routes
 app.use('/v1/auth', authRoutes);
@@ -93,6 +95,7 @@ app.use('/v1/execute', operationRoutes); // Will add trigger to operationRoutes
 app.use('/v1/rules', logicRuleRoutes);
 app.use('/v1/admin', adminRoutes);
 app.use('/v1/webhooks', webhookRoutes);
+app.use('/v1/governance', governanceRoutes);
 
 app.get('/health', (req: any, res: any) => {
   res.json({ status: 'Zypherion Backend Online', realtime: 'Active' });

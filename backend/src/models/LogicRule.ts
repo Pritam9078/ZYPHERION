@@ -30,6 +30,12 @@ export interface ILogicRule extends Document {
 
   onChainId?: number;
   onChainTxHash?: string;
+
+  // Phase 3: Enterprise Governance
+  isMultiSig: boolean;
+  requiredApprovals: number;
+  approvers: string[];
+
   createdAt: Date;
 }
 
@@ -63,6 +69,12 @@ const LogicRuleSchema: Schema = new Schema({
 
   onChainId: { type: Number },
   onChainTxHash: { type: String },
+
+  // Phase 3: Enterprise Governance
+  isMultiSig: { type: Boolean, default: false },
+  requiredApprovals: { type: Number, default: 1 },
+  approvers: [{ type: String }],
+
   createdAt: { type: Date, default: Date.now },
 });
 

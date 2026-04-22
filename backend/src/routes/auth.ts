@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { login, getMe } from '../controllers/auth';
-import { authenticateToken } from '../middleware/auth';
+import { login, getMe, verifyDID } from '../controllers/auth';
+import { authenticateToken, authenticate } from '../middleware/auth';
 
 const router = Router();
 
 router.post('/login', login);
 router.get('/me', authenticateToken, getMe);
+router.post('/verify-did', authenticate, verifyDID);
 
 // SDK-First v1 Auth Routes
 router.get('/request-message', (req: any, res: any) => {

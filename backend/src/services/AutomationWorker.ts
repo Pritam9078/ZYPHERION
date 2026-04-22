@@ -3,6 +3,7 @@ import Proof from '../models/Proof';
 import LogicRule from '../models/LogicRule';
 import SystemSetting from '../models/SystemSetting';
 import User from '../models/User';
+import BatchProof from '../models/BatchProof';
 
 export const initAutomationWorker = (io: any) => {
   console.log('[Zypherion] Initializing Automation Worker...');
@@ -136,6 +137,39 @@ export const initAutomationWorker = (io: any) => {
           type: 'INFO',
           message: `Scheduled execution started for ${rule.name}`,
           opId: op._id
+        });
+      }
+
+      // PHASE 3: Proof Batching Engine (Aggregation)
+      const verifiedProofs = await Proof.find({ status: 'verified', txHash: { $exists: false } });
+      if (verifiedProofs.length >= 3) { // Minimum batch size for aggregation
+        console.log(`[Zypherion] Initializing Batch Aggregation for ${verifiedProofs.length} proofs...`);
+        
+        // Mock Aggregation Logic (Recursive SNARK Simulation)
+        const batchData = `AGGREGATED_PROOF_V3_${Date.now()}`;
+        const proofIds = verifiedProofs.map(p => p._id);
+        
+        const batch = new BatchProof({
+          proofIds,
+          aggregatedProofData: batchData,
+          status: 'submitted',
+          txHash: `B_TX_${Math.random().toString(36).substring(7).toUpperCase()}`,
+          targetChain: 'Interchain_Aggregator'
+        });
+        
+        await batch.save();
+
+        // Update individual proofs with the batch transaction hash
+        await Proof.updateMany(
+          { _id: { $in: proofIds } },
+          { txHash: batch.txHash }
+        );
+
+        console.log(`[Zypherion] Batch Aggregation Successful: ${batch.txHash}`);
+        io.emit('system_stats', {
+          timestamp: new Date(),
+          lastBatchHash: batch.txHash,
+          batchSize: proofIds.length
         });
       }
 

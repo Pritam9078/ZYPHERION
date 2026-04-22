@@ -45,13 +45,15 @@ export default function Dashboard() {
   const [rules, setRules] = useState<LogicRule[]>([]);
   const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'builder' | 'automation' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'builder' | 'automation' | 'history' | 'governance'>('overview');
   
   // Real-time Logs State
   const [liveLogs, setLiveLogs] = useState<{t: string, m: string, c: string}[]>([]);
   const [systemStats, setSystemStats] = useState({ connections: 0, load: 'LOW' });
   const [systemPaused, setSystemPaused] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [pendingGov, setPendingGov] = useState<any[]>([]);
+  const [isVerifyingDID, setIsVerifyingDID] = useState(false);
 
   // Designer State
   const [formState, setFormState] = useState({ 
@@ -70,7 +72,11 @@ export default function Dashboard() {
     dataSourceUrl: '',
     dataSourcePath: '',
     triggerEventSignature: '',
-    triggerContractAddress: ''
+    triggerContractAddress: '',
+    // Phase 3 Fields
+    isMultiSig: false,
+    requiredApprovals: 2,
+    approvers: '' // Comma separated addresses
   });
 
   // Simulator State
@@ -150,14 +156,19 @@ export default function Dashboard() {
     if (!token) return;
     setLoading(true);
     try {
-      const [rulesData, opsData, userData] = await Promise.all([
+      const [rulesData, opsData, userData, govRes] = await Promise.all([
         fetchRules(token),
         fetchOperations(token),
-        fetchUserProfile(token)
+        fetchUserProfile(token),
+        fetch(`${API_BASE}/api/governance/pending`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       setRules(rulesData);
       setOperations(opsData);
       setUser(userData);
+      if (govRes.ok) {
+        const govData = await govRes.json();
+        setPendingGov(govData.pending);
+      }
     } catch (err: any) {
       addNotification('Failed to sync protocol data.', 'error');
     } finally {
@@ -220,6 +231,9 @@ export default function Dashboard() {
         dataSourcePath: formState.dataSourcePath,
         triggerEventSignature: formState.triggerEventSignature,
         triggerContractAddress: formState.triggerContractAddress,
+        isMultiSig: formState.isMultiSig,
+        requiredApprovals: formState.requiredApprovals,
+        approvers: formState.approvers.split(',').map(a => a.trim()).filter(a => a),
         automationConfig: {
           autoExecute: formState.autoExecute,
           retryDelay: 60,
@@ -234,7 +248,8 @@ export default function Dashboard() {
         targetContract: '', targetPayload: '', useGasAbstraction: false,
         autoExecute: false, triggerType: 'state', scheduledAt: '',
         recurrenceInterval: 0, dataSourceUrl: '', dataSourcePath: '',
-        triggerEventSignature: '', triggerContractAddress: ''
+        triggerEventSignature: '', triggerContractAddress: '',
+        isMultiSig: false, requiredApprovals: 2, approvers: ''
       });
       setActiveTab('overview');
       addNotification('Infrastructure Rule deployed successfully.', 'success');
@@ -394,7 +409,7 @@ export default function Dashboard() {
             </div>
 
             <nav className="flex gap-4 mt-8 bg-white/[0.01] p-2 rounded-2xl border border-white/[0.02] w-fit">
-               {['overview', 'builder', 'automation', 'history'].map((tab) => (
+               {['overview', 'builder', 'automation', 'history', 'governance'].map((tab) => (
                   <button
                      key={tab}
                      onClick={() => setActiveTab(tab as any)}
@@ -594,6 +609,54 @@ export default function Dashboard() {
                           </motion.div>
                         )}
                       </AnimatePresence>
+
+                      {/* Phase 3: Enterprise Governance (Multi-Sig) */}
+                      <div className="mb-12 p-8 rounded-3xl bg-indigo-500/[0.03] border border-indigo-500/10">
+                        <div className="flex items-center justify-between mb-8">
+                           <div>
+                              <h4 className="text-white font-bold text-lg">Enterprise Governance_</h4>
+                              <p className="text-[9px] text-indigo-400 font-black uppercase tracking-widest mt-1">Require cryptographic quorum for execution</p>
+                           </div>
+                           <button 
+                             type="button"
+                             onClick={() => setFormState({...formState, isMultiSig: !formState.isMultiSig})}
+                             className={`w-14 h-8 rounded-full relative transition-all ${formState.isMultiSig ? 'bg-indigo-600' : 'bg-slate-800'}`}
+                           >
+                             <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${formState.isMultiSig ? 'right-1' : 'left-1'}`} />
+                           </button>
+                        </div>
+
+                        <AnimatePresence>
+                          {formState.isMultiSig && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                            >
+                               <div className="space-y-3">
+                                  <label className="text-[10px] font-black uppercase text-indigo-400 tracking-widest px-2">Approval Threshold (Quorum)</label>
+                                  <input 
+                                     type="number"
+                                     value={formState.requiredApprovals}
+                                     onChange={e => setFormState({...formState, requiredApprovals: parseInt(e.target.value)})}
+                                     className="w-full bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                                  />
+                               </div>
+                               <div className="space-y-3">
+                                  <label className="text-[10px] font-black uppercase text-indigo-400 tracking-widest px-2">Authorized Approvers (CSV)</label>
+                                  <input 
+                                     type="text"
+                                     value={formState.approvers}
+                                     onChange={e => setFormState({...formState, approvers: e.target.value})}
+                                     placeholder="0x..., 0x..."
+                                     className="w-full bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none text-xs"
+                                  />
+                               </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
 
                       {/* Phase 1: Cross-Chain Details */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -797,6 +860,75 @@ export default function Dashboard() {
                   </div>
                 </motion.section>
               )}
+
+              {activeTab === 'governance' && (
+                <motion.section 
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  className="space-y-8"
+                >
+                   <div className="p-12 rounded-[3rem] glass-blue border-indigo-500/10 flex items-center justify-between">
+                      <div>
+                         <h3 className="text-4xl font-black text-white tracking-tighter mb-2">Governance Hub_</h3>
+                         <p className="text-[10px] text-indigo-400 font-black uppercase tracking-[0.3em] opacity-60">Cryptographic Quorum & Multi-Sig Verification</p>
+                      </div>
+                      <div className="flex gap-4">
+                         <div className="bg-indigo-600/10 border border-indigo-500/20 px-8 py-4 rounded-2xl text-center">
+                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Pending Consensys</div>
+                            <div className="text-2xl font-bold text-white">{pendingGov.length}</div>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 gap-6">
+                      {pendingGov.length === 0 ? (
+                        <div className="p-20 text-center rounded-[3rem] glass border-white/5 opacity-30 italic uppercase font-black tracking-widest">
+                           No pending approvals found for your authorized addresses
+                        </div>
+                      ) : (
+                        pendingGov.map(gov => (
+                          <div key={gov._id} className="p-10 rounded-[3rem] glass border-white/5 flex items-center justify-between group hover:border-indigo-500/30 transition-all">
+                             <div className="flex items-center gap-8">
+                                <div className="w-16 h-16 bg-indigo-600/20 rounded-3xl flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 21.355r-.015.015V21a11.952 11.952 0 00-8.618-3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                   </svg>
+                                </div>
+                                <div>
+                                   <div className="text-2xl font-black text-white tracking-tighter">{gov.ruleId.name}</div>
+                                   <div className="flex gap-4 mt-2">
+                                      <div className="text-[9px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/5 px-3 py-1 rounded-lg border border-indigo-500/10">Quorum: {gov.signatures.length}/{gov.ruleId.requiredApprovals}</div>
+                                      <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Rule_ID: {gov.ruleId._id.slice(-8)}</div>
+                                   </div>
+                                </div>
+                             </div>
+                             <button 
+                                onClick={async () => {
+                                   try {
+                                      const signature = await signActionRequest(wallet.address, `Approve execution of rule ${gov.ruleId._id}`);
+                                      const res = await fetch(`${API_BASE}/api/governance/approve`, {
+                                         method: 'POST',
+                                         headers: { 
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${token}`
+                                         },
+                                         body: JSON.stringify({ proofId: gov._id, signature })
+                                      });
+                                      if (res.ok) {
+                                         addNotification('Consensus signature recorded.', 'success');
+                                         setPendingGov(prev => prev.filter(p => p._id !== gov._id));
+                                      }
+                                   } catch (e) { addNotification('Signing failed', 'error'); }
+                                }}
+                                className="px-10 py-5 bg-white text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-xl"
+                             >
+                                Confirm_Quorum
+                             </button>
+                          </div>
+                        ))
+                      )}
+                   </div>
+                </motion.section>
+              )}
             </AnimatePresence>
           </div>
 
@@ -866,6 +998,63 @@ export default function Dashboard() {
                            className="h-full bg-blue-500"
                          />
                       </div>
+                   </div>
+                </div>
+
+                {/* Phase 3: Identity & Trust (DID) */}
+                <div className="p-10 rounded-[3rem] glass-blue border-blue-500/10 space-y-6">
+                   <div className="flex justify-between items-center">
+                      <div className="text-[9px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                         Identity_Trust
+                      </div>
+                      {user?.isDIDVerified ? (
+                         <span className="text-[7px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded font-black uppercase">DID_VERIFIED</span>
+                      ) : (
+                         <span className="text-[7px] px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-black uppercase">UNVERIFIED</span>
+                      )}
+                   </div>
+                   
+                   <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight leading-relaxed mb-6">
+                         Link your self-sovereign identity to enable enterprise-tier operations and trustless KYC.
+                      </p>
+                      
+                      {user?.isDIDVerified ? (
+                         <div className="p-4 bg-black/40 rounded-2xl border border-emerald-500/10">
+                            <div className="text-[8px] text-emerald-500 uppercase font-black mb-1">Decentralized ID</div>
+                            <div className="text-[10px] font-mono text-white truncate">{user.did}</div>
+                         </div>
+                      ) : (
+                         <button 
+                            onClick={async () => {
+                               setIsVerifyingDID(true);
+                               try {
+                                  const signature = await signActionRequest(wallet.address, "Verify DID Identity for Zypherion");
+                                  const res = await fetch(`${API_BASE}/api/auth/verify-did`, {
+                                     method: 'POST',
+                                     headers: { 
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                     },
+                                     body: JSON.stringify({ 
+                                        did: `did:zypher:${wallet.address.slice(0, 10)}`,
+                                        didDocument: { verificationMethod: 'Ed25519Signature2018', signature }
+                                     })
+                                  });
+                                  if (res.ok) {
+                                     addNotification('DID verified and linked.', 'success');
+                                     loadData();
+                                  }
+                               } catch (e) { addNotification('DID verification failed', 'error'); }
+                               setIsVerifyingDID(false);
+                            }}
+                            disabled={isVerifyingDID}
+                            className="w-full py-4 bg-blue-600 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:scale-105 transition-all"
+                         >
+                            {isVerifyingDID ? 'VERIFYING...' : 'Link_DID_Protocol'}
+                         </button>
+                      )}
                    </div>
                 </div>
              </div>

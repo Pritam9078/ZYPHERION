@@ -32,6 +32,9 @@ export interface LogicRule {
   dataSourcePath?: string;
   triggerEventSignature?: string;
   triggerContractAddress?: string;
+  isMultiSig?: boolean;
+  requiredApprovals?: number;
+  approvers?: string[];
   createdAt?: string;
 }
 
@@ -97,6 +100,9 @@ export const createRule = async (
     dataSourcePath?: string;
     triggerEventSignature?: string;
     triggerContractAddress?: string;
+    isMultiSig?: boolean;
+    requiredApprovals?: number;
+    approvers?: string[];
     signature: string;
     message: string;
     nonce: string;
