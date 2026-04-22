@@ -7,8 +7,10 @@ Zypherion is a production-grade, enterprise-ready protocol designed to define, v
 ---
 
 ## 🚀 Live Links
-- **Live Demo (Frontend):** `[INSERT_VERCEL_OR_NETLIFY_LINK_HERE]`
-- **Backend API Server:** `[INSERT_RENDER_OR_HEROKU_LINK_HERE]`
+- **Live Demo (Frontend):** 
+https://zypherion.vercel.app/
+- **Backend API Server:** 
+https://zypherion-backend.onrender.com/
 - **Demo Video (Full Walkthrough):** `[INSERT_YOUTUBE_OR_LOOM_LINK_HERE]`
 - **User Feedback Documentation:** `[INSERT_NOTION_OR_GOOGLE_DOC_LINK_HERE]`
 
