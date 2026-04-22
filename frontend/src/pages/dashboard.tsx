@@ -60,10 +60,16 @@ export default function Dashboard() {
     conditionType: 'Storage value',
     logic: '', 
     targetChain: 'Ethereum (Simulated)',
-    targetContract: '',
     targetPayload: '',
     useGasAbstraction: false,
-    autoExecute: false
+    autoExecute: false,
+    triggerType: 'state', // state, time, event
+    scheduledAt: '',
+    recurrenceInterval: 0,
+    dataSourceUrl: '',
+    dataSourcePath: '',
+    triggerEventSignature: '',
+    triggerContractAddress: ''
   });
 
   // Simulator State
@@ -475,6 +481,18 @@ export default function Dashboard() {
                           <h3 className="text-3xl font-black text-white tracking-tighter">Logic Architect_</h3>
                           <p className="text-blue-400/60 text-xs font-bold uppercase tracking-widest mt-1">Design trustless multi-chain predicates</p>
                         </div>
+                        <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5">
+                           {['state', 'time', 'event'].map((type) => (
+                             <button
+                               key={type}
+                               type="button"
+                               onClick={() => setFormState({...formState, triggerType: type})}
+                               className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formState.triggerType === type ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+                             >
+                               {type}_BASED
+                             </button>
+                           ))}
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -495,13 +513,77 @@ export default function Dashboard() {
                             onChange={e => setFormState({...formState, targetChain: e.target.value})}
                             className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-blue-500 outline-none"
                            >
-                             <option>Ethereum (L1_Safe)</option>
-                             <option>Base (Coinbase_L2)</option>
-                             <option>Arbitrum (One)</option>
-                             <option>Stellar (Mainnet)</option>
+                             <option value="Ethereum (Simulated)">Ethereum (Simulated)</option>
+                             <option value="Base (L2)">Base (L2)</option>
+                             <option value="Arbitrum (One)">Arbitrum (One)</option>
+                             <option value="Stellar (Mainnet)">Stellar (Mainnet)</option>
                            </select>
                         </div>
                       </div>
+
+                      {/* Phase 2: Dynamic Trigger Parameters */}
+                      <AnimatePresence mode="wait">
+                        {formState.triggerType === 'time' && (
+                          <motion.div 
+                            key="time"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+                          >
+                             <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase text-amber-500 tracking-widest px-2">Scheduled Execution (UTC)</label>
+                                <input 
+                                   type="datetime-local"
+                                   value={formState.scheduledAt}
+                                   onChange={e => setFormState({...formState, scheduledAt: e.target.value})}
+                                   className="w-full bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-white focus:border-amber-500 outline-none"
+                                />
+                             </div>
+                             <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase text-amber-500 tracking-widest px-2">Recurrence (Seconds)</label>
+                                <input 
+                                   type="number"
+                                   value={formState.recurrenceInterval}
+                                   onChange={e => setFormState({...formState, recurrenceInterval: parseInt(e.target.value)})}
+                                   placeholder="0 for one-time"
+                                   className="w-full bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-white focus:border-amber-500 outline-none"
+                                />
+                             </div>
+                          </motion.div>
+                        )}
+
+                        {formState.triggerType === 'event' && (
+                          <motion.div 
+                            key="event"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+                          >
+                             <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase text-emerald-500 tracking-widest px-2">Contract Address</label>
+                                <input 
+                                   type="text"
+                                   value={formState.triggerContractAddress}
+                                   onChange={e => setFormState({...formState, triggerContractAddress: e.target.value})}
+                                   placeholder="0x..."
+                                   className="w-full bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-white focus:border-emerald-500 outline-none"
+                                />
+                             </div>
+                             <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase text-emerald-500 tracking-widest px-2">Event Signature (Topic0)</label>
+                                <input 
+                                   type="text"
+                                   value={formState.triggerEventSignature}
+                                   onChange={e => setFormState({...formState, triggerEventSignature: e.target.value})}
+                                   placeholder="Transfer(address,address,uint256)"
+                                   className="w-full bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-white focus:border-emerald-500 outline-none"
+                                />
+                             </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
                       {/* Phase 1: Cross-Chain Details */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">

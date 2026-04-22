@@ -11,6 +11,8 @@ export const createRule = async (req: AuthRequest, res: Response) => {
   const { 
     name, description, conditions, condition, 
     targetChain, targetContract, targetPayload, useGasAbstraction, 
+    scheduledAt, recurrenceInterval, dataSourceUrl, dataSourcePath,
+    triggerEventSignature, triggerContractAddress,
     status, automationConfig, onChainId, onChainTxHash, 
     signature, message, nonce 
   } = req.body;
@@ -51,6 +53,12 @@ export const createRule = async (req: AuthRequest, res: Response) => {
       targetContract,
       targetPayload,
       useGasAbstraction: useGasAbstraction ?? false,
+      scheduledAt,
+      recurrenceInterval,
+      dataSourceUrl,
+      dataSourcePath,
+      triggerEventSignature,
+      triggerContractAddress,
       status: status ?? 'active',
       automationConfig,
       onChainId,
@@ -134,7 +142,13 @@ export const updateRule = async (req: AuthRequest, res: Response) => {
     }
 
     // Mandatory Action Signature Verification
-    const { name, description, conditions, condition, targetChain, targetContract, targetPayload, useGasAbstraction, status, signature, message, nonce } = req.body;
+    const { 
+      name, description, conditions, condition, targetChain, 
+      targetContract, targetPayload, useGasAbstraction, 
+      scheduledAt, recurrenceInterval, dataSourceUrl, dataSourcePath,
+      triggerEventSignature, triggerContractAddress,
+      status, signature, message, nonce 
+    } = req.body;
     if (!signature || !message || !nonce) {
       return res.status(400).json({ message: 'Cryptographic authorization required for this action.' });
     }
@@ -153,6 +167,12 @@ export const updateRule = async (req: AuthRequest, res: Response) => {
     rule.targetContract = targetContract ?? rule.targetContract;
     rule.targetPayload = targetPayload ?? rule.targetPayload;
     rule.useGasAbstraction = useGasAbstraction !== undefined ? useGasAbstraction : rule.useGasAbstraction;
+    rule.scheduledAt = scheduledAt ?? rule.scheduledAt;
+    rule.recurrenceInterval = recurrenceInterval ?? rule.recurrenceInterval;
+    rule.dataSourceUrl = dataSourceUrl ?? rule.dataSourceUrl;
+    rule.dataSourcePath = dataSourcePath ?? rule.dataSourcePath;
+    rule.triggerEventSignature = triggerEventSignature ?? rule.triggerEventSignature;
+    rule.triggerContractAddress = triggerContractAddress ?? rule.triggerContractAddress;
     rule.status = status ?? rule.status;
 
     const updatedRule = await rule.save();

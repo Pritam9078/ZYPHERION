@@ -26,6 +26,12 @@ export interface LogicRule {
   targetContract?: string;
   targetPayload?: string;
   useGasAbstraction?: boolean;
+  scheduledAt?: string;
+  recurrenceInterval?: number;
+  dataSourceUrl?: string;
+  dataSourcePath?: string;
+  triggerEventSignature?: string;
+  triggerContractAddress?: string;
   createdAt?: string;
 }
 
@@ -85,6 +91,12 @@ export const createRule = async (
     targetContract?: string;
     targetPayload?: string;
     useGasAbstraction?: boolean;
+    scheduledAt?: string;
+    recurrenceInterval?: number;
+    dataSourceUrl?: string;
+    dataSourcePath?: string;
+    triggerEventSignature?: string;
+    triggerContractAddress?: string;
     signature: string;
     message: string;
     nonce: string;

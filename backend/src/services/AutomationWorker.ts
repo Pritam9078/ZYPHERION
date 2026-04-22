@@ -79,6 +79,41 @@ export const initAutomationWorker = (io: any) => {
         activeConnections: io.engine.clientsCount,
         loadIndex: 'LOW'
       });
+      
+      // PHASE 2: Scheduled & Recurring Logic (Chronos Engine)
+      const now = new Date();
+      const scheduledRules = await LogicRule.find({
+        status: 'active',
+        scheduledAt: { $lte: now }
+      });
+
+      for (const rule of scheduledRules) {
+        console.log(`[Zypherion] Triggering Scheduled Rule: ${rule.name}`);
+        
+        // 1. Create a new operation (Proof) for this scheduled rule
+        const op = new Proof({
+          creator: rule.creator,
+          ruleId: rule._id,
+          status: 'pending',
+          metadata: { trigger: 'schedule', scheduledAt: rule.scheduledAt }
+        });
+        await op.save();
+
+        // 2. Handle Recurrence
+        if (rule.recurrenceInterval && rule.recurrenceInterval > 0) {
+          rule.scheduledAt = new Date(now.getTime() + rule.recurrenceInterval * 1000);
+        } else {
+          // One-time execution: clear schedule but keep rule active
+          rule.scheduledAt = undefined;
+        }
+        await rule.save();
+
+        io.to(rule.creator).emit('execution_update', {
+          type: 'INFO',
+          message: `Scheduled execution started for ${rule.name}`,
+          opId: op._id
+        });
+      }
 
     } catch (err) {
       console.error('[Zypherion] Automation Worker Error:', err);

@@ -20,6 +20,14 @@ export interface ILogicRule extends Document {
   targetPayload?: string;
   useGasAbstraction?: boolean;
 
+  // Phase 2: Intelligence & Automation
+  scheduledAt?: Date;
+  recurrenceInterval?: number; // seconds
+  dataSourceUrl?: string;
+  dataSourcePath?: string;
+  triggerEventSignature?: string;
+  triggerContractAddress?: string;
+
   onChainId?: number;
   onChainTxHash?: string;
   createdAt: Date;
@@ -44,6 +52,14 @@ const LogicRuleSchema: Schema = new Schema({
   targetContract: { type: String },
   targetPayload: { type: String },
   useGasAbstraction: { type: Boolean, default: false },
+
+  // Phase 2: Intelligence & Automation
+  scheduledAt: { type: Date },
+  recurrenceInterval: { type: Number },
+  dataSourceUrl: { type: String },
+  dataSourcePath: { type: String },
+  triggerEventSignature: { type: String },
+  triggerContractAddress: { type: String },
 
   onChainId: { type: Number },
   onChainTxHash: { type: String },
