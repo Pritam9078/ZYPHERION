@@ -90,6 +90,30 @@ export const initAutomationWorker = (io: any) => {
       for (const rule of scheduledRules) {
         console.log(`[Zypherion] Triggering Scheduled Rule: ${rule.name}`);
         
+        // PHASE 2: Verifiable External Data Fetching
+        let dataVerified = true;
+        if (rule.dataSourceUrl) {
+          try {
+            console.log(`[Zypherion] Fetching external data from: ${rule.dataSourceUrl}`);
+            const response = await fetch(rule.dataSourceUrl);
+            if (!response.ok) throw new Error(`HTTP_${response.status}`);
+            
+            const data = await response.json();
+            // Basic check: if data exists, it's verified for now (MVP)
+            // Future: Implement JSONPath verification via rule.dataSourcePath
+            console.log(`[Zypherion] External data verified for ${rule.name}`);
+          } catch (dataErr) {
+            console.error(`[Zypherion] Data fetch failed for ${rule.name}:`, dataErr);
+            dataVerified = false;
+            io.to(rule.creator).emit('execution_update', {
+              type: 'ERROR',
+              message: `Data Feed Failure: ${rule.name} skipped.`,
+            });
+          }
+        }
+
+        if (!dataVerified) continue;
+
         // 1. Create a new operation (Proof) for this scheduled rule
         const op = new Proof({
           creator: rule.creator,
