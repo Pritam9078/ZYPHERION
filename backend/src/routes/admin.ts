@@ -18,7 +18,11 @@ import {
 
 const router = Router();
 
-// Apply both protect and isAdmin to all routes in this file
+// @route   GET /api/admin/system/status
+// Expose telemetry status to ALL authenticated users (not just admins)
+router.get('/system/status', protect, getSystemStatus);
+
+// Apply protect and isAdmin to all OTHER routes in this file
 router.use(protect);
 router.use(isAdmin);
 
@@ -55,8 +59,6 @@ router.put('/rules/:id/status', toggleRuleStatus);
 // @route   DELETE /api/admin/rules/:id
 router.delete('/rules/:id', deleteRule);
 
-// @route   GET /api/admin/system/status
-router.get('/system/status', getSystemStatus);
 
 // @route   POST /api/admin/system/toggle
 router.post('/system/toggle', toggleProtocolHalt);

@@ -135,10 +135,12 @@ export default function Dashboard() {
   }, [router, wallet.address]);
 
   useEffect(() => {
-    if (token) loadData();
+    if (token && wallet.status === 'connected') {
+      loadData();
+    }
 
     const loadSettings = async () => {
-      if (!token) return;
+      if (!token || wallet.status !== 'connected') return;
       try {
         const settings = await fetchSystemSettings(token);
         setSystemPaused(settings.protocolHalt);
@@ -150,7 +152,7 @@ export default function Dashboard() {
       }
     };
     loadSettings();
-  }, [token]);
+  }, [token, wallet.status]);
 
   const loadData = async () => {
     if (!token) return;
