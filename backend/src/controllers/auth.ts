@@ -65,7 +65,6 @@ export const login = async (req: Request, res: Response) => {
     // 3. Persist User in DB & Determine role
     let user = await User.findOne({ address });
     
-    const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
     const isFirstAdmin = adminAddress && address === adminAddress;
     const role = isFirstAdmin ? 'admin' : (user?.role || 'user');
 
