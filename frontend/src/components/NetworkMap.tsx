@@ -94,8 +94,8 @@ const NetworkMap = () => {
          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">Stellar_Finality_Ledger</span>
          
          {/* Live Verification Pings */}
-         <div className="absolute bottom-4 right-8">
-            <div className="flex items-center gap-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10">
+         <div className="absolute top-8 right-8">
+            <div className="flex items-center gap-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10 backdrop-blur-md">
                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
                SECURED_ON_CHAIN
             </div>
