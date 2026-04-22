@@ -71,11 +71,17 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const connect = async (accountType?: string) => {
     setWallet(prev => ({ ...prev, status: 'connecting' }));
     try {
-      const connected = await isConnected();
-      const isActuallyConnected = typeof connected === 'boolean' ? connected : (connected as any)?.isConnected;
+      // Robust detection with retry loop
+      let isActuallyConnected = false;
+      for (let i = 0; i < 3; i++) {
+        const connected = await isConnected();
+        isActuallyConnected = typeof connected === 'boolean' ? connected : (connected as any)?.isConnected;
+        if (isActuallyConnected) break;
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for injection
+      }
 
       if (!isActuallyConnected) {
-        alert('Freighter wallet not detected. Please install it.');
+        alert('Freighter wallet not detected. Please install the extension and refresh the page.');
         setWallet(prev => ({ ...prev, status: 'error' }));
         return;
       }
