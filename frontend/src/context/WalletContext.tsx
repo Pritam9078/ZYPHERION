@@ -11,6 +11,8 @@ interface WalletState {
   tier?: 'Free' | 'Basic' | 'Pro' | 'Enterprise';
   kycStatus?: 'unverified' | 'pending' | 'verified';
   approved?: boolean;
+  creditsBalance?: number;
+  gasBalance?: number;
 }
 
 interface WalletContextType {
@@ -50,6 +52,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
               tier: user.tier,
               kycStatus: user.kycStatus,
               approved: user.approved,
+              creditsBalance: user.creditsBalance,
+              gasBalance: user.gasBalance,
             });
           } else {
             localStorage.removeItem('zypher_token');
@@ -105,6 +109,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           tier: data.user.tier,
           kycStatus: data.user.kycStatus,
           approved: data.user.approved,
+          creditsBalance: data.user.creditsBalance,
+          gasBalance: data.user.gasBalance,
         });
         
         // Handle Approval routing

@@ -229,7 +229,6 @@ export const approveDeposit = async (
     headers: getAuthHeaders(token),
     body: JSON.stringify({ ...auth }),
   });
-
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Failed to approve deposit' }));
     throw new Error(error.message || 'Failed to approve deposit');
@@ -237,3 +236,13 @@ export const approveDeposit = async (
 
   return response.json();
 };
+
+export const fetchUserProfile = async (token: string): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/auth/me`, {
+    headers: getAuthHeaders(token),
+  });
+  if (!response.ok) throw new Error('Failed to fetch user profile');
+  const data = await response.json();
+  return data.user;
+};
+

@@ -16,6 +16,7 @@ import {
   requestProof, 
   submitProof,
   fetchSystemSettings,
+  fetchUserProfile,
   LogicRule,
   Operation,
   API_BASE
@@ -50,6 +51,7 @@ export default function Dashboard() {
   const [liveLogs, setLiveLogs] = useState<{t: string, m: string, c: string}[]>([]);
   const [systemStats, setSystemStats] = useState({ connections: 0, load: 'LOW' });
   const [systemPaused, setSystemPaused] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   // Designer State
   const [formState, setFormState] = useState({ 
@@ -141,12 +143,14 @@ export default function Dashboard() {
     if (!token) return;
     setLoading(true);
     try {
-      const [rulesData, opsData] = await Promise.all([
+      const [rulesData, opsData, userData] = await Promise.all([
         fetchRules(token),
-        fetchOperations(token)
+        fetchOperations(token),
+        fetchUserProfile(token)
       ]);
       setRules(rulesData);
       setOperations(opsData);
+      setUser(userData);
     } catch (err: any) {
       addNotification('Failed to sync protocol data.', 'error');
     } finally {
