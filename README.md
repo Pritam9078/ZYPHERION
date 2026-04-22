@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="frontend/public/logo.png" width="200" alt="Zypherion Logo">
+</p>
+
 # Zypherion Protocol 💎🌐
 
 **Sovereign Infrastructure for Trustless Cross-Chain Automation**
