@@ -24,7 +24,10 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
   const jwtSecret = process.env.JWT_SECRET || 'zypherion_fallback_secret_67890';
 
   jwt.verify(token, jwtSecret, (err: any, user: any) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
+    if (err) {
+      console.log(`[Auth Middleware] JWT Verify Failed: ${err.message} for token starting with ${token.substring(0, 15)}...`);
+      return res.status(403).json({ message: 'Invalid token', error: err.message });
+    }
     req.user = user;
     next();
   });
