@@ -8,13 +8,13 @@ router.post('/login', login);
 router.get('/me', authenticateToken, getMe);
 
 // SDK-First v1 Auth Routes
-router.get('/request-message', (req, res) => {
+router.get('/request-message', (req: any, res: any) => {
   const { wallet } = req.query;
   const nonce = Math.random().toString(36).substring(2, 15);
   res.json({ message: `ZYPHERION_AUTH_${nonce}`, nonce, expiresIn: 300 });
 });
 
-router.post('/verify-signature', (req, res) => {
+router.post('/verify-signature', (req: any, res: any) => {
   const { wallet, signature, message, nonce } = req.body;
   // Stub for signature verification
   const token = 'mock-jwt-token-for-sdk';

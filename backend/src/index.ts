@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
 });
 
 // Middleware to inject IO into routes
-app.use((req, res, next) => {
+app.use((req: any, res: any, next: any) => {
   (req as any).io = io;
   next();
 });
@@ -83,7 +83,7 @@ app.use('/v1/rules', logicRuleRoutes);
 app.use('/v1/admin', adminRoutes);
 app.use('/v1/webhooks', webhookRoutes);
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: any, res: any) => {
   res.json({ status: 'Zypherion Backend Online', realtime: 'Active' });
 });
 
