@@ -1,12 +1,16 @@
 <p align="center">
-  <img src="frontend/public/logo.png" width="200" alt="Zypherion Logo">
+  <img src="frontend/public/logo.png" width="220" alt="Zypherion Logo">
 </p>
 
-# Zypherion Protocol 💎🌐
+<h1 align="center">Zypherion Protocol 💎🌐</h1>
 
-**Sovereign Infrastructure for Trustless Cross-Chain Automation**
+<p align="center">
+  <strong>Sovereign Infrastructure for Trustless Cross-Chain Automation</strong>
+</p>
 
-Zypherion is a production-grade, enterprise-ready protocol designed to define, verify, and automate cross-chain logic with cryptographic certainty. By removing centralized middlemen from state attestation, Zypherion provides a zero-trust orchestration layer secured by the Stellar network and autonomous SNARK batching.
+<p align="center">
+  Zypherion is a production-grade, enterprise-ready protocol designed to define, verify, and automate cross-chain logic with cryptographic certainty. By removing centralized middlemen from state attestation, Zypherion provides a zero-trust orchestration layer secured by the Stellar network and autonomous SNARK batching.
+</p>
 
 ---
 
