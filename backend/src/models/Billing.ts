@@ -6,7 +6,7 @@ export interface IBilling extends Document {
   currency: string;
   txHash: string;
   status: 'pending' | 'confirmed' | 'failed' | 'refunded';
-  type: 'subscription' | 'deposit' | 'escrow_stake';
+  type: 'subscription' | 'deposit' | 'escrow_stake' | 'gas_deposit';
   tierUpgradeTo?: 'Basic' | 'Pro' | 'Enterprise';
   createdAt: Date;
 }
@@ -17,7 +17,7 @@ const BillingSchema: Schema = new Schema({
   currency: { type: String, default: 'USDC_TEST' },
   txHash: { type: String, required: true, unique: true },
   status: { type: String, enum: ['pending', 'confirmed', 'failed', 'refunded'], default: 'pending' },
-  type: { type: String, enum: ['subscription', 'deposit', 'escrow_stake'], required: true },
+  type: { type: String, enum: ['subscription', 'deposit', 'escrow_stake', 'gas_deposit'], required: true },
   tierUpgradeTo: { type: String, enum: ['Basic', 'Pro', 'Enterprise'] },
   createdAt: { type: Date, default: Date.now },
 });

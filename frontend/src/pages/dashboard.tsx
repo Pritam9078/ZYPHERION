@@ -58,6 +58,9 @@ export default function Dashboard() {
     conditionType: 'Storage value',
     logic: '', 
     targetChain: 'Ethereum (Simulated)',
+    targetContract: '',
+    targetPayload: '',
+    useGasAbstraction: false,
     autoExecute: false
   });
 
@@ -194,9 +197,12 @@ export default function Dashboard() {
         description: formState.description,
         conditions: { 
           condition: formState.logic, 
-          targetChain: formState.targetChain,
           type: formState.conditionType 
         },
+        targetChain: formState.targetChain,
+        targetContract: formState.targetContract,
+        targetPayload: formState.targetPayload,
+        useGasAbstraction: formState.useGasAbstraction,
         automationConfig: {
           autoExecute: formState.autoExecute,
           retryDelay: 60,
@@ -205,7 +211,12 @@ export default function Dashboard() {
         status: 'active',
         ...auth
       });
-      setFormState({ name: '', description: '', conditionType: 'Storage value', logic: '', targetChain: 'Ethereum (Simulated)', autoExecute: false });
+      setFormState({ 
+        name: '', description: '', conditionType: 'Storage value', 
+        logic: '', targetChain: 'Ethereum (Simulated)', 
+        targetContract: '', targetPayload: '', useGasAbstraction: false,
+        autoExecute: false 
+      });
       setActiveTab('overview');
       addNotification('Infrastructure Rule deployed successfully.', 'success');
       addLiveLog(`DEPLOY: New rule ${formState.name} committed to Stellar.`, 'text-emerald-400');
@@ -251,6 +262,7 @@ export default function Dashboard() {
 
   const stats = [
     { label: 'Active Rules', value: rules.length, color: '#3b82f6' },
+    { label: 'Gas Balance', value: `${user?.gasBalance || 0} credits`, color: '#f59e0b' },
     { label: 'Total Attestations', value: operations.filter(o => o.status === 'verified').length, color: '#10b981' },
     { label: 'Network Load', value: '14.2%', color: '#8b5cf6' },
   ];
@@ -472,8 +484,52 @@ export default function Dashboard() {
                              <option>Ethereum (L1_Safe)</option>
                              <option>Base (Coinbase_L2)</option>
                              <option>Arbitrum (One)</option>
+                             <option>Stellar (Mainnet)</option>
                            </select>
                         </div>
+                      </div>
+
+                      {/* Phase 1: Cross-Chain Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-400">Target Contract Address</label>
+                           <input 
+                              type="text"
+                              value={formState.targetContract}
+                              onChange={e => setFormState({...formState, targetContract: e.target.value})}
+                              placeholder="0x71C... or Stellar_Address"
+                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                           />
+                        </div>
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-400">Execution Payload (Hex)</label>
+                           <input 
+                              type="text"
+                              value={formState.targetPayload}
+                              onChange={e => setFormState({...formState, targetPayload: e.target.value})}
+                              placeholder="0xa9059cbb..."
+                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                           />
+                        </div>
+                      </div>
+
+                      <div className="p-8 bg-indigo-500/5 rounded-3xl border border-indigo-500/20 flex items-center justify-between mb-12">
+                         <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400">
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            </div>
+                            <div>
+                               <div className="text-sm font-bold text-white uppercase tracking-tighter">Gas Abstraction Service</div>
+                               <div className="text-[9px] text-slate-500 font-bold uppercase mt-1">Pay destination gas with your ZYP credits</div>
+                            </div>
+                         </div>
+                         <button 
+                          type="button"
+                          onClick={() => setFormState({...formState, useGasAbstraction: !formState.useGasAbstraction})}
+                          className={`w-12 h-6 rounded-full transition-all relative ${formState.useGasAbstraction ? 'bg-indigo-600' : 'bg-slate-700'}`}
+                         >
+                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formState.useGasAbstraction ? 'left-7' : 'left-1'}`} />
+                         </button>
                       </div>
 
                       <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">

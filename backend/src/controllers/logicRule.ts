@@ -8,7 +8,12 @@ import { verifyActionIntent } from '../utils/signature';
 // @route   POST /api/rules
 // @access  Private
 export const createRule = async (req: AuthRequest, res: Response) => {
-  const { name, description, conditions, condition, targetChain, status, automationConfig, onChainId, onChainTxHash, signature, message, nonce } = req.body;
+  const { 
+    name, description, conditions, condition, 
+    targetChain, targetContract, targetPayload, useGasAbstraction, 
+    status, automationConfig, onChainId, onChainTxHash, 
+    signature, message, nonce 
+  } = req.body;
 
   if (!req.user?.address) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -42,7 +47,12 @@ export const createRule = async (req: AuthRequest, res: Response) => {
       name,
       description,
       conditions: normalizedConditions,
+      targetChain,
+      targetContract,
+      targetPayload,
+      useGasAbstraction: useGasAbstraction ?? false,
       status: status ?? 'active',
+      automationConfig,
       onChainId,
       onChainTxHash
     });
@@ -124,7 +134,7 @@ export const updateRule = async (req: AuthRequest, res: Response) => {
     }
 
     // Mandatory Action Signature Verification
-    const { signature, message, nonce } = req.body;
+    const { name, description, conditions, condition, targetChain, targetContract, targetPayload, useGasAbstraction, status, signature, message, nonce } = req.body;
     if (!signature || !message || !nonce) {
       return res.status(400).json({ message: 'Cryptographic authorization required for this action.' });
     }
@@ -139,6 +149,10 @@ export const updateRule = async (req: AuthRequest, res: Response) => {
     rule.name = name ?? rule.name;
     rule.description = description ?? rule.description;
     rule.conditions = normalizedConditions ?? rule.conditions;
+    rule.targetChain = targetChain ?? rule.targetChain;
+    rule.targetContract = targetContract ?? rule.targetContract;
+    rule.targetPayload = targetPayload ?? rule.targetPayload;
+    rule.useGasAbstraction = useGasAbstraction !== undefined ? useGasAbstraction : rule.useGasAbstraction;
     rule.status = status ?? rule.status;
 
     const updatedRule = await rule.save();

@@ -14,6 +14,7 @@ export interface IUser extends Document {
   // Quotas & Usage
   proofsUsedThisMonth: number;
   creditsBalance: number;
+  gasBalance: number; // For Gas Abstraction Service
 
   createdAt: Date;
 }
@@ -31,6 +32,7 @@ const UserSchema: Schema = new Schema({
   
   proofsUsedThisMonth: { type: Number, default: 0 },
   creditsBalance: { type: Number, default: 0 },
+  gasBalance: { type: Number, default: 0 },
 
   createdAt: { type: Date, default: Date.now },
 });

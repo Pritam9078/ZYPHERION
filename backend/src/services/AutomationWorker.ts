@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import Proof from '../models/Proof';
 import LogicRule from '../models/LogicRule';
 import SystemSetting from '../models/SystemSetting';
+import User from '../models/User';
 
 export const initAutomationWorker = (io: any) => {
   console.log('[Zypherion] Initializing Automation Worker...');
@@ -28,16 +29,47 @@ export const initAutomationWorker = (io: any) => {
         if (rule && rule.automationConfig?.autoExecute) {
           console.log(`[Zypherion] Auto-executing Proof: ${op._id}`);
           
+          // PHASE 1: Gas Abstraction Check
+          if (rule.useGasAbstraction) {
+            const user = await User.findOne({ address: rule.creator });
+            const estimatedGas = 2.5; // Mock estimate
+            
+            if (!user || user.gasBalance < estimatedGas) {
+              console.log(`[Zypherion] Insufficient gas balance for ${rule.creator}`);
+              io.to(rule.creator).emit('execution_update', {
+                type: 'ERROR',
+                message: `Insufficient Gas Credits for ${rule.name}`,
+                opId: op._id
+              });
+              continue;
+            }
+            
+            user.gasBalance -= estimatedGas;
+            await user.save();
+            console.log(`[Zypherion] Deducted ${estimatedGas} gas credits from ${rule.creator}`);
+          }
+
           // Simulate verification delay
           op.status = 'verified';
           await op.save();
           
+          const isCrossChain = !!rule.targetChain;
+          const msg = isCrossChain 
+            ? `Interchain execution triggered on ${rule.targetChain} for ${rule.name}`
+            : `Auto-execution successful for ${rule.name}`;
+
           // Emit real-time update to user
           io.to(rule.creator).emit('execution_update', {
             type: 'SUCCESS',
-            message: `Auto-execution successful for ${rule.name}`,
-            opId: op._id
+            message: msg,
+            opId: op._id,
+            isCrossChain,
+            targetChain: rule.targetChain
           });
+
+          if (isCrossChain) {
+            console.log(`[Zypherion] CROSS-CHAIN DISPATCH: Sending payload to ${rule.targetChain}`);
+          }
         }
       }
 

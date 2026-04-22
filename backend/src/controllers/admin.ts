@@ -178,7 +178,9 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
 // @access  Private/Admin
 export const getAllDeposits = async (req: AuthRequest, res: Response) => {
   try {
-    const deposits = await Billing.find({ type: 'deposit' }).sort({ createdAt: -1 });
+    const deposits = await Billing.find({ 
+      type: { $in: ['deposit', 'gas_deposit', 'subscription'] } 
+    }).sort({ createdAt: -1 });
     res.json(deposits);
   } catch (error) {
     res.status(500).json({ message: 'Server error fetching deposits' });
@@ -216,7 +218,18 @@ export const approveDeposit = async (req: AuthRequest, res: Response) => {
     // Update user credits balance based on the deposit amount (1 XLM = 1 Credit for this mock)
     const user = await User.findOne({ address: deposit.userAddress });
     if (user) {
-      user.creditsBalance = (user.creditsBalance || 0) + deposit.depositAmount;
+      if (deposit.type === 'gas_deposit') {
+        user.gasBalance = (user.gasBalance || 0) + deposit.depositAmount;
+      } else {
+        user.creditsBalance = (user.creditsBalance || 0) + deposit.depositAmount;
+      }
+      
+      // Auto-upgrade tier if it was a subscription deposit
+      if (deposit.type === 'subscription' && deposit.tierUpgradeTo) {
+        user.tier = deposit.tierUpgradeTo;
+        user.approved = true;
+      }
+
       await user.save();
     }
 

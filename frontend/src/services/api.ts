@@ -22,6 +22,10 @@ export interface LogicRule {
     maxRetries?: number;
   };
   version?: number;
+  targetChain?: string;
+  targetContract?: string;
+  targetPayload?: string;
+  useGasAbstraction?: boolean;
   createdAt?: string;
 }
 
@@ -77,6 +81,10 @@ export const createRule = async (
     conditions: Record<string, unknown>;
     status?: 'pending' | 'active' | 'disabled';
     automationConfig?: any;
+    targetChain?: string;
+    targetContract?: string;
+    targetPayload?: string;
+    useGasAbstraction?: boolean;
     signature: string;
     message: string;
     nonce: string;
