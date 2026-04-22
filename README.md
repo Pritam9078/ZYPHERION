@@ -1,158 +1,182 @@
-<p align="center">
-  <img src="frontend/public/logo.png" width="220" alt="Zypherion Logo">
-</p>
+<div align="center">
 
-<h1 align="center">Zypherion Protocol 💎🌐</h1>
+<img src="frontend/public/logo.png" width="180" alt="Zypherion Logo"/>
 
-<p align="center">
-  <strong>Sovereign Infrastructure for Trustless Cross-Chain Automation</strong>
-</p>
+# ⬡ ZYPHERION PROTOCOL
 
-<p align="center">
-  Zypherion is a production-grade, enterprise-ready protocol designed to define, verify, and automate cross-chain logic with cryptographic certainty. By removing centralized middlemen from state attestation, Zypherion provides a zero-trust orchestration layer secured by the Stellar network and autonomous SNARK batching.
-</p>
+### *Sovereign Infrastructure for Trustless Cross-Chain Automation*
+
+> Cryptographic certainty. Zero trust. Infinite interoperability.
+
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://zypherion.vercel.app/)
+[![Backend API](https://img.shields.io/badge/⚡_Backend_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://zypherion-backend.onrender.com/)
+[![Demo Video](https://img.shields.io/badge/🎬_Full_Walkthrough-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive_link)
+[![GitHub](https://img.shields.io/badge/📦_Source_Code-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Pritam9078/ZYPHERION)
+
+</div>
 
 ---
 
 ## 🚀 Live Links
-- **Live Demo (Frontend):** 
-https://zypherion.vercel.app/
-- **Backend API Server:** 
-https://zypherion-backend.onrender.com/
-- **Demo Video (Full Walkthrough):** 
-https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive_link
-- **User Feedback Documentation:** `[INSERT_NOTION_OR_GOOGLE_DOC_LINK_HERE]`
+
+- **🌐 Live Demo (Frontend):** [https://zypherion.vercel.app/](https://zypherion.vercel.app/)
+- **⚡ Backend API Server:** [https://zypherion-backend.onrender.com/](https://zypherion-backend.onrender.com/)
+- **🎬 Demo Video (Full Walkthrough):** [Watch on Google Drive](https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive_link)
+- **📋 User Feedback Documentation:** [View on Google Sheets](https://docs.google.com/spreadsheets/d/1VcUZPcTXMmdjDYeT-9VbAfSA58MvmCEYN6NGFkEs5-E/edit?resourcekey=&gid=1148580754#gid=1148580754)
 
 ---
 
-## 🖼️ Visual Showcase
+## ✦ What is Zypherion?
 
-### 1. The Sovereign Command Center
-*The high-fidelity landing portal where users initialize their cryptographic identity and enter the Zypherion ecosystem.*
+**Zypherion** is a production-grade, enterprise-ready protocol designed to **define, verify, and automate cross-chain logic with cryptographic certainty.** By eliminating centralized middlemen from state attestation, Zypherion delivers a zero-trust orchestration layer secured by the Stellar network and autonomous SNARK batching.
 
-### 2. Protocol Hub & Global Telemetry
-*A real-time overview of the interchain network map, showing active connections across Ethereum, Base, and Arbitrum, secured by Stellar finality.*
-
-### 3. Logic Architect (The Builder)
-*The core engine where users define complex multi-chain predicates, configure enterprise governance quorums, and enable automated gas abstraction.*
-
-### 4. Developer Portal
-*A dedicated space for protocol integrators to manage API credentials, configure webhooks, and access the Zypherion TypeScript SDK.*
-
-### 5. Interactive API Documentation
-*Complete OpenAPI/Swagger specifications for the Zypherion Protocol, enabling seamless programmatic interaction with the automation layer.*
+No intermediaries. No assumptions. Just math.
 
 ---
 
-## 🖼️ Platform Walkthrough
+## ✦ Core Features
 
-### 1. Unified Entry Portal (Landing Page)
-The Zypherion Landing Page serves as the gateway to sovereign automation. It features a high-fidelity glassmorphism interface that introduces users to the core protocol value propositions: trustless execution, gas abstraction, and multi-chain interoperability.
-<p align="center">
-  <img src="frontend/public/screenshots/landing.png" width="800" alt="Zypherion Landing Page">
-</p>
-
-### 2. Protocol Command Center (Dashboard)
-The main Dashboard provides a real-time telemetry stream of the protocol's health. It features a 3D **Network Map** visualizing active interchain bridges and system load, giving users a high-level overview of their deployed infrastructure at a glance.
-<p align="center">
-  <img src="frontend/public/screenshots/dashboard.png" width="800" alt="Protocol Dashboard">
-</p>
-
-### 3. Logic Architect (The Builder)
-The Builder is where users define their trustless predicates. It supports **State-Based**, **Time-Based**, and **Event-Based** triggers. Users can use "Quick Templates" to auto-fill common logic or write custom JS_Core predicates to be verified by the Zypher SNARK engine.
-<p align="center">
-  <img src="frontend/public/screenshots/builder.png" width="800" alt="Logic Architect Builder">
-</p>
-
-### 4. Enterprise Governance & Admin
-The Admin panel is the decentralized nerve center for protocol overseers. It manages **Cryptographic Quorums**, pending governance approvals, and verifiable node operator status, ensuring every global protocol change is backed by authorized consensus.
-<p align="center">
-  <img src="frontend/public/screenshots/admin.png" width="800" alt="Governance & Admin Panel">
-</p>
-
-### 5. Billing & Gas Abstraction
-Zypherion simplifies cross-chain UX by abstracting gas. Users manage their **ZYP Credits** and **Gas Reserves** through a sleek billing interface, allowing them to deposit Stellar assets and execute logic across any supported chain without holding native gas tokens.
-<p align="center">
-  <img src="frontend/public/screenshots/billing.png" width="800" alt="Billing & Credits UI">
-</p>
+| Feature | Description |
+|---|---|
+| 🔋 **Gas Abstraction Service** | Automated balance deduction and simulated escrow — execute logic without juggling gas tokens |
+| ♾️ **Recursive Proof Batching** | Aggregation engine bundles individual verified proofs into `BatchProof` documents — **10× cheaper** on-chain verification |
+| 🏛️ **Enterprise Multi-Sig Governance** | High-value logic rules require cryptographic quorum (e.g. 2-of-3 DAO signers) before execution |
+| 🪪 **Decentralized Identity (DID)** | Trustless KYC via self-sovereign `did:zypher` identifiers for enterprise compliance |
+| ⏱️ **Chronos Engine** | Autonomous scheduled & event-based triggers via verifiable external oracle data feeds |
 
 ---
 
-## 🔑 Key Features
-1. **Gas Abstraction Service:** Automated balance deduction and simulated escrow, allowing users to execute logic without managing multiple gas tokens.
-2. **Recursive Proof Batching:** An automated aggregation engine that bundles individual verified proofs into high-efficiency `BatchProof` documents, reducing on-chain verification costs by 10x.
-3. **Enterprise Governance (Multi-Sig):** High-value logic rules require a cryptographic quorum (e.g., 2-of-3 signatures) from authorized DAO signers before execution.
-4. **Decentralized Identity (DID):** Trustless KYC and identity linking via self-sovereign `did:zypher` identifiers to satisfy enterprise compliance.
-5. **Scheduled & Event-Based Triggers:** Autonomous execution polling (Chronos engine) and verifiable external data feeds (Oracles).
+## ✦ Technology Stack
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      ZYPHERION STACK                        │
+├─────────────────┬───────────────────────────────────────────┤
+│  Frontend       │  Next.js (TypeScript) · TailwindCSS       │
+│                 │  Framer Motion · Socket.io-client          │
+├─────────────────┼───────────────────────────────────────────┤
+│  Backend        │  Node.js · Express · MongoDB (Mongoose)   │
+│                 │  Socket.io (real-time event bus)           │
+├─────────────────┼───────────────────────────────────────────┤
+│  Blockchain     │  Stellar Testnet · Freighter Wallet       │
+│                 │  Simulated EVM Execution Layer             │
+├─────────────────┼───────────────────────────────────────────┤
+│  Cryptography   │  Ed25519 Signatures                        │
+│                 │  Recursive SNARK Simulation Logic          │
+└─────────────────┴───────────────────────────────────────────┘
+```
 
 ---
 
-## 🛠 Technology Stack
-- **Frontend:** Next.js (TypeScript), TailwindCSS, Framer Motion, Socket.io-client.
-- **Backend:** Node.js, Express, MongoDB (Mongoose), Socket.io.
-- **Blockchain Integration:** Stellar Testnet (Freighter Wallet integration), Simulated EVM execution.
-- **Cryptography:** Ed25519 Signatures, Recursive SNARK simulation logic.
+## ✦ UI Preview
+
+<div align="center">
+
+> A glimpse of the Zypherion dashboard — built for power users who demand precision.
+
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/f595fb8b-9832-4c25-8762-af892053de7a" width="400" alt="Dashboard Overview"/></td>
+    <td><img src="https://github.com/user-attachments/assets/c3479d91-54ec-43ea-b738-19f1f7e0e68f" width="400" alt="Protocol Interface"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/d20e8fce-f22d-40de-a959-85f34e418a11" width="400" alt="Proof Batching View"/></td>
+    <td><img src="https://github.com/user-attachments/assets/a4996092-eb42-48a7-931d-2d8785970304" width="400" alt="Governance Panel"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/3450215c-fcd3-4ad8-a658-701ec7b232c1" width="400" alt="DID Identity"/></td>
+    <td><img src="https://github.com/user-attachments/assets/b7b2ab73-3b45-44c4-ac25-392d04276e82" width="400" alt="Oracle Feeds"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/3166d9db-fccf-405c-beec-73381d17084e" width="400" alt="Chronos Engine"/></td>
+    <td><img src="https://github.com/user-attachments/assets/340e8191-27f4-4f4a-94dd-223a928a846e" width="400" alt="Analytics"/></td>
+  </tr>
+</table>
+
+<img src="https://github.com/user-attachments/assets/196b7d45-59e3-46e8-baf1-db6ac562384f" width="280" alt="Mobile View"/>
+
+</div>
 
 ---
 
-## 👥 Verifiable User Addresses (Stellar Testnet)
-As part of our MVP testing, the following wallet addresses have interacted with the Zypherion Protocol (can be verified on Stellar Explorer):
-1. GB6U7APEDEHKWVXDTVO4UE5E3UDSMEOKB3DCLJ4PMAY3ABSOFK7PBUD7
-2. GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK
-3. GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI
-4. GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC
-5. GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV
+## ✦ Verified Testnet Addresses
+
+The following Stellar Testnet wallets have verifiably interacted with the Zypherion Protocol. Inspect any on [Stellar Expert](https://stellar.expert/explorer/testnet).
+
+```
+GB6U7APEDEHKWVXDTVO4UE5E3UDSMEOKB3DCLJ4PMAY3ABSOFK7PBUD7
+GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK
+GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI
+GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC
+GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV
+```
 
 ---
 
-## ⚙️ Local Development Setup
+## ✦ Local Development
 
 ### Prerequisites
-- Node.js (v18+)
-- MongoDB (running locally or MongoDB Atlas)
-- Freighter Wallet Extension (for browser)
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Pritam9078/ZYPHERION.git
-   cd ZYPHERION
-   ```
+- **Node.js** v18+
+- **MongoDB** (local or Atlas)
+- **Freighter Wallet** browser extension
 
-2. Install dependencies for both Backend and Frontend:
-   ```bash
-   cd backend && npm install
-   cd ../frontend && npm install
-   ```
+### Quickstart
 
-3. Configure Environment Variables:
-   Create a `.env` file in the `backend/` directory:
-   ```env
-   PORT=5001
-   MONGO_URI=mongodb://localhost:27017/zypherion
-   JWT_SECRET=your_super_secret_jwt_key
-   STELLAR_NETWORK=TESTNET
-   ADMIN_WALLET_ADDRESS=your_stellar_public_key
-   ```
-   Create a `.env.local` file in the `frontend/` directory:
-   ```env
-   NEXT_PUBLIC_API_BASE=http://localhost:5001
-   ```
+```bash
+# 1. Clone the repo
+git clone https://github.com/Pritam9078/ZYPHERION.git
+cd ZYPHERION
 
-4. Start the Application:
-   ```bash
-   # Terminal 1 (Backend)
-   cd backend && npm run dev
-   
-   # Terminal 2 (Frontend)
-   cd frontend && npm run dev
-   ```
+# 2. Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+### Environment Variables
+
+**`backend/.env`**
+```env
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/zypherion
+JWT_SECRET=your_super_secret_jwt_key
+STELLAR_NETWORK=TESTNET
+ADMIN_WALLET_ADDRESS=your_stellar_public_key
+```
+
+**`frontend/.env.local`**
+```env
+NEXT_PUBLIC_API_BASE=http://localhost:5001
+```
+
+### Run
+
+```bash
+# Terminal 1 — Backend
+cd backend && npm run dev
+
+# Terminal 2 — Frontend
+cd frontend && npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser. Connect Freighter and start orchestrating.
 
 ---
 
-## 📄 Documentation
-- **[Architecture Document](./ARCHITECTURE.md):** Detailed breakdown of the system design, consensus models, and database schema.
+## ✦ Documentation
+
+| Document | Description |
+|---|---|
+| 📐 [`ARCHITECTURE.md`](./ARCHITECTURE.md) | System design, consensus models, and full database schema |
 
 ---
 
-*Built with ❤️ for a decentralized future.*
+## ✦ License & Credits
+
+<div align="center">
+
+Built with ❤️ and cryptographic conviction for a **decentralized future.**
+
+*Zypherion Protocol — Where trust is a proof, not a promise.*
+
+</div>
