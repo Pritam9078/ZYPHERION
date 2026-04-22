@@ -348,21 +348,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Global Infrastructure Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
-          {[
-            { label: 'Network Wallets', value: stats?.users || 0, color: '#3b82f6' },
-            { label: 'Global Registries', value: stats?.rules || 0, color: '#8b5cf6' },
-            { label: 'Active Verifications', value: stats?.proofs || 0, color: '#ec4899' },
-            { label: 'Protocol Finality', value: stats?.successRate || '0%', color: '#10b981' },
-          ].map((stat, i) => (
-            <div key={i} className="p-10 rounded-[2.5rem] glass border-white/[0.05] relative overflow-hidden group">
-               <h3 className="text-[10px] font-black tracking-[0.2em] text-slate-500 mb-4 uppercase">{stat.label}</h3>
-               <div className="text-4xl font-bold text-white tracking-tighter mb-6 underline decoration-white/10 underline-offset-8">{stat.value}</div>
-               <Sparkline color={stat.color} />
-            </div>
-          ))}
-        </div>
+        {/* Global metrics removed from top level */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 text-sm">
           
@@ -374,6 +360,21 @@ export default function AdminDashboard() {
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                   className="space-y-8"
                 >
+                   {/* Integrated Metrics for Security Overview */}
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                      {[
+                        { label: 'Network Wallets', value: stats?.users || 0, color: '#3b82f6' },
+                        { label: 'Global Registries', value: stats?.rules || 0, color: '#8b5cf6' },
+                        { label: 'Active Verifications', value: stats?.proofs || 0, color: '#ec4899' },
+                        { label: 'Protocol Finality', value: stats?.successRate || '0%', color: '#10b981' },
+                      ].map((stat, i) => (
+                        <div key={i} className="p-6 rounded-[2rem] glass border-white/[0.05] relative overflow-hidden group bg-white/5">
+                           <h3 className="text-[8px] font-black tracking-[0.1em] text-slate-500 mb-2 uppercase">{stat.label}</h3>
+                           <div className="text-2xl font-bold text-white tracking-tighter mb-2">{stat.value}</div>
+                           <Sparkline color={stat.color} />
+                        </div>
+                      ))}
+                   </div>
                    <div className="p-12 rounded-[3.5rem] glass-blue border-red-500/10">
                       <div className="flex items-center gap-4 mb-8">
                          <div className="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse" />
