@@ -60,6 +60,7 @@ export default function Dashboard() {
     conditionType: 'Storage value',
     logic: '', 
     targetChain: 'Ethereum (Simulated)',
+    targetContract: '',
     targetPayload: '',
     useGasAbstraction: false,
     autoExecute: false,
@@ -213,6 +214,12 @@ export default function Dashboard() {
         targetContract: formState.targetContract,
         targetPayload: formState.targetPayload,
         useGasAbstraction: formState.useGasAbstraction,
+        scheduledAt: formState.scheduledAt || undefined,
+        recurrenceInterval: formState.recurrenceInterval,
+        dataSourceUrl: formState.dataSourceUrl,
+        dataSourcePath: formState.dataSourcePath,
+        triggerEventSignature: formState.triggerEventSignature,
+        triggerContractAddress: formState.triggerContractAddress,
         automationConfig: {
           autoExecute: formState.autoExecute,
           retryDelay: 60,
@@ -225,7 +232,9 @@ export default function Dashboard() {
         name: '', description: '', conditionType: 'Storage value', 
         logic: '', targetChain: 'Ethereum (Simulated)', 
         targetContract: '', targetPayload: '', useGasAbstraction: false,
-        autoExecute: false 
+        autoExecute: false, triggerType: 'state', scheduledAt: '',
+        recurrenceInterval: 0, dataSourceUrl: '', dataSourcePath: '',
+        triggerEventSignature: '', triggerContractAddress: ''
       });
       setActiveTab('overview');
       addNotification('Infrastructure Rule deployed successfully.', 'success');
