@@ -431,6 +431,7 @@ export default function Dashboard() {
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
                 <motion.div 
+                  key="overview"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -498,8 +499,10 @@ export default function Dashboard() {
 
               {activeTab === 'builder' && (
                 <motion.section 
+                  key="builder"
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
                   className="space-y-12"
                 >
                    <form onSubmit={handleCreateRule} className="p-10 rounded-[3rem] glass-blue border-blue-500/10">
@@ -865,7 +868,9 @@ export default function Dashboard() {
 
               {activeTab === 'governance' && (
                 <motion.section 
+                  key="governance"
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className="space-y-8"
                 >
                    <div className="p-12 rounded-[3rem] glass-blue border-indigo-500/10 flex items-center justify-between">
