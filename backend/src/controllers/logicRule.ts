@@ -27,7 +27,7 @@ export const createRule = async (req: AuthRequest, res: Response) => {
 
   const verification = await verifyActionIntent(req.user.address, message, signature, nonce, 'CREATE_RULE');
   if (!verification.success) {
-    return res.status(401).json({ message: verification.message });
+    return res.status(403).json({ message: verification.message });
   }
 
   const normalizedConditions = conditions ?? (condition || targetChain ? { condition, targetChain } : undefined);
@@ -131,7 +131,7 @@ export const updateRule = async (req: AuthRequest, res: Response) => {
 
     const verification = await verifyActionIntent(req.user.address, message, signature, nonce, 'UPDATE_RULE');
     if (!verification.success) {
-      return res.status(401).json({ message: verification.message });
+      return res.status(403).json({ message: verification.message });
     }
 
     const normalizedConditions = conditions ?? (condition || targetChain ? { condition, targetChain } : undefined);
@@ -181,7 +181,7 @@ export const deleteRule = async (req: AuthRequest, res: Response) => {
 
     const verification = await verifyActionIntent(req.user.address, message, signature, nonce, 'DELETE_RULE');
     if (!verification.success) {
-      return res.status(401).json({ message: verification.message });
+      return res.status(403).json({ message: verification.message });
     }
 
     await rule.deleteOne();

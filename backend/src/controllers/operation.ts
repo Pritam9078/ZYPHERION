@@ -86,7 +86,7 @@ export const triggerExecution = async (req: AuthRequest, res: Response) => {
 
   const verification = await verifyActionIntent(userAddress, message, signature, nonce, 'TRIGGER_EXECUTION');
   if (!verification.success) {
-    return res.status(401).json({ message: verification.message });
+    return res.status(403).json({ message: verification.message });
   }
 
   try {
@@ -148,7 +148,7 @@ export const submitProof = async (req: AuthRequest, res: Response) => {
 
     const verification = await verifyActionIntent(req.user.address, message, signature, nonce, 'SUBMIT_PROOF');
     if (!verification.success) {
-      return res.status(401).json({ message: verification.message });
+      return res.status(403).json({ message: verification.message });
     }
 
     if (proof.submitter !== req.user.address) {

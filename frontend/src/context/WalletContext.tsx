@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { isConnected, getAddress, signMessage, setAllowed } from '@stellar/freighter-api';
 import { useRouter } from 'next/router';
+import { API_BASE } from '../services/api';
 
 interface WalletState {
   address: string | null;
@@ -35,7 +36,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       if (token) {
         setWallet(prev => ({ ...prev, status: 'connecting' }));
         try {
-          const res = await fetch('http://localhost:5001/api/auth/me', {
+          const res = await fetch(`${API_BASE}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {
@@ -87,7 +88,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       const signature = typeof signedResult === 'string' ? signedResult : (signedResult as any)?.signedMessage;
 
-      const response = await fetch('http://localhost:5001/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address, signature, message, accountType }),
