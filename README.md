@@ -25,6 +25,25 @@ https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive
 
 ---
 
+## 🖼️ Visual Showcase
+
+### 1. The Sovereign Command Center
+*The high-fidelity landing portal where users initialize their cryptographic identity and enter the Zypherion ecosystem.*
+
+### 2. Protocol Hub & Global Telemetry
+*A real-time overview of the interchain network map, showing active connections across Ethereum, Base, and Arbitrum, secured by Stellar finality.*
+
+### 3. Logic Architect (The Builder)
+*The core engine where users define complex multi-chain predicates, configure enterprise governance quorums, and enable automated gas abstraction.*
+
+### 4. Developer Portal
+*A dedicated space for protocol integrators to manage API credentials, configure webhooks, and access the Zypherion TypeScript SDK.*
+
+### 5. Interactive API Documentation
+*Complete OpenAPI/Swagger specifications for the Zypherion Protocol, enabling seamless programmatic interaction with the automation layer.*
+
+---
+
 ## 🖼️ Platform Walkthrough
 
 ### 1. Unified Entry Portal (Landing Page)
@@ -82,7 +101,7 @@ As part of our MVP testing, the following wallet addresses have interacted with 
 2. GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK
 3. GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI
 4. GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC
-5. `[INSERT_ADDRESS_5_HERE]`
+5. GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV
 
 ---
 
