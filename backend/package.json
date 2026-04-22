@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && cp src/openapi.yaml dist/"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^15.0.1",
