@@ -4,7 +4,7 @@ import { Keypair } from '@stellar/stellar-sdk';
 import User from '../models/User';
 
 export const login = async (req: Request, res: Response) => {
-  const { address, signature, message } = req.body;
+  const { address, signature, message, accountType } = req.body;
 
   if (!address || !signature || !message) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -63,7 +63,10 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       user = await User.create({
         address,
-        role
+        role,
+        accountType: accountType || 'Guest',
+        tier: 'Free',
+        approved: role === 'admin' ? true : false, // Admins auto-approved
       });
       console.log('[Auth] New user registered:', address);
     } else if (user.role !== role) {
@@ -74,12 +77,27 @@ export const login = async (req: Request, res: Response) => {
     // 4. Issue JWT
     const jwtSecret = process.env.JWT_SECRET || 'zypherion_fallback_secret_67890';
     const token = jwt.sign(
-      { address: user.address, role: user.role },
+      { 
+        address: user.address, 
+        role: user.role, 
+        tier: user.tier, 
+        approved: user.approved 
+      },
       jwtSecret,
       { expiresIn: '24h' }
     );
 
-    res.json({ token, user: { address: user.address, role: user.role } });
+    res.json({ 
+      token, 
+      user: { 
+        address: user.address, 
+        role: user.role, 
+        accountType: user.accountType,
+        tier: user.tier,
+        kycStatus: user.kycStatus,
+        approved: user.approved
+      } 
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -87,5 +105,23 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const getMe = async (req: any, res: Response) => {
-  res.json({ user: req.user });
+  try {
+    const user = await User.findOne({ address: req.user.address });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    res.json({ 
+      user: {
+        address: user.address,
+        role: user.role,
+        accountType: user.accountType,
+        tier: user.tier,
+        kycStatus: user.kycStatus,
+        approved: user.approved,
+        proofsUsedThisMonth: user.proofsUsedThisMonth,
+        creditsBalance: user.creditsBalance
+      } 
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get user profile' });
+  }
 };

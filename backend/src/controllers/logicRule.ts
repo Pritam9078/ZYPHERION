@@ -8,7 +8,7 @@ import { verifyActionIntent } from '../utils/signature';
 // @route   POST /api/rules
 // @access  Private
 export const createRule = async (req: AuthRequest, res: Response) => {
-  const { name, description, conditions, condition, targetChain, status, automationConfig, signature, message, nonce } = req.body;
+  const { name, description, conditions, condition, targetChain, status, automationConfig, onChainId, onChainTxHash, signature, message, nonce } = req.body;
 
   if (!req.user?.address) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -43,6 +43,8 @@ export const createRule = async (req: AuthRequest, res: Response) => {
       description,
       conditions: normalizedConditions,
       status: status ?? 'active',
+      onChainId,
+      onChainTxHash
     });
 
     res.status(201).json(rule);

@@ -11,6 +11,7 @@ import advancedRoutes from './routes/advanced';
 import logicRuleRoutes from './routes/logicRules';
 import adminRoutes from './routes/admin';
 import { webhookRoutes } from './routes/webhooks';
+import billingRoutes from './routes/billing';
 import { initAutomationWorker } from './services/AutomationWorker';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
@@ -72,6 +73,7 @@ app.use('/api/ops', operationRoutes);
 app.use('/api/advanced', advancedRoutes);
 app.use('/api/rules', logicRuleRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/billing', billingRoutes);
 
 // SDK-First v1 Routes
 app.use('/v1/auth', authRoutes);

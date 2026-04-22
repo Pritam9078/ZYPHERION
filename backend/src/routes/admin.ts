@@ -7,7 +7,10 @@ import {
   getAllRules,
   updateUserStatus,
   updateUserRole,
+  approveUser,
   deleteRule,
+  getAllDeposits,
+  approveDeposit,
   getAllProofs,
   getSystemStatus,
   toggleProtocolHalt
@@ -27,6 +30,15 @@ router.put('/users/:id/status', updateUserStatus);
 
 // @route   PUT /api/admin/users/:id/role
 router.put('/users/:id/role', updateUserRole);
+
+// @route   PUT /api/admin/users/:id/approve
+router.put('/users/:id/approve', approveUser);
+
+// @route   GET /api/admin/deposits
+router.get('/deposits', getAllDeposits);
+
+// @route   PUT /api/admin/deposits/:id/approve
+router.put('/deposits/:id/approve', approveDeposit);
 
 // @route   GET /api/admin/stats
 router.get('/stats', getSystemStats);

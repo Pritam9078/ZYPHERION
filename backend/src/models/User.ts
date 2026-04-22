@@ -4,6 +4,17 @@ export interface IUser extends Document {
   address: string;
   role: 'admin' | 'user';
   status: 'active' | 'banned';
+  
+  // SaaS Tiering & Identity
+  accountType: 'Guest' | 'Developer' | 'DAOAdmin' | 'NodeOperator';
+  tier: 'Free' | 'Basic' | 'Pro' | 'Enterprise';
+  kycStatus: 'unverified' | 'pending' | 'verified';
+  approved: boolean;
+  
+  // Quotas & Usage
+  proofsUsedThisMonth: number;
+  creditsBalance: number;
+
   createdAt: Date;
 }
 
@@ -11,6 +22,16 @@ const UserSchema: Schema = new Schema({
   address: { type: String, required: true, unique: true },
   role: { type: String, enum: ['admin', 'user'], default: 'user' },
   status: { type: String, enum: ['active', 'banned'], default: 'active' },
+  
+  // SaaS Fields
+  accountType: { type: String, enum: ['Guest', 'Developer', 'DAOAdmin', 'NodeOperator'], default: 'Guest' },
+  tier: { type: String, enum: ['Free', 'Basic', 'Pro', 'Enterprise'], default: 'Free' },
+  kycStatus: { type: String, enum: ['unverified', 'pending', 'verified'], default: 'unverified' },
+  approved: { type: Boolean, default: false }, // Requires admin approval for non-guests
+  
+  proofsUsedThisMonth: { type: Number, default: 0 },
+  creditsBalance: { type: Number, default: 0 },
+
   createdAt: { type: Date, default: Date.now },
 });
 

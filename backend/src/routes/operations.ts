@@ -3,7 +3,8 @@ import { protect } from '../middleware/auth';
 import { 
   getMyOperations, 
   requestProof, 
-  submitProof 
+  submitProof,
+  getProofStatus
 } from '../controllers/operation';
 
 const router = Router();
@@ -19,6 +20,10 @@ router.post('/proofs/request', protect, requestProof);
 // @route   POST /api/ops/proofs/submit
 // @desc    Submit proof to "Contract" (Mock)
 router.post('/proofs/submit', protect, submitProof);
+
+// @route   GET /api/ops/proof/:id
+// @desc    Get specific proof status
+router.get('/proof/:id', protect, getProofStatus);
 
 export default router;
 

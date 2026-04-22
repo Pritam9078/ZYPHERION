@@ -5,6 +5,7 @@ import LogicRule from '../models/LogicRule';
 import Proof from '../models/Proof';
 import UsedNonce from '../models/UsedNonce';
 import SystemSetting from '../models/SystemSetting';
+import Billing from '../models/Billing';
 import { verifyActionIntent } from '../utils/signature';
 
 // @desc    Get all users
@@ -135,6 +136,93 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating user role' });
+  }
+};
+
+// @desc    Approve a pending user account
+// @route   PUT /api/admin/users/:id/approve
+// @access  Private/Admin
+export const approveUser = async (req: AuthRequest, res: Response) => {
+  const { signature, message, nonce } = req.body;
+  const adminAddress = req.user?.address;
+
+  if (!adminAddress) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // Mandatory Action Signature Verification
+  if (!signature || !message || !nonce) {
+    return res.status(400).json({ message: 'Cryptographic authorization required to approve users.' });
+  }
+
+  const verification = await verifyActionIntent(adminAddress, message, signature, nonce, 'APPROVE_USER');
+  if (!verification.success) {
+    return res.status(401).json({ message: verification.message });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.approved = true;
+    user.kycStatus = 'verified'; // Mock KYC verification for hackathon
+    await user.save();
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error approving user' });
+  }
+};
+
+// @desc    Get all deposits
+// @route   GET /api/admin/deposits
+// @access  Private/Admin
+export const getAllDeposits = async (req: AuthRequest, res: Response) => {
+  try {
+    const deposits = await Billing.find({ type: 'deposit' }).sort({ createdAt: -1 });
+    res.json(deposits);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching deposits' });
+  }
+};
+
+// @desc    Approve a deposit
+// @route   PUT /api/admin/deposits/:id/approve
+// @access  Private/Admin
+export const approveDeposit = async (req: AuthRequest, res: Response) => {
+  const { signature, message, nonce } = req.body;
+  const adminAddress = req.user?.address;
+
+  if (!adminAddress) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  if (!signature || !message || !nonce) {
+    return res.status(400).json({ message: 'Cryptographic authorization required.' });
+  }
+
+  const verification = await verifyActionIntent(adminAddress, message, signature, nonce, 'APPROVE_DEPOSIT');
+  if (!verification.success) {
+    return res.status(401).json({ message: verification.message });
+  }
+
+  try {
+    const deposit = await Billing.findById(req.params.id);
+    if (!deposit) return res.status(404).json({ message: 'Deposit not found' });
+    if (deposit.status === 'confirmed') return res.status(400).json({ message: 'Deposit already confirmed' });
+
+    deposit.status = 'confirmed';
+    await deposit.save();
+
+    // Update user credits balance based on the deposit amount (1 XLM = 1 Credit for this mock)
+    const user = await User.findOne({ address: deposit.userAddress });
+    if (user) {
+      user.creditsBalance = (user.creditsBalance || 0) + deposit.depositAmount;
+      await user.save();
+    }
+
+    res.json(deposit);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error approving deposit' });
   }
 };
 

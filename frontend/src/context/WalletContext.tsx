@@ -6,11 +6,15 @@ interface WalletState {
   address: string | null;
   status: 'idle' | 'connecting' | 'connected' | 'error';
   role: 'user' | 'admin' | null;
+  accountType?: 'Guest' | 'Developer' | 'DAOAdmin' | 'NodeOperator';
+  tier?: 'Free' | 'Basic' | 'Pro' | 'Enterprise';
+  kycStatus?: 'unverified' | 'pending' | 'verified';
+  approved?: boolean;
 }
 
 interface WalletContextType {
   wallet: WalletState;
-  connect: () => Promise<void>;
+  connect: (accountType?: string) => Promise<void>;
   disconnect: () => void;
 }
 
@@ -41,6 +45,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
               address: user.address,
               status: 'connected',
               role: user.role,
+              accountType: user.accountType,
+              tier: user.tier,
+              kycStatus: user.kycStatus,
+              approved: user.approved,
             });
           } else {
             localStorage.removeItem('zypher_token');
@@ -55,7 +63,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     restoreSession();
   }, []);
 
-  const connect = async () => {
+  const connect = async (accountType?: string) => {
     setWallet(prev => ({ ...prev, status: 'connecting' }));
     try {
       const connected = await isConnected();
@@ -82,7 +90,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch('http://localhost:5001/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, signature, message }),
+        body: JSON.stringify({ address, signature, message, accountType }),
       });
 
       const data = await response.json();
@@ -92,8 +100,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           address,
           status: 'connected',
           role: data.user.role,
+          accountType: data.user.accountType,
+          tier: data.user.tier,
+          kycStatus: data.user.kycStatus,
+          approved: data.user.approved,
         });
-        router.push('/dashboard');
+        
+        // Handle Approval routing
+        if (data.user.role !== 'admin' && !data.user.approved && data.user.accountType !== 'Guest') {
+          router.push('/pending-approval');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         throw new Error(data.message);
       }

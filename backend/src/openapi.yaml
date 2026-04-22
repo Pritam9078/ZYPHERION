@@ -37,6 +37,8 @@ tags:
     description: Event-driven integration for third-party apps
   - name: Administration
     description: Elevated protocol governance and metrics
+  - name: Billing
+    description: Escrow deposits and quota management
 
 components:
   securitySchemes:
@@ -60,6 +62,17 @@ components:
         ruleId: { type: string }
         status: { type: string, enum: [pending, verified, failed] }
         data: { type: string, description: "Base64 encoded proof data" }
+    BillingRecord:
+      type: object
+      properties:
+        id: { type: string }
+        userAddress: { type: string }
+        depositAmount: { type: number }
+        currency: { type: string }
+        txHash: { type: string }
+        status: { type: string, enum: [pending, confirmed, failed, refunded] }
+        type: { type: string, enum: [subscription, deposit, escrow_stake] }
+        createdAt: { type: string, format: date-time }
 
 paths:
   # --- AUTHENTICATION ---
@@ -227,6 +240,40 @@ paths:
         '200':
           description: Execution intent broadcasted
 
+  # --- BILLING ---
+  /billing:
+    get:
+      tags: [Billing]
+      security: [{ bearerAuth: [] }]
+      summary: List Billing Transactions
+      responses:
+        '200':
+          description: List of deposits and charges
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/BillingRecord' }
+
+  /billing/deposit:
+    post:
+      tags: [Billing]
+      security: [{ bearerAuth: [] }]
+      summary: Register Testnet Deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                depositAmount: { type: number }
+                txHash: { type: string }
+                currency: { type: string, default: "XLM" }
+      responses:
+        '201':
+          description: Deposit recorded and pending verification
+
   # --- WEBHOOKS ---
   /webhooks/register:
     post:
@@ -251,7 +298,7 @@ paths:
           description: Registered successfully
 
   # --- ADMIN ---
-  /admin/metrics:
+  /admin/stats:
     get:
       tags: [Administration]
       security: [{ bearerAuth: [] }]
@@ -259,3 +306,79 @@ paths:
       responses:
         '200':
           description: Real-time telemetry data
+
+  /admin/users:
+    get:
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: List All Users
+      responses:
+        '200':
+          description: Success
+
+  /admin/users/{id}/approve:
+    put:
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: Approve User Access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signature: { type: string }
+                message: { type: string }
+                nonce: { type: string }
+      responses:
+        '200':
+          description: User approved
+
+  /admin/deposits:
+    get:
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: List All Pending Deposits
+      responses:
+        '200':
+          description: Success
+
+  /admin/deposits/{id}/approve:
+    put:
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: Verify & Fund Deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signature: { type: string }
+                message: { type: string }
+                nonce: { type: string }
+      responses:
+        '200':
+          description: Escrow funded
+
+  /admin/system/toggle:
+    post:
+      tags: [Administration]
+      security: [{ bearerAuth: [] }]
+      summary: Toggle Global Protocol Halt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                halted: { type: boolean }
+                signature: { type: string }
+                message: { type: string }
+                nonce: { type: string }
+      responses:
+        '200':
+          description: Protocol state updated

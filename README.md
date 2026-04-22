@@ -37,6 +37,14 @@ const proof = await sdk.proofs.generate(rule._id);
 // Subscribe to real-time events
 sdk.events.connect('YOUR_WALLET_ADDRESS');
 sdk.events.on('execution_update', (data) => console.log(data));
+
+// Billing & Deposits
+const balance = await sdk.billing.getHistory();
+const deposit = await sdk.billing.recordDeposit({
+  depositAmount: 500,
+  txHash: '...',
+  currency: 'XLM'
+});
 ```
 
 ---
@@ -72,7 +80,8 @@ ZYPHERION/
 │           ├── RuleModule.ts
 │           ├── ProofModule.ts
 │           ├── ExecutionModule.ts
-│           └── EventModule.ts
+│           ├── EventModule.ts
+│           └── BillingModule.ts
 │
 └── sample-app/       # SDK usage example
 ```
@@ -103,6 +112,8 @@ https://api.zypherion.io/v1 (production)
 | `POST` | `/proof/generate` | Generate cross-chain proof |
 | `POST` | `/execute/trigger` | Trigger rule execution |
 | `POST` | `/webhooks/register` | Register a webhook |
+| `GET`  | `/billing` | Get deposit history |
+| `POST` | `/billing/deposit` | Register escrow deposit |
 
 ---
 

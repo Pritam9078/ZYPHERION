@@ -7,11 +7,18 @@ import Link from 'next/link';
 
 export default function LandingPage() {
   const [loading, setLoading] = useState(true);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('Developer');
   const { wallet, connect } = useWallet();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1500);
   }, []);
+
+  const handleConnect = () => {
+    setIsRoleModalOpen(false);
+    connect(selectedRole);
+  };
 
   if (loading) return <Preloader />;
 
@@ -65,7 +72,7 @@ export default function LandingPage() {
                </Link>
             ) : (
               <button 
-                onClick={connect}
+                onClick={() => setIsRoleModalOpen(true)}
                 className="px-12 py-5 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/20 hover:bg-blue-500 transition-all transform hover:-translate-y-1 active:scale-95"
               >
                 Establish Secure Uplink_
@@ -149,7 +156,80 @@ export default function LandingPage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Pricing & Tiers Section */}
+        <div className="w-full max-w-6xl mt-32">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-white tracking-tighter mb-4">Enterprise-Grade Tiers_</h2>
+            <p className="text-slate-400">Scale your cross-chain automation with our deposit-based SaaS models.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              { tier: 'Free', price: '$0', desc: 'Testnet gas & basic UI', proofs: '1,000 proofs/mo', color: 'slate' },
+              { tier: 'Basic', price: '$20', desc: '1x API key, email support', proofs: '10,000 proofs/mo', color: 'blue' },
+              { tier: 'Pro', price: '$80', desc: '5x keys, AI ZKML tools', proofs: '50,000 proofs/mo', color: 'indigo' },
+              { tier: 'Enterprise', price: 'Custom', desc: '24/7 SLA & Dedicated Nodes', proofs: 'Unlimited', color: 'emerald' },
+            ].map((plan, idx) => (
+              <div key={idx} className="glass p-8 rounded-[2rem] border border-white/5 hover:border-white/20 transition-all flex flex-col">
+                <div className={`text-[10px] font-black uppercase tracking-widest text-${plan.color}-400 mb-2`}>{plan.tier} Plan</div>
+                <div className="text-4xl font-black text-white mb-4">{plan.price}<span className="text-sm text-slate-500 font-medium">/mo</span></div>
+                <div className="text-sm text-slate-400 font-medium mb-8 flex-1">{plan.desc}</div>
+                <div className="p-4 bg-black/30 rounded-xl mb-8">
+                  <div className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Quota</div>
+                  <div className="text-sm font-bold text-white">{plan.proofs}</div>
+                </div>
+                <button 
+                  onClick={() => setIsRoleModalOpen(true)}
+                  className={`w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${idx === 2 ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-white/5 hover:bg-white/10 text-slate-300'}`}
+                >
+                  {idx === 3 ? 'Contact Sales' : 'Deploy Now'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
+
+      {/* Role Selection Modal */}
+      {isRoleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md glass border border-white/10 rounded-[2.5rem] p-8 relative"
+          >
+            <button 
+              onClick={() => setIsRoleModalOpen(false)}
+              className="absolute top-6 right-6 text-slate-500 hover:text-white"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h3 className="text-2xl font-black text-white tracking-tighter mb-2">Select Identity_</h3>
+            <p className="text-sm text-slate-400 mb-8">Choose your role to initialize the correct telemetry and SLA profiles.</p>
+            
+            <div className="space-y-3 mb-8">
+              {['Developer', 'DAOAdmin', 'NodeOperator', 'Guest'].map((role) => (
+                <button
+                  key={role}
+                  onClick={() => setSelectedRole(role)}
+                  className={`w-full p-4 rounded-2xl border text-left flex justify-between items-center transition-all ${selectedRole === role ? 'bg-blue-500/10 border-blue-500/50 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                >
+                  <span className="font-bold text-sm">{role === 'DAOAdmin' ? 'DAO Administrator' : role === 'NodeOperator' ? 'Verifier Node Operator' : role}</span>
+                  {selectedRole === role && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+                </button>
+              ))}
+            </div>
+
+            <button 
+              onClick={handleConnect}
+              className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all"
+            >
+              Sign Request
+            </button>
+          </motion.div>
+        </div>
+      )}
 
       <footer className="border-t border-white/[0.05] p-16 text-center">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">

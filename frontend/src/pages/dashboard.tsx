@@ -332,6 +332,9 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">SYSTEM_INFRA_V2</span>
+              <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${wallet.tier === 'Pro' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : wallet.tier === 'Basic' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                {wallet.tier || 'Free'} TIER
+              </span>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Node ID: {wallet.address ? wallet.address.slice(0, 16) : 'GUEST'}</span>
             </div>
             <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Protocol Hub_</h2>
@@ -358,6 +361,13 @@ export default function Dashboard() {
                 <div className="text-[9px] font-black text-slate-500 uppercase mb-1">System Load</div>
                 <div className={`font-bold ${systemStats.load === 'LOW' ? 'text-emerald-400' : 'text-amber-400'}`}>{systemStats.load}</div>
              </div>
+             <div className="w-[1px] h-8 bg-white/10 hidden md:block" />
+             <button 
+                onClick={() => router.push('/billing')}
+                className="hidden md:block px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-colors border border-white/10"
+             >
+                Manage Billing
+             </button>
           </div>
         </header>
 

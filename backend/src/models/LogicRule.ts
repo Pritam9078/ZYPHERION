@@ -13,6 +13,8 @@ export interface ILogicRule extends Document {
     retryDelay: number;
     maxRetries: number;
   };
+  onChainId?: number;
+  onChainTxHash?: string;
   createdAt: Date;
 }
 
@@ -29,6 +31,8 @@ const LogicRuleSchema: Schema = new Schema({
     retryDelay: { type: Number, default: 60 }, // minutes
     maxRetries: { type: Number, default: 3 },
   },
+  onChainId: { type: Number },
+  onChainTxHash: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

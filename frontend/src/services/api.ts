@@ -1,5 +1,13 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001';
 
+export const CONTRACTS = {
+  testnet: {
+    logicRegistry: 'CCPHWXKVAM74QTLBHSOQAZJDDGHACTY6QMW5SOHSITP4NCLK2PDHFOXE',
+    proofVerifier: 'CDTFPR5BX5J77YEZQU5QLI6CYRFREEVE4XTE3K5QDAEG6YAOR6J7CNC6',
+    executionRouter: 'CC6ZZ464E3YHRRNFAQ5CXJWA7PLCSLPNQ2SPUQ2LJUSAYB3GZEVU7RTM'
+  }
+};
+
 export interface LogicRule {
   _id: string;
   creator: string;
@@ -7,6 +15,12 @@ export interface LogicRule {
   description?: string;
   conditions: Record<string, unknown>;
   status: 'pending' | 'active' | 'disabled';
+  automationConfig?: {
+    autoExecute: boolean;
+    retryDelay?: number;
+    maxRetries?: number;
+  };
+  version?: number;
   createdAt?: string;
 }
 
@@ -141,6 +155,75 @@ export const toggleProtocolHalt = async (
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Failed to toggle protocol' }));
     throw new Error(error.message || 'Failed to toggle protocol');
+  }
+
+  return response.json();
+};
+
+export const fetchUserDeposits = async (token: string): Promise<any[]> => {
+  const response = await fetch(`${API_BASE}/api/billing`, {
+    headers: getAuthHeaders(token),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to fetch deposits' }));
+    throw new Error(error.message || 'Failed to fetch deposits');
+  }
+
+  return response.json();
+};
+
+export const recordDeposit = async (
+  token: string,
+  payload: { depositAmount: number; txHash: string; currency: string }
+): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/billing/deposit`, {
+    method: 'POST',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to record deposit' }));
+    throw new Error(error.message || 'Failed to record deposit');
+  }
+
+  return response.json();
+};
+
+export const approveUser = async (
+  token: string,
+  userId: string,
+  auth: { signature: string; message: string; nonce: string }
+): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/admin/users/${userId}/approve`, {
+    method: 'PUT',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify({ ...auth }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to approve user' }));
+    throw new Error(error.message || 'Failed to approve user');
+  }
+
+  return response.json();
+};
+
+export const approveDeposit = async (
+  token: string,
+  depositId: string,
+  auth: { signature: string; message: string; nonce: string }
+): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/admin/deposits/${depositId}/approve`, {
+    method: 'PUT',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify({ ...auth }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to approve deposit' }));
+    throw new Error(error.message || 'Failed to approve deposit');
   }
 
   return response.json();

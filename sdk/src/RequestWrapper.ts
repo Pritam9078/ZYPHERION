@@ -33,5 +33,9 @@ export class RequestWrapper {
     return this.client.get(endpoint, { headers });
   }
 
-  // Add put/delete similarly as needed
+  async post(endpoint: string, payload: any) {
+    const token = this.getToken();
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.client.post(endpoint, payload, { headers });
+  }
 }

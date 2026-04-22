@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import Proof from '../models/Proof';
 import LogicRule from '../models/LogicRule';
+import SystemSetting from '../models/SystemSetting';
 
 export const initAutomationWorker = (io: any) => {
   console.log('[Zypherion] Initializing Automation Worker...');
@@ -10,6 +11,13 @@ export const initAutomationWorker = (io: any) => {
     console.log('[Zypherion] Running Automation Health Check...');
     
     try {
+      // 0. Check Protocol Halt Status
+      const settings = await SystemSetting.findOne();
+      if (settings?.protocolHalt) {
+        console.log('[Zypherion] Protocol is HALTED. Skipping automation cycle.');
+        return;
+      }
+
       // 1. Find pending proofs that need auto-execution if enabled
       const pendingOps = await Proof.find({ status: 'pending' }).populate('ruleId');
       
@@ -17,7 +25,7 @@ export const initAutomationWorker = (io: any) => {
         const rule = op.ruleId as any;
         
         // Simulate auto-execution if enabled in rule logic (future property)
-        if (rule.automationConfig?.autoExecute) {
+        if (rule && rule.automationConfig?.autoExecute) {
           console.log(`[Zypherion] Auto-executing Proof: ${op._id}`);
           
           // Simulate verification delay

@@ -67,8 +67,7 @@ export const requestProof = async (req: AuthRequest, res: Response) => {
 // @route   POST /api/ops/proofs/submit
 // @access  Private
 export const submitProof = async (req: AuthRequest, res: Response) => {
-  const { proofId } = req.body;
-  const { proofId: opId } = req.body;
+  const { opId } = req.body;
 
   if (!req.user?.address) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -110,5 +109,20 @@ export const submitProof = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error submitting proof:', error);
     res.status(500).json({ message: 'Server error while submitting proof' });
+  }
+};
+
+// @desc    Get specific proof status
+// @route   GET /api/ops/proof/:id
+// @access  Private
+export const getProofStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const proof = await Proof.findById(req.params.id).populate('ruleId', 'name');
+    if (!proof) {
+      return res.status(404).json({ message: 'Proof not found' });
+    }
+    res.json(proof);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching proof status' });
   }
 };

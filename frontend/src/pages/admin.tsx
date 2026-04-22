@@ -16,6 +16,9 @@ interface UserData {
   address: string;
   role: string;
   status: 'active' | 'banned';
+  accountType?: string;
+  kycStatus?: string;
+  approved?: boolean;
   createdAt: string;
 }
 
@@ -48,9 +51,10 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [rules, setRules] = useState<any[]>([]);
   const [ops, setOps] = useState<any[]>([]);
+  const [deposits, setDeposits] = useState<any[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'security' | 'entities' | 'governance' | 'cluster'>('security');
+  const [activeTab, setActiveTab] = useState<'security' | 'entities' | 'governance' | 'cluster' | 'treasury'>('security');
   
   // Real-time Systems Telemetry
   const [telemetry, setTelemetry] = useState<{t: string, m: string, c: string}[]>([]);
@@ -104,11 +108,12 @@ export default function AdminDashboard() {
       if (!token) return;
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [usersRes, statsRes, rulesRes, opsRes] = await Promise.all([
+        const [usersRes, statsRes, rulesRes, opsRes, depositsRes] = await Promise.all([
           fetch(`${API_BASE}/api/admin/users`, { headers }),
           fetch(`${API_BASE}/api/admin/stats`, { headers }),
           fetch(`${API_BASE}/api/admin/rules`, { headers }),
-          fetch(`${API_BASE}/api/admin/proofs`, { headers })
+          fetch(`${API_BASE}/api/admin/proofs`, { headers }),
+          fetch(`${API_BASE}/api/admin/deposits`, { headers })
         ]);
 
         if (!usersRes.ok || !statsRes.ok) throw new Error('Elevated permissions required.');
@@ -117,8 +122,10 @@ export default function AdminDashboard() {
         setStats(await statsRes.json());
         setRules(await rulesRes.json().catch(() => []));
         setOps(await opsRes.json().catch(() => []));
+        setDeposits(await depositsRes.json().catch(() => []));
       } catch (err: any) {
-        setTimeout(() => router.push('/dashboard'), 2000);
+        console.error(err);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 2000);
       } finally {
         setLoading(false);
       }
@@ -163,6 +170,50 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error('Action denied');
+    }
+  };
+
+  const handleApproveUser = async (userId: string) => {
+    if (!token || !wallet.address) return;
+    try {
+      const auth = await signActionRequest(wallet.address, 'APPROVE_USER', `UserID: ${userId}`);
+      
+      const res = await fetch(`${API_BASE}/api/admin/users/${userId}/approve`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...auth })
+      });
+      if (res.ok) {
+        setUsers(prev => prev.map(u => u._id === userId ? { ...u, approved: true, kycStatus: 'verified' } : u));
+        addTelemetryLog(`GOV: Entity_${userId.slice(-6)} KYC verified and access approved.`, 'text-blue-400');
+      }
+    } catch (err) {
+      console.error('Approval denied');
+    }
+  };
+
+  const handleApproveDeposit = async (depositId: string) => {
+    if (!token || !wallet.address) return;
+    try {
+      const auth = await signActionRequest(wallet.address, 'APPROVE_DEPOSIT', `DepositID: ${depositId}`);
+      
+      const res = await fetch(`${API_BASE}/api/admin/deposits/${depositId}/approve`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...auth })
+      });
+      if (res.ok) {
+        setDeposits(prev => prev.map(d => d._id === depositId ? { ...d, status: 'confirmed' } : d));
+        addTelemetryLog(`TREASURY: Deposit_${depositId.slice(-6)} verified and escrow funded.`, 'text-blue-400');
+      }
+    } catch (err) {
+      console.error('Deposit approval denied');
     }
   };
 
@@ -272,7 +323,7 @@ export default function AdminDashboard() {
             </div>
             <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Sovereign Command_</h2>
             <div className="flex gap-1.5 overflow-x-auto pb-2">
-              {['security', 'entities', 'governance', 'cluster'].map((tab) => (
+              {['security', 'entities', 'governance', 'cluster', 'treasury'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
@@ -385,6 +436,9 @@ export default function AdminDashboard() {
                               <div className="text-[9px] text-slate-500 mt-2 uppercase tracking-[0.2em] font-black opacity-50 flex gap-4">
                                 <span>ROLE: {u.role}</span>
                                 <span>STATUS: {u.status}</span>
+                                <span className={u.approved ? 'text-blue-400' : 'text-amber-500'}>
+                                  KYC: {u.kycStatus || 'unverified'}
+                                </span>
                               </div>
                             </td>
                              <td className="p-10 text-right space-x-3">
@@ -400,6 +454,14 @@ export default function AdminDashboard() {
                                >
                                  {u.status === 'banned' ? 'REVOKE_BAN' : 'RESTRICT_ID'}
                                </button>
+                               {!u.approved && u.accountType !== 'Guest' && (
+                                 <button 
+                                  onClick={() => handleApproveUser(u._id)}
+                                  className="px-8 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all bg-blue-600/10 text-blue-400 border border-blue-500/20 hover:bg-blue-600 hover:text-white"
+                                 >
+                                   APPROVE_ACCESS
+                                 </button>
+                               )}
                             </td>
                           </tr>
                         ))}
@@ -490,6 +552,49 @@ export default function AdminDashboard() {
                          <p className="text-[10px] text-slate-500 font-medium">Protocol state synchronized across all known validators globally.</p>
                       </div>
                    </div>
+                </motion.section>
+              )}
+
+              {activeTab === 'treasury' && (
+                <motion.section 
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="rounded-[3rem] glass border-white/5 overflow-hidden"
+                >
+                   <div className="p-8 border-b border-white/5 bg-white/[0.02] px-10">
+                    <h3 className="text-xl font-black text-white px-2 tracking-tighter uppercase">Protocol Treasury & Escrow</h3>
+                  </div>
+                   <div className="overflow-x-auto text-[11px] font-bold">
+                    <table className="w-full text-left">
+                      <tbody>
+                        {deposits.length === 0 ? (
+                           <tr>
+                             <td className="p-10 text-center opacity-30 italic uppercase font-black tracking-widest">No deposits found</td>
+                           </tr>
+                        ) : deposits.map(d => (
+                          <tr key={d._id} className="border-b border-white/5 group hover:bg-blue-600/[0.02] transition-colors">
+                            <td className="p-10">
+                               <div className="text-lg font-bold text-white uppercase tracking-tighter flex items-center gap-3">
+                                  {d.depositAmount} {d.currency}
+                                  <span className={`text-[8px] font-black px-2 py-0.5 border rounded uppercase tracking-tighter ${d.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>{d.status}</span>
+                               </div>
+                               <div className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-black opacity-50">From: {d.userAddress?.slice(0, 16)}...</div>
+                               <div className="text-[8px] text-slate-600 mt-1 uppercase font-mono">TX: {d.txHash}</div>
+                            </td>
+                            <td className="p-10 text-right space-x-3">
+                               {d.status === 'pending' && (
+                                 <button 
+                                  onClick={() => handleApproveDeposit(d._id)} 
+                                  className="px-5 py-2.5 bg-blue-600/10 text-blue-500 hover:bg-blue-600 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                 >
+                                   Approve & Fund
+                                 </button>
+                               )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </motion.section>
               )}
             </AnimatePresence>

@@ -6,6 +6,8 @@ export interface AuthRequest extends Request {
   user?: {
     address: string;
     role: 'admin' | 'user';
+    tier?: 'Free' | 'Basic' | 'Pro' | 'Enterprise';
+    approved?: boolean;
   };
 }
 
@@ -49,4 +51,41 @@ export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunctio
   } catch (err) {
     return res.status(500).json({ message: 'Role verification failed' });
   }
+};
+
+/**
+ * Middleware to enforce SaaS tier access.
+ * Usage: router.get('/pro-feature', protect, requireTier('Pro'), handler)
+ */
+const tierHierarchy = {
+  'Free': 0,
+  'Basic': 1,
+  'Pro': 2,
+  'Enterprise': 3
+};
+
+export const requireTier = (requiredTier: keyof typeof tierHierarchy) => {
+  return async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const dbUser = await User.findOne({ address: req.user?.address });
+      if (!dbUser) return res.status(401).json({ message: 'User not found' });
+      
+      if (!dbUser.approved && dbUser.accountType !== 'Guest') {
+        return res.status(403).json({ message: 'Account pending admin approval.' });
+      }
+
+      const userTier = dbUser.tier || 'Free';
+      if (tierHierarchy[userTier] < tierHierarchy[requiredTier]) {
+        return res.status(403).json({ 
+          message: `Upgrade required. This feature requires ${requiredTier} tier.` 
+        });
+      }
+
+      req.user!.tier = userTier;
+      req.user!.approved = dbUser.approved;
+      next();
+    } catch (err) {
+      return res.status(500).json({ message: 'Tier verification failed' });
+    }
+  };
 };

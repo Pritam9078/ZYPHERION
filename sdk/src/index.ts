@@ -5,6 +5,7 @@ import { RuleModule } from './modules/RuleModule';
 import { ProofModule } from './modules/ProofModule';
 import { ExecutionModule } from './modules/ExecutionModule';
 import { EventModule } from './modules/EventModule';
+import { BillingModule } from './modules/BillingModule';
 
 export interface ZypherionConfig {
   apiKey?: string; // Optional for now
@@ -12,12 +13,22 @@ export interface ZypherionConfig {
   secretKey: string;
 }
 
+export const CONTRACTS = {
+  testnet: {
+    logicRegistry: 'CCPHWXKVAM74QTLBHSOQAZJDDGHACTY6QMW5SOHSITP4NCLK2PDHFOXE',
+    proofVerifier: 'CDTFPR5BX5J77YEZQU5QLI6CYRFREEVE4XTE3K5QDAEG6YAOR6J7CNC6',
+    executionRouter: 'CC6ZZ464E3YHRRNFAQ5CXJWA7PLCSLPNQ2SPUQ2LJUSAYB3GZEVU7RTM'
+  }
+};
+
 export class ZypherionSDK {
   public auth: AuthModule;
   public rules: RuleModule;
   public proofs: ProofModule;
   public execution: ExecutionModule;
   public events: EventModule;
+  public billing: BillingModule;
+  public contracts: any;
   
   private baseUrl: string;
   private wsUrl: string;
@@ -49,6 +60,10 @@ export class ZypherionSDK {
     this.execution = new ExecutionModule(this.requestWrapper);
     this.events = new EventModule(this.wsUrl);
     this.events.setRequest(this.requestWrapper);
+    this.billing = new BillingModule(this.requestWrapper);
+    
+    // Set contracts
+    this.contracts = config.network === 'testnet' ? CONTRACTS.testnet : {};
   }
 
   public setToken(token: string) {
