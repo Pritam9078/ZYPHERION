@@ -4,7 +4,8 @@ import {
   getMyOperations, 
   requestProof, 
   submitProof,
-  getProofStatus
+  getProofStatus,
+  triggerExecution
 } from '../controllers/operation';
 
 const router = Router();
@@ -24,6 +25,11 @@ router.post('/proofs/submit', protect, submitProof);
 // @route   GET /api/ops/proof/:id
 // @desc    Get specific proof status
 router.get('/proof/:id', protect, getProofStatus);
+router.get('/status/:id', protect, getProofStatus); // SDK Alias
+
+// @route   POST /api/ops/trigger
+// @desc    Trigger execution (SDK/API)
+router.post('/trigger', protect, triggerExecution);
 
 export default router;
 

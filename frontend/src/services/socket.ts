@@ -1,9 +1,9 @@
 import { io, Socket } from 'socket.io-client';
-import { API_BASE } from './api';
+import { WS_BASE } from './api';
 
 class SocketService {
   private static instance: Socket | null = null;
-  private static baseUrl: string = API_BASE.replace('/api', '');
+  private static baseUrl: string = WS_BASE;
 
   public static getSocket(): Socket {
     if (!this.instance) {

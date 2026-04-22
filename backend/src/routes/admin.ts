@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { protect, isAdmin } from '../middleware/auth';
-import { 
-  getAllUsers, 
-  getSystemStats, 
-  toggleRuleStatus, 
+import {
+  getAllUsers,
+  getSystemStats,
+  toggleRuleStatus,
   getAllRules,
   updateUserStatus,
   updateUserRole,

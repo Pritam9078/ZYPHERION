@@ -1,4 +1,5 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001';
+export const WS_BASE = process.env.NEXT_PUBLIC_WS_BASE || API_BASE.replace('http', 'ws');
 
 export const CONTRACTS = {
   testnet: {
@@ -100,10 +101,10 @@ export const requestProof = async (
   ruleId: string, 
   auth: { signature: string; message: string; nonce: string }
 ): Promise<any> => {
-  const response = await fetch(`${API_BASE}/api/ops/proof/${ruleId}`, {
+  const response = await fetch(`${API_BASE}/api/ops/proofs/request`, {
     method: 'POST',
     headers: getAuthHeaders(token),
-    body: JSON.stringify({ ...auth }),
+    body: JSON.stringify({ ruleId, ...auth }),
   });
 
   if (!response.ok) {
@@ -116,13 +117,13 @@ export const requestProof = async (
 
 export const submitProof = async (
   token: string, 
-  proofId: string,
+  opId: string,
   auth: { signature: string; message: string; nonce: string }
 ): Promise<any> => {
-  const response = await fetch(`${API_BASE}/api/ops/proof/submit`, {
+  const response = await fetch(`${API_BASE}/api/ops/proofs/submit`, {
     method: 'POST',
     headers: getAuthHeaders(token),
-    body: JSON.stringify({ proofId, ...auth }),
+    body: JSON.stringify({ opId, ...auth }),
   });
 
   if (!response.ok) {

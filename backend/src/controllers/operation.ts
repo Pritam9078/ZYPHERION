@@ -63,6 +63,61 @@ export const requestProof = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const triggerExecution = async (req: AuthRequest, res: Response) => {
+  const { ruleId, signature, message, nonce } = req.body;
+  const userAddress = req.user?.address;
+
+  if (!userAddress) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  const settings = await SystemSetting.findOne();
+  if (settings?.protocolHalt) {
+    return res.status(403).json({ message: 'PROTOCOL_HALTED: Execution triggers are currently suspended.' });
+  }
+
+  if (!ruleId) {
+    return res.status(400).json({ message: 'Please provide ruleId' });
+  }
+
+  if (!signature || !message || !nonce) {
+    return res.status(400).json({ message: 'Cryptographic authorization required to trigger execution.' });
+  }
+
+  const verification = await verifyActionIntent(userAddress, message, signature, nonce, 'TRIGGER_EXECUTION');
+  if (!verification.success) {
+    return res.status(401).json({ message: verification.message });
+  }
+
+  try {
+    const rule = await LogicRule.findById(ruleId);
+    if (!rule) return res.status(404).json({ message: 'Logic registry rule not found.' });
+
+    const proof = await Proof.create({
+      ruleId,
+      submitter: userAddress,
+      proofData: `auto_proof_${Math.random().toString(36).substring(7)}`,
+      status: 'pending'
+    });
+
+    if ((req as any).io) {
+      (req as any).io.to(userAddress).emit('execution_update', {
+        message: `Execution triggered for ${rule.name}`,
+        type: 'INFO'
+      });
+    }
+
+    res.status(201).json({
+      message: 'Execution pipeline initialized.',
+      executionId: proof._id,
+      status: proof.status
+    });
+  } catch (error) {
+    console.error('Error triggering execution:', error);
+    res.status(500).json({ message: 'Server error during execution trigger' });
+  }
+};
+
 // @desc    Submit proof to "contract"
 // @route   POST /api/ops/proofs/submit
 // @access  Private
