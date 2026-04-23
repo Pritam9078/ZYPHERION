@@ -1,14 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import AuthGuard from '../components/AuthGuard';
+import { fetchUserProfile, regenerateApiKey } from '../services/api';
 
 export default function DeveloperDashboard() {
-  const [apiKey, setApiKey] = useState('ZYPH-TEST-9F8A-XXXX-XXXX');
+  const [apiKey, setApiKey] = useState('ZYPH-TEST-XXXX-XXXX-XXXX');
   const [webhookUrl, setWebhookUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [webhooks, setWebhooks] = useState([
     { id: '1', url: 'https://myapp.com/api/zypherion-webhook', events: ['EXECUTION_COMPLETED'] }
   ]);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    const token = localStorage.getItem('zypher_token');
+    console.log('[Developer] Loading profile, token exists:', !!token);
+    if (!token) return;
+    try {
+      const user = await fetchUserProfile(token);
+      console.log('[Developer] Profile loaded, apiKey:', user.apiKey);
+      if (user.apiKey) setApiKey(user.apiKey);
+    } catch (err) {
+      console.error('[Developer] Failed to load profile:', err);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    const token = localStorage.getItem('zypher_token');
+    console.log('[Developer] Regenerating API key...');
+    if (!token) {
+      console.error('[Developer] No token found in localStorage');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const data = await regenerateApiKey(token);
+      console.log('[Developer] API key regenerated:', data.apiKey);
+      setApiKey(data.apiKey);
+    } catch (err) {
+      console.error('[Developer] Regeneration failed:', err);
+      alert('Failed to regenerate API key');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleRegisterWebhook = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +87,13 @@ export default function DeveloperDashboard() {
                     <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Sandbox Key</div>
                     <div className="font-mono text-emerald-400 tracking-wider text-sm">{apiKey}</div>
                   </div>
-                  <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Regenerate</button>
+                  <button 
+                    onClick={handleRegenerate}
+                    disabled={isLoading}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                  >
+                    {isLoading ? 'Regenerating...' : 'Regenerate'}
+                  </button>
                 </div>
               </motion.div>
 

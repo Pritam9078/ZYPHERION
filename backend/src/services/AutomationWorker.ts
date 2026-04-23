@@ -4,7 +4,7 @@ import LogicRule from '../models/LogicRule';
 import SystemSetting from '../models/SystemSetting';
 import User from '../models/User';
 import BatchProof from '../models/BatchProof';
-
+import { generateProof } from './zkProver';
 export const initAutomationWorker = (io: any) => {
   console.log('[Zypherion] Initializing Automation Worker...');
 
@@ -124,12 +124,34 @@ export const initAutomationWorker = (io: any) => {
 
         if (!dataVerified) continue;
 
-        // 1. Create a new operation (Proof) for this scheduled rule
+        // 1. Generate ZK Proof for this scheduled rule execution
+        let zkProofData = '';
+        let zkPublicSignals: string[] = [];
+        try {
+           const threshold = rule.conditions?.threshold || 0;
+           const privateData = rule.conditions?.privateData || 100; // Simulated private data
+           console.log(`[Zypherion] Generating ZK Proof for ${rule.name}...`);
+           const { proof, publicSignals } = await generateProof(rule._id.toString(), threshold, privateData);
+           zkProofData = JSON.stringify(proof);
+           zkPublicSignals = publicSignals;
+           console.log(`[Zypherion] ZK Proof generated successfully.`);
+        } catch (zkErr) {
+           console.error(`[Zypherion] ZK Proof generation failed:`, zkErr);
+           io.to(rule.creator).emit('execution_update', {
+              type: 'ERROR',
+              message: `ZK Proof Generation Failed: ${rule.name} skipped.`,
+           });
+           continue;
+        }
+
         const op = new Proof({
-          creator: rule.creator,
+          submitter: rule.creator, // Changed from creator to submitter to match Schema
           ruleId: rule._id,
           status: 'pending',
-          metadata: { trigger: 'schedule', scheduledAt: rule.scheduledAt }
+          proofData: zkProofData,
+          publicSignals: zkPublicSignals,
+          isZK: true,
+          // Note: metadata was in the old code but not in Proof schema. Removed to avoid errors.
         });
         await op.save();
 

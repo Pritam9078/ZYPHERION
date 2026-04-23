@@ -17,6 +17,7 @@ router.get('/', protect, getMyOperations);
 // @route   POST /api/ops/proofs/request
 // @desc    Request a new proof (Mock)
 router.post('/proofs/request', protect, requestProof);
+router.post('/generate', protect, requestProof); // SDK Alias
 
 // @route   POST /api/ops/proofs/submit
 // @desc    Submit proof to "Contract" (Mock)

@@ -119,9 +119,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           gasBalance: data.user.gasBalance,
         });
         
-        // Handle Approval routing
+        // Handle Identity-based routing
         if (data.user.role !== 'admin' && !data.user.approved && data.user.accountType !== 'Guest') {
           router.push('/pending-approval');
+        } else if (data.user.role === 'admin' || data.user.accountType === 'DAOAdmin') {
+          router.push('/admin');
+        } else if (data.user.accountType === 'NodeOperator') {
+          router.push('/node-operator');
         } else {
           router.push('/dashboard');
         }

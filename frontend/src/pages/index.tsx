@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import { useWallet } from '../hooks/useWallet';
 import Link from 'next/link';
 
+import ThreeDBackground from '../components/ThreeDBackground';
+
 export default function LandingPage() {
   const [loading, setLoading] = useState(true);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -23,10 +25,13 @@ export default function LandingPage() {
   if (loading) return <Preloader />;
 
   return (
-    <div className="min-h-screen bg-zypher-bg text-slate-200 selection:bg-blue-500/30 overflow-hidden">
+    <div className="min-h-screen bg-zypher-bg text-slate-200 selection:bg-blue-500/30 overflow-x-hidden">
       {/* Blueprint & Grid Background */}
       <div className="fixed inset-0 blueprint-bg opacity-20 pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.05),transparent)] pointer-events-none" />
+      
+      {/* 3D Background Layer */}
+      <ThreeDBackground />
       
       {/* Ambient Visual Orbs */}
       <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
@@ -65,7 +70,11 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {wallet.address ? (
                <Link 
-                href={wallet.role === 'admin' ? '/admin' : '/dashboard'}
+                href={
+                  wallet.role === 'admin' ? '/admin' : 
+                  wallet.accountType === 'NodeOperator' ? '/node-operator' : 
+                  '/dashboard'
+                }
                 className="px-12 py-5 bg-white text-slate-950 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/10 hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1"
                >
                  Launch Sovereign Command
@@ -155,6 +164,116 @@ export default function LandingPage() {
               <p className="text-slate-400 text-sm leading-relaxed font-medium opacity-80">{feature.desc}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* Protocol Initiation Sequence - HOW IT WORKS */}
+        <div className="w-full max-w-6xl mt-32">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-white tracking-tighter mb-4 uppercase">Protocol_Initiation_Sequence_</h2>
+            <p className="text-slate-400">Follow these steps to establish your sovereign automation footprint.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[
+              { step: '01', title: 'Identity Link', desc: 'Connect your Stellar wallet and choose your protocol role.' },
+              { step: '02', title: 'Logic Definition', desc: 'Define cross-chain rules and predicates via the Architect.' },
+              { step: '03', title: 'ZK Validation', desc: 'Generate zero-knowledge proofs for trustless rule verification.' },
+              { step: '04', title: 'Execution', desc: 'Logic is finalized on-chain with millisecond precision.' }
+            ].map((s, idx) => (
+              <div key={idx} className="relative p-8 glass rounded-3xl border border-white/5 group hover:border-blue-500/50 transition-all">
+                <div className="text-4xl font-black text-white/10 mb-4 group-hover:text-blue-500/20 transition-colors">{s.step}</div>
+                <h4 className="text-lg font-black text-white mb-2 uppercase tracking-tight">{s.title}</h4>
+                <p className="text-xs text-slate-500 leading-relaxed font-medium">{s.desc}</p>
+                {idx < 3 && (
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-20">
+                    <svg className="w-8 h-8 text-white/10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Core Services Deep Dive */}
+        <div className="w-full max-w-6xl mt-32 p-12 bg-white/5 rounded-[3rem] border border-white/10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div>
+              <h2 className="text-4xl font-black text-white tracking-tighter mb-8 uppercase">Sovereign_Services_</h2>
+              <div className="space-y-8">
+                <div>
+                  <h4 className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service_01</h4>
+                  <h3 className="text-2xl font-bold text-white mb-4">ZK Prover Engine</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">Zypherion utilizes <strong>snarkjs</strong> and <strong>circom</strong> to generate Groth16 proofs. This ensures that your off-chain logic execution is verifiably correct before it ever touches the Stellar network.</p>
+                </div>
+                <div>
+                  <h4 className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service_02</h4>
+                  <h3 className="text-2xl font-bold text-white mb-4">Chronos Automation</h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">A decentralized cron-job layer that triggers based on block-time, specific events, or oracle price-feeds. Your logic runs autonomously, 24/7, without manual intervention.</p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-8 pt-20">
+              <div>
+                <h4 className="text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Service_03</h4>
+                <h3 className="text-2xl font-bold text-white mb-4">Gas Abstraction</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">Stop juggling multiple native tokens. Zypherion abstracts gas costs through a unified deposit system, allowing you to pay for automation in stable credits.</p>
+              </div>
+              <div className="p-8 bg-gradient-to-br from-blue-600/20 to-indigo-600/10 rounded-3xl border border-blue-500/30 relative overflow-hidden group">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 blur-[60px] rounded-full group-hover:bg-blue-500/20 transition-all" />
+                
+                <h3 className="text-xl font-black text-white mb-2 tracking-tighter uppercase">Ready to Integrate?_</h3>
+                <p className="text-[10px] text-slate-400 mb-6 font-medium leading-relaxed">Embed sovereign automation into your dApp with just 3 lines of code.</p>
+                
+                {/* Code Snippet Visual */}
+                <div className="bg-black/40 rounded-2xl p-5 mb-8 border border-white/5 font-mono text-[10px] relative">
+                  <div className="flex gap-1.5 mb-3">
+                    <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                    <div className="w-2 h-2 rounded-full bg-amber-500/50" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-500/50" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-blue-400"><span className="text-purple-400">import</span> {'{ Zypherion }'} <span className="text-purple-400">from</span> <span className="text-emerald-400">'@zypherion/sdk'</span>;</p>
+                    <p className="text-slate-300"><span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> <span className="text-blue-400">Zypherion</span>(<span className="text-emerald-400">'ZYPH-TEST-9F8A'</span>);</p>
+                    <p className="text-slate-300"><span className="text-purple-400">await</span> client.<span className="text-blue-400">execute</span>(<span className="text-emerald-400">'LIQUIDATE_RULE'</span>, payload);</p>
+                  </div>
+                </div>
+
+                <button className="w-full py-4 bg-white text-slate-950 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-blue-500/10">
+                  View SDK Documentation_
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Identity & RBAC Explorer */}
+        <div className="w-full max-w-6xl mt-32">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-white tracking-tighter mb-4 uppercase">Role_Based_Architecture_</h2>
+            <p className="text-slate-400">Specialized interfaces designed for specific protocol participants.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-10 glass rounded-[2.5rem] border border-white/5">
+              <div className="text-blue-500 font-black text-6xl mb-6 opacity-20">DEV</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Developer Portal</h3>
+              <ul className="space-y-4 text-sm text-slate-400 mb-8">
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> API Key Generation & Management</li>
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> Webhook Integration Suite</li>
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> Local Sandbox & Simulation Tools</li>
+              </ul>
+            </div>
+            <div className="p-10 glass rounded-[2.5rem] border border-white/5">
+              <div className="text-indigo-500 font-black text-6xl mb-6 opacity-20">NODE</div>
+              <h3 className="text-2xl font-bold text-white mb-4">Node Operator Hub</h3>
+              <ul className="space-y-4 text-sm text-slate-400 mb-8">
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" /> Real-time Network Telemetry</li>
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" /> Verifier Node Health Monitoring</li>
+                <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" /> Staking & Performance Metrics</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         {/* Pricing & Tiers Section */}

@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { login, getMe, verifyDID } from '../controllers/auth';
+import { login, getMe, verifyDID, updateProfile, regenerateApiKey } from '../controllers/auth';
 import { authenticateToken, authenticate } from '../middleware/auth';
 
 const router = Router();
 
 router.post('/login', login);
 router.get('/me', authenticateToken, getMe);
+router.put('/profile', authenticateToken, updateProfile);
+router.post('/regenerate-api-key', authenticateToken, regenerateApiKey);
 router.post('/verify-did', authenticate, verifyDID);
 
 // SDK-First v1 Auth Routes

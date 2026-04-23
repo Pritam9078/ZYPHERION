@@ -46,6 +46,8 @@ export interface Operation {
   } | string;
   submitter: string;
   proofData: string;
+  publicSignals?: string[];
+  isZK?: boolean;
   status: 'pending' | 'verified' | 'failed';
   txHash?: string;
   createdAt: string;
@@ -264,3 +266,31 @@ export const fetchUserProfile = async (token: string): Promise<any> => {
   return data.user;
 };
 
+export const updateUserProfile = async (token: string, payload: { name?: string; email?: string; bio?: string; avatar?: string }): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/auth/profile`, {
+    method: 'PUT',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to update profile' }));
+    throw new Error(error.message || 'Failed to update profile');
+  }
+
+  return response.json();
+};
+
+export const regenerateApiKey = async (token: string): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/auth/regenerate-api-key`, {
+    method: 'POST',
+    headers: getAuthHeaders(token),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to regenerate API key' }));
+    throw new Error(error.message || 'Failed to regenerate API key');
+  }
+
+  return response.json();
+};

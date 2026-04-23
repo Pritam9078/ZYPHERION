@@ -21,6 +21,14 @@ export interface IUser extends Document {
   didDocument?: any;
   isDIDVerified: boolean;
 
+  // Profile Information
+  name?: string;
+  email?: string;
+  bio?: string;
+  avatar?: string;
+  apiKey?: string;
+
+
   createdAt: Date;
 }
 
@@ -43,6 +51,14 @@ const UserSchema: Schema = new Schema({
   did: { type: String },
   didDocument: { type: Schema.Types.Mixed },
   isDIDVerified: { type: Boolean, default: false },
+
+  // Profile Information
+  name: { type: String },
+  email: { type: String },
+  bio: { type: String },
+  avatar: { type: String },
+  apiKey: { type: String, unique: true, sparse: true },
+
 
   createdAt: { type: Date, default: Date.now },
 });

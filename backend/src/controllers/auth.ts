@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { Keypair } from '@stellar/stellar-sdk';
 import User from '../models/User';
+import crypto from 'crypto';
 
 const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
 
@@ -102,6 +103,7 @@ export const login = async (req: Request, res: Response) => {
         accountType: accountType || 'Guest',
         tier: 'Free',
         approved: role === 'admin' ? true : false, // Admins auto-approved
+        apiKey: (accountType === 'Developer' || role === 'admin') ? `ZYPH-TEST-${require('crypto').randomBytes(4).toString('hex').toUpperCase()}-${require('crypto').randomBytes(2).toString('hex').toUpperCase()}` : undefined
       });
       console.log('[Auth] New user registered:', address);
     } else if (user.role !== role) {
@@ -130,7 +132,11 @@ export const login = async (req: Request, res: Response) => {
         accountType: user.accountType,
         tier: user.tier,
         kycStatus: user.kycStatus,
-        approved: user.approved
+        approved: user.approved,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        apiKey: user.apiKey
       } 
     });
   } catch (error) {
@@ -153,11 +159,46 @@ export const getMe = async (req: any, res: Response) => {
         kycStatus: user.kycStatus,
         approved: user.approved,
         proofsUsedThisMonth: user.proofsUsedThisMonth,
-        creditsBalance: user.creditsBalance
+        creditsBalance: user.creditsBalance,
+        name: user.name,
+        email: user.email,
+        bio: user.bio,
+        avatar: user.avatar,
+        isDIDVerified: user.isDIDVerified,
+        apiKey: user.apiKey
       } 
     });
   } catch (err) {
     res.status(500).json({ message: 'Failed to get user profile' });
+  }
+};
+
+export const updateProfile = async (req: any, res: Response) => {
+  const { name, email, bio, avatar } = req.body;
+  const address = req.user.address;
+
+  try {
+    const user = await User.findOne({ address });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (bio !== undefined) user.bio = bio;
+    if (avatar !== undefined) user.avatar = avatar;
+
+    await user.save();
+
+    res.json({ 
+      message: 'Profile updated successfully',
+      user: {
+        name: user.name,
+        email: user.email,
+        bio: user.bio,
+        avatar: user.avatar
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update profile' });
   }
 };
 
@@ -189,5 +230,27 @@ export const verifyDID = async (req: any, res: Response) => {
 
   } catch (err: any) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const regenerateApiKey = async (req: any, res: Response) => {
+  const address = req.user?.address;
+  if (!address) return res.status(401).json({ message: 'Unauthorized' });
+
+  try {
+    const user = await User.findOne({ address });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const part1 = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const part2 = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const part3 = crypto.randomBytes(2).toString('hex').toUpperCase();
+    user.apiKey = `ZYPH-TEST-${part1}-${part2}-${part3}`;
+    
+    await user.save();
+    console.log(`[Auth] API Key regenerated for ${address}: ${user.apiKey}`);
+    res.json({ apiKey: user.apiKey });
+  } catch (err: any) {
+    console.error('[Auth] API Key regeneration failed:', err);
+    res.status(500).json({ message: 'Failed to regenerate API key', error: err.message });
   }
 };

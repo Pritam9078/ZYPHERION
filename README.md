@@ -34,14 +34,12 @@ No intermediaries. No assumptions. Just math.
 
 ---
 
-## ✦ Core Features
-
 | Feature | Description |
 |---|---|
 | 🔋 **Gas Abstraction Service** | Automated balance deduction and simulated escrow — execute logic without juggling gas tokens |
-| ♾️ **Recursive Proof Batching** | Aggregation engine bundles individual verified proofs into `BatchProof` documents — **10× cheaper** on-chain verification |
-| 🏛️ **Enterprise Multi-Sig Governance** | High-value logic rules require cryptographic quorum (e.g. 2-of-3 DAO signers) before execution |
-| 🪪 **Decentralized Identity (DID)** | Trustless KYC via self-sovereign `did:zypher` identifiers for enterprise compliance |
+| ♾️ **Zero-Knowledge Proofs** | Integrated **snarkjs & circom** for verifiable off-chain computation and batching |
+| 🏛️ **Role-Based Identity** | Dedicated dashboards for **Developers**, **Node Operators**, and **DAO Admins** with tailored tooling |
+| 🪪 **Sovereign Profile** | Centralized management of identity metadata, DIDs, and API credentials |
 | ⏱️ **Chronos Engine** | Autonomous scheduled & event-based triggers via verifiable external oracle data feeds |
 
 ---
@@ -52,17 +50,17 @@ No intermediaries. No assumptions. Just math.
 ┌─────────────────────────────────────────────────────────────┐
 │                      ZYPHERION STACK                        │
 ├─────────────────┬───────────────────────────────────────────┤
-│  Frontend       │  Next.js (TypeScript) · TailwindCSS       │
-│                 │  Framer Motion · Socket.io-client          │
+│  Frontend       │  Next.js 14 · Framer Motion · TailwindCSS │
+│                 │  Socket.io-client · Zypherion SDK         │
 ├─────────────────┼───────────────────────────────────────────┤
 │  Backend        │  Node.js · Express · MongoDB (Mongoose)   │
-│                 │  Socket.io (real-time event bus)           │
+│                 │  snarkjs (ZK-SNARK Prover) · Socket.io    │
 ├─────────────────┼───────────────────────────────────────────┤
-│  Blockchain     │  Stellar Testnet · Freighter Wallet       │
-│                 │  Simulated EVM Execution Layer             │
+│  Blockchain     │  Stellar Testnet · Soroban Smart Contracts│
+│                 │  Freighter Wallet Integration             │
 ├─────────────────┼───────────────────────────────────────────┤
-│  Cryptography   │  Ed25519 Signatures                        │
-│                 │  Recursive SNARK Simulation Logic          │
+│  Cryptography   │  Circom 2.1 (Circuits) · Ed25519          │
+│                 │  Groth16 Proof Verification               │
 └─────────────────┴───────────────────────────────────────────┘
 ```
 
@@ -122,6 +120,17 @@ The following core protocol contracts are deployed on the **Stellar Testnet**.
 | **Logic Registry** | `CCPHWXKVAM74QTLBHSOQAZJDDGHACTY6QMW5SOHSITP4NCLK2PDHFOXE` |
 | **Proof Verifier** | `CDTFPR5BX5J77YEZQU5QLI6CYRFREEVE4XTE3K5QDAEG6YAOR6J7CNC6` |
 | **Execution Router** | `CC6ZZ464E3YHRRNFAQ5CXJWA7PLCSLPNQ2SPUQ2LJUSAYB3GZEVU7RTM` |
+
+---
+
+## ✦ Protocol Identity & RBAC
+
+Zypherion implements a sovereign identity model where your wallet is your passport. Access is governed by specific protocol roles:
+
+- **👨‍💻 Developer**: Access to the Developer Portal, API Key management, and Sandbox environments.
+- **📡 Node Operator**: Access to real-time network telemetry, health monitoring, and staking metrics.
+- **🏛️ DAO Admin**: Governance oversight, multi-sig rule approval, and the global Protocol Kill Switch.
+- **👤 Guest**: Public view of protocol analytics and global telemetry.
 
 ---
 

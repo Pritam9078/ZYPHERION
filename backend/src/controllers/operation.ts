@@ -4,6 +4,7 @@ import Proof from '../models/Proof';
 import LogicRule from '../models/LogicRule';
 import SystemSetting from '../models/SystemSetting';
 import { verifyActionIntent } from '../utils/signature';
+import { generateProof } from '../services/zkProver';
 
 // @desc    Get all proofs/operations for the logged-in user
 // @route   GET /api/ops
@@ -46,13 +47,22 @@ export const requestProof = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    // Mock proof generation logic
-    const mockProofData = `proof_zphi_${Math.random().toString(36).substring(7)}`;
+    const rule = await LogicRule.findById(ruleId);
+    if (!rule) {
+      return res.status(404).json({ message: 'Logic rule not found' });
+    }
+
+    const threshold = rule.conditions?.threshold || 0;
+    const privateData = rule.conditions?.privateData || 100;
     
+    const { proof: zkProof, publicSignals } = await generateProof(ruleId.toString(), threshold, privateData);
+
     const proof = await Proof.create({
       ruleId,
       submitter: req.user.address,
-      proofData: mockProofData,
+      proofData: JSON.stringify(zkProof),
+      publicSignals,
+      isZK: true,
       status: 'pending'
     });
 
@@ -93,10 +103,17 @@ export const triggerExecution = async (req: AuthRequest, res: Response) => {
     const rule = await LogicRule.findById(ruleId);
     if (!rule) return res.status(404).json({ message: 'Logic registry rule not found.' });
 
+    const threshold = rule.conditions?.threshold || 0;
+    const privateData = rule.conditions?.privateData || 100;
+    
+    const { proof: zkProof, publicSignals } = await generateProof(ruleId.toString(), threshold, privateData);
+
     const proof = await Proof.create({
       ruleId,
       submitter: userAddress,
-      proofData: `auto_proof_${Math.random().toString(36).substring(7)}`,
+      proofData: JSON.stringify(zkProof),
+      publicSignals,
+      isZK: true,
       status: 'pending'
     });
 
