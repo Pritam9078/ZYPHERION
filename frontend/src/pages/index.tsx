@@ -239,9 +239,9 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <button className="w-full py-4 bg-white text-slate-950 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-blue-500/10">
+                <Link href="/docs/sdk" className="block w-full py-4 bg-white text-slate-950 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-600 hover:text-white transition-all shadow-xl shadow-blue-500/10 text-center">
                   View SDK Documentation_
-                </button>
+                </Link>
               </div>
             </div>
           </div>
