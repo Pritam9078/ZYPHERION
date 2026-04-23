@@ -188,7 +188,7 @@ export default function BillingDashboard() {
 
             {/* Wallet Balance & Deposit */}
             <aside className="space-y-8">
-              <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="p-8 rounded-[2.5rem] bg-blue-50 dark:glass-blue border border-blue-100 dark:border-white/5">
+              <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="p-8 rounded-[2.5rem] bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-500/20 glass">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-6">Testnet Escrow</h3>
                 
                 <div className="text-center mb-8">
