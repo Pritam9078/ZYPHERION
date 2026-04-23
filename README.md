@@ -113,6 +113,18 @@ GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV
 
 ---
 
+## ✦ Smart Contract IDs (Soroban)
+
+The following core protocol contracts are deployed on the **Stellar Testnet**.
+
+| Contract | Contract ID |
+|---|---|
+| **Logic Registry** | `CCPHWXKVAM74QTLBHSOQAZJDDGHACTY6QMW5SOHSITP4NCLK2PDHFOXE` |
+| **Proof Verifier** | `CDTFPR5BX5J77YEZQU5QLI6CYRFREEVE4XTE3K5QDAEG6YAOR6J7CNC6` |
+| **Execution Router** | `CC6ZZ464E3YHRRNFAQ5CXJWA7PLCSLPNQ2SPUQ2LJUSAYB3GZEVU7RTM` |
+
+---
+
 ## ✦ Local Development
 
 ### Prerequisites

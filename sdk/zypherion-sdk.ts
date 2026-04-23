@@ -13,8 +13,8 @@ export class Zypherion {
 
   constructor(config: ZypherionConfig) {
     this.config = {
-      apiBase: config.apiBase.replace(/\/$/, ''),
-      ...config
+      ...config,
+      apiBase: config.apiBase.replace(/\/$/, '')
     };
   }
 
