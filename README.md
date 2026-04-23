@@ -20,9 +20,16 @@
 ## 🚀 Live Links
 
 - **🌐 Live Demo (Frontend):** [https://zypherion.vercel.app/](https://zypherion.vercel.app/)
+
 - **⚡ Backend API Server:** [https://zypherion-backend.onrender.com/](https://zypherion-backend.onrender.com/)
+
 - **🎬 Demo Video (Full Walkthrough):** [Watch on Google Drive](https://drive.google.com/file/d/1vFOfGjbB2ehYbs4v8T5p3AgA8TBAU9KX/view?usp=drive_link)
+
 - **📋 User Feedback Documentation:** [View on Google Sheets](https://docs.google.com/spreadsheets/d/1VcUZPcTXMmdjDYeT-9VbAfSA58MvmCEYN6NGFkEs5-E/edit?resourcekey=&gid=1148580754#gid=1148580754)
+
+- **📐 System Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+- **🐦 Social Flex:** [Protocol Deep Dive on X](https://x.com/i/status/2047345248519749953)
 
 ---
 
