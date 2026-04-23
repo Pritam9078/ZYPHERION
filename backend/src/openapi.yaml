@@ -126,7 +126,30 @@ paths:
                 type: object
                 properties:
                   token: { type: string }
-                  role: { type: string }
+                  user:
+                    type: object
+                    properties:
+                      address: { type: string }
+                      role: { type: string, enum: [admin, user] }
+                      accountType: { type: string, enum: [Guest, Developer, DAOAdmin, NodeOperator] }
+                      tier: { type: string }
+                      apiKey: { type: string }
+
+  /auth/regenerate-api-key:
+    post:
+      tags: [Authentication]
+      security: [{ bearerAuth: [] }]
+      summary: Rotate Developer API Credentials
+      description: Generates a new `ZYPH-TEST-...` API key for the authenticated user and invalidates the previous one.
+      responses:
+        '200':
+          description: Key successfully regenerated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  apiKey: { type: string, example: "ZYPH-TEST-9F8A-A2B3-C4D5" }
 
   # --- RULES ---
   /rules/list:

@@ -160,9 +160,12 @@ This diagram visualizes the interconnected nature of the Zypherion ecosystem, il
 graph TD
     subgraph Client["Client Tier (Frontend)"]
         UI[Next.js 14 UI]
+        3D[3D Performance Layer]
         V_SDK[Zypherion SDK]
         WS_C[Socket.io Client]
     end
+
+    UI -- "Aesthetics & Depth" --> 3D
 
     subgraph Logic["Orchestration Tier (Backend)"]
         API[Express REST API]
@@ -204,6 +207,35 @@ graph TD
 | **Database** | MongoDB (Persistence), Redis (Optional/Caching) |
 | **Smart Contracts** | Rust (Soroban SDK), ZK-Verifier |
 | **Identity** | Stellar Freighter, ZK-Identity Protocol |
+
+---
+
+## 6. ZK-Compilation Workflow
+
+To maintain cryptographic sovereignty, the protocol requires a local compilation of Circom circuits. The build process transforms human-readable `.circom` logic into machine-executable `.wasm` and `.zkey` artifacts.
+
+```mermaid
+graph LR
+    A[.circom Source] --> B[Circom Compiler]
+    B --> C[WASM Runtime]
+    B --> D[R1CS Constraints]
+    E[PTAU File] & D --> F[SnarkJS Setup]
+    F --> G[.zkey Final]
+    G --> H[Verification Key]
+```
+
+> [!TIP]
+> Use the provided `circuits/compile_zk.sh` script to automate this entire pipeline.
+
+---
+
+## 7. 3D Sovereign Interface Layer
+
+The frontend utilizes a custom **3D Performance Layer** to provide an immersive administrative experience without the overhead of heavy WebGL libraries.
+
+- **Hardware Acceleration**: Uses CSS `perspective` and `transform-style: preserve-3d` for GPU-accelerated rendering.
+- **Dynamic Assets**: Rotating wireframe octahedrons and orbiting data particles that respond to system state.
+- **Tactile UI**: Integrated SVG noise filters and radial gradients create a premium, high-fidelity aesthetic.
 
 ---
 

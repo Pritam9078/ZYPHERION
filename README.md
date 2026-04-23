@@ -41,6 +41,7 @@ No intermediaries. No assumptions. Just math.
 | 🏛️ **Role-Based Identity** | Dedicated dashboards for **Developers**, **Node Operators**, and **DAO Admins** with tailored tooling |
 | 🪪 **Sovereign Profile** | Centralized management of identity metadata, DIDs, and API credentials |
 | ⏱️ **Chronos Engine** | Autonomous scheduled & event-based triggers via verifiable external oracle data feeds |
+| 💎 **3D Sovereign Interface** | A hardware-accelerated, high-fidelity UI featuring immersive 3D telemetry and tactile aesthetics |
 
 ---
 
@@ -152,6 +153,12 @@ cd ZYPHERION
 # 2. Install dependencies
 cd backend && npm install
 cd ../frontend && npm install
+cd ../sdk && npm install && npm run build
+
+# 3. Setup ZK Circuits
+cd ../circuits
+chmod +x compile_zk.sh
+./compile_zk.sh
 ```
 
 ### Environment Variables
