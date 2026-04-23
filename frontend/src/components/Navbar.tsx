@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useWallet } from '../hooks/useWallet';
 import { toggleGlobalMute, getGlobalIsMuted } from '../hooks/useSound';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
   const router = useRouter();
   const { wallet, connect, disconnect } = useWallet();
+  const { theme, toggleTheme } = useTheme();
   const [isMuted, setIsMuted] = React.useState(false);
 
   React.useEffect(() => {
@@ -17,13 +19,13 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="px-8 py-4 flex justify-between items-center border-b border-white/[0.05] bg-zypher-bg/80 backdrop-blur-xl sticky top-0 z-40">
+    <nav className="px-8 py-4 flex justify-between items-center border-b border-white/[0.05] dark:border-white/[0.05] bg-white/80 dark:bg-zypher-bg/80 backdrop-blur-xl sticky top-0 z-40 transition-colors duration-300">
       <div className="flex items-center gap-12">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
             <img src="/logo.png" alt="Zypherion Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="text-lg font-bold tracking-[0.15em] text-white group-hover:text-blue-400 transition-colors">
+          <span className="text-lg font-bold tracking-[0.15em] text-slate-900 dark:text-white group-hover:text-blue-400 transition-colors">
             ZYPHERION
           </span>
         </Link>
@@ -31,21 +33,21 @@ const Navbar = () => {
         <div className="hidden lg:flex gap-8 text-[11px] font-semibold uppercase tracking-wide">
           <Link 
             href="/dashboard" 
-            className={`transition-colors ${router.pathname === '/dashboard' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
+            className={`transition-colors ${router.pathname === '/dashboard' ? 'text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
           >
             Dashboard
           </Link>
           {wallet.accountType === 'NodeOperator' && (
             <Link 
               href="/node-operator" 
-              className={`transition-colors ${router.pathname === '/node-operator' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
+              className={`transition-colors ${router.pathname === '/node-operator' ? 'text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
             >
               Node_Monitor
             </Link>
           )}
           <Link 
             href="/developer" 
-            className={`transition-colors ${router.pathname === '/developer' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
+            className={`transition-colors ${router.pathname === '/developer' ? 'text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
           >
             Developer
           </Link>
@@ -53,7 +55,7 @@ const Navbar = () => {
             <>
               <Link 
                 href="/billing" 
-                className={`transition-colors ${router.pathname === '/billing' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
+                className={`transition-colors ${router.pathname === '/billing' ? 'text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
               >
                 Billing
               </Link>
@@ -62,19 +64,36 @@ const Navbar = () => {
           {wallet.role === 'admin' && (
             <Link 
               href="/admin" 
-              className={`transition-colors ${router.pathname === '/admin' ? 'text-red-400' : 'text-slate-400 hover:text-white'}`}
+              className={`transition-colors ${router.pathname === '/admin' ? 'text-red-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
             >
               Admin_Panel
             </Link>
           )}
-          <a href="#" className="text-slate-400 hover:text-white transition-colors">Documentation</a>
+          <a href="#" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Documentation</a>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {theme === 'dark' ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 18v1m9-9h-1M3 12H2m3.343-5.657l-.707-.707m12.728 12.728l-.707-.707M6.343 17.657l-.707.707M17.657 6.343l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+        </button>
+
         <button
           onClick={() => toggleGlobalMute()}
-          className="p-2 rounded-full border border-white/10 hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+          className="p-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           title={isMuted ? "Unmute sounds" : "Mute sounds"}
         >
           {isMuted ? (
@@ -87,7 +106,7 @@ const Navbar = () => {
         {wallet.address && (
           <Link 
             href="/profile" 
-            className={`p-2 rounded-full border transition-all ${router.pathname === '/profile' ? 'bg-blue-600/10 border-blue-500 text-blue-400' : 'border-white/10 text-slate-400 hover:text-white hover:bg-white/5'}`}
+            className={`p-2 rounded-full border transition-all ${router.pathname === '/profile' ? 'bg-blue-600/10 border-blue-500 text-blue-400' : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`}
             title="Sovereign Identity Profile"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

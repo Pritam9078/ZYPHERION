@@ -19,15 +19,15 @@ export default function PendingApproval() {
   };
 
   return (
-    <div className="min-h-screen bg-zypher-bg text-slate-200">
-      <div className="fixed inset-0 blueprint-bg opacity-20 pointer-events-none" />
+    <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
+      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
       <Navbar />
       
       <main className="flex items-center justify-center min-h-[85vh] px-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-16 text-center max-w-xl glass-blue border-white/5 rounded-[3.5rem] relative overflow-hidden"
+          className="p-16 text-center max-w-xl glass-blue border-slate-200 dark:border-white/5 rounded-[3.5rem] relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50" />
           
@@ -42,10 +42,10 @@ export default function PendingApproval() {
             </motion.div>
           </div>
 
-          <h2 className="text-4xl font-black text-white tracking-tighter mb-6 uppercase">Awaiting Authorization_</h2>
+          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-6 uppercase">Awaiting Authorization_</h2>
           
-          <p className="text-slate-400 mb-10 leading-relaxed text-sm font-medium">
-            Your application for a <span className="text-amber-400 font-black tracking-widest uppercase">{wallet.accountType}</span> account is currently in the high-priority review queue. 
+          <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed text-sm font-medium">
+            Your application for a <span className="text-amber-600 dark:text-amber-400 font-black tracking-widest uppercase">{wallet.accountType}</span> account is currently in the high-priority review queue. 
             Administrator consensus is required to activate protocol-wide signing capabilities.
           </p>
 
@@ -54,18 +54,18 @@ export default function PendingApproval() {
               onClick={() => { playClick(); handleRefresh(); }}
               onMouseEnter={playHover}
               disabled={isChecking}
-              className={`w-full py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isChecking ? 'bg-white/5 text-slate-500 border-white/5 cursor-not-allowed' : 'bg-white text-black hover:bg-slate-200 border-white shadow-xl shadow-white/10'}`}
+              className={`w-full py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isChecking ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5 cursor-not-allowed' : 'bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-slate-200 border-slate-900 dark:border-white shadow-xl shadow-slate-900/10 dark:shadow-white/10'}`}
             >
               {isChecking ? 'Querying State...' : 'Check Status Now'}
             </button>
 
-            <div className="flex items-center justify-center gap-4 py-4 px-8 bg-black/40 rounded-2xl border border-white/5">
+            <div className="flex items-center justify-center gap-4 py-4 px-8 bg-slate-100 dark:bg-black/40 rounded-2xl border border-slate-200 dark:border-white/5">
               <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Status: Review_In_Progress</span>
             </div>
           </div>
 
-          <p className="mt-12 text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+          <p className="mt-12 text-[10px] text-slate-500 dark:text-slate-600 font-bold uppercase tracking-widest">
             Zypherion Protocol Governance v2.4.1
           </p>
         </motion.div>

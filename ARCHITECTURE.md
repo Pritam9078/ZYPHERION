@@ -198,16 +198,6 @@ graph TD
     SOROBAN -- "Finality" --> STELLAR["Stellar Network"]
 ```
 
-### Technology Stack Summary
-
-| Layer | Core Technologies |
-| :--- | :--- |
-| **Frontend** | Next.js 14, Framer Motion, TailwindCSS |
-| **Backend** | Node.js, Express, snarkjs, Circom 2.1 |
-| **Database** | MongoDB (Persistence), Redis (Optional/Caching) |
-| **Smart Contracts** | Rust (Soroban SDK), ZK-Verifier |
-| **Identity** | Stellar Freighter, ZK-Identity Protocol |
-
 ---
 
 ## 6. ZK-Compilation Workflow
@@ -239,5 +229,17 @@ The frontend utilizes a custom **3D Performance Layer** to provide an immersive 
 
 ---
 
+
+### Technology Stack Summary
+
+| Layer | Core Technologies |
+| :--- | :--- |
+| **Frontend** | Next.js 14, Framer Motion, TailwindCSS |
+| **Backend** | Node.js, Express, snarkjs, Circom 2.1 |
+| **Database** | MongoDB (Persistence), Redis (Optional/Caching) |
+| **Smart Contracts** | Rust (Soroban SDK), ZK-Verifier |
+| **Identity** | Stellar Freighter, ZK-Identity Protocol |
+
+___
 > [!IMPORTANT]
 > The ZK Prover Engine currently supports Groth16 proofs generated via Circom circuits. The **Batch Aggregator** module enables the protocol to combine multiple state transitions into a single on-chain verification, significantly reducing gas costs.

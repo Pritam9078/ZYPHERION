@@ -107,15 +107,15 @@ export default function BillingDashboard() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-zypher-bg text-slate-200">
-        <div className="fixed inset-0 blueprint-bg opacity-20 pointer-events-none" />
+      <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
+        <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
         <Navbar />
 
         <main className="relative z-10 container mx-auto px-6 py-12">
           
-          <header className="mb-12 border-b border-white/5 pb-8">
-            <h2 className="text-5xl font-black text-white tracking-tighter mb-4">Billing & Quota_</h2>
-            <p className="text-sm text-slate-400 max-w-2xl">
+          <header className="mb-12 border-b border-slate-200 dark:border-white/5 pb-8">
+            <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Billing & Quota_</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
               Manage your SaaS tier, track proof usage, and deposit testnet credits into the escrow contract.
             </p>
           </header>
@@ -123,61 +123,61 @@ export default function BillingDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Current Tier & Usage */}
             <section className="lg:col-span-2 space-y-8">
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-8 rounded-[2.5rem] glass border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
                 <div>
                   <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Current Tier</div>
-                  <div className="text-4xl font-black text-white mb-2">{wallet.tier || 'Free'} Plan</div>
-                  <div className="text-xs text-slate-400">Account Type: <span className="text-blue-400">{wallet.accountType}</span></div>
+                  <div className="text-4xl font-black text-slate-900 dark:text-white mb-2">{wallet.tier || 'Free'} Plan</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">Account Type: <span className="text-blue-600 dark:text-blue-400 font-bold">{wallet.accountType}</span></div>
                 </div>
                 <div className="text-right">
                    <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Status</div>
-                   <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider inline-block ${wallet.approved ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+                   <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider inline-block ${wallet.approved ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'}`}>
                      {wallet.approved ? 'Approved' : 'Pending Review'}
                    </div>
                 </div>
               </motion.div>
 
               {/* Usage Metrics */}
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-8 rounded-[2.5rem] glass border-white/5">
-                <h3 className="text-lg font-black text-white uppercase tracking-tighter mb-6">Usage Analytics</h3>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-6">Usage Analytics</h3>
                 
                 <div className="mb-8">
                   <div className="flex justify-between text-sm font-bold mb-2">
-                    <span className="text-slate-400">Proofs Generated (Monthly)</span>
-                    <span className="text-white">142 / 1,000</span>
+                    <span className="text-slate-600 dark:text-slate-400">Proofs Generated (Monthly)</span>
+                    <span className="text-slate-900 dark:text-white">142 / 1,000</span>
                   </div>
-                  <div className="w-full h-3 bg-black/50 rounded-full overflow-hidden">
+                  <div className="w-full h-3 bg-slate-200 dark:bg-black/50 rounded-full overflow-hidden">
                     <div className="h-full bg-blue-500 rounded-full w-[14%]" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                  <div className="p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5">
                     <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Total Logic Rules</div>
-                    <div className="text-2xl font-bold text-white">2 <span className="text-xs text-slate-500">/ 3</span></div>
+                    <div className="text-2xl font-bold text-slate-900 dark:text-white">2 <span className="text-xs text-slate-500">/ 3</span></div>
                   </div>
-                  <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                  <div className="p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5">
                     <div className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">API Error Rate</div>
-                    <div className="text-2xl font-bold text-emerald-400">0.00%</div>
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">0.00%</div>
                   </div>
                 </div>
 
                 <div className="mt-12">
-                  <h4 className="text-sm font-black text-white uppercase tracking-widest mb-6">Recent Escrow Transactions_</h4>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest mb-6">Recent Escrow Transactions_</h4>
                   <div className="space-y-4">
                     {transactions.length === 0 ? (
-                      <div className="p-8 text-center glass border-white/5 rounded-2xl opacity-40 italic text-xs uppercase tracking-widest">No transaction history found</div>
+                      <div className="p-8 text-center glass border-slate-200 dark:border-white/5 rounded-2xl opacity-40 italic text-xs uppercase tracking-widest">No transaction history found</div>
                     ) : transactions.map((tx, i) => (
-                      <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl flex justify-between items-center group hover:bg-white/[0.04] transition-all">
+                      <div key={i} className="p-6 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-2xl flex justify-between items-center group hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all">
                         <div>
-                          <div className="text-xs font-bold text-white mb-1 uppercase tracking-tight">{tx.depositAmount} {tx.currency} {tx.type}</div>
+                          <div className="text-xs font-bold text-slate-900 dark:text-white mb-1 uppercase tracking-tight">{tx.depositAmount} {tx.currency} {tx.type}</div>
                           <div className="text-[10px] text-slate-500 font-mono">{tx.txHash.slice(0, 24)}...</div>
                         </div>
                         <div className="text-right">
-                          <div className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${tx.status === 'confirmed' ? 'text-emerald-400 border-emerald-400/20 bg-emerald-400/5' : 'text-amber-400 border-amber-400/20 bg-amber-400/5'}`}>
+                          <div className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${tx.status === 'confirmed' ? 'text-emerald-600 dark:text-emerald-400 border-emerald-400/20 bg-emerald-400/5' : 'text-amber-600 dark:text-amber-400 border-amber-400/20 bg-amber-400/5'}`}>
                             {tx.status}
                           </div>
-                          <div className="text-[9px] text-slate-600 mt-2 font-bold">{new Date(tx.createdAt).toLocaleDateString()}</div>
+                          <div className="text-[9px] text-slate-500 dark:text-slate-600 mt-2 font-bold">{new Date(tx.createdAt).toLocaleDateString()}</div>
                         </div>
                       </div>
                     ))}
@@ -188,23 +188,23 @@ export default function BillingDashboard() {
 
             {/* Wallet Balance & Deposit */}
             <aside className="space-y-8">
-              <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="p-8 rounded-[2.5rem] glass-blue border-white/5">
-                <h3 className="text-lg font-black text-white uppercase tracking-tighter mb-6">Testnet Escrow</h3>
+              <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="p-8 rounded-[2.5rem] bg-blue-50 dark:glass-blue border border-blue-100 dark:border-white/5">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-6">Testnet Escrow</h3>
                 
                 <div className="text-center mb-8">
-                  <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Available Balance</div>
-                  <div className="text-5xl font-black text-white mb-1">{balance}</div>
+                  <div className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Available Balance</div>
+                  <div className="text-5xl font-black text-slate-900 dark:text-white mb-1">{balance}</div>
                   <div className="text-xs font-medium text-slate-500">XLM (Testnet)</div>
                 </div>
 
                 <form onSubmit={handleDeposit} className="space-y-4">
                   <div>
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Deposit Amount</label>
+                    <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">Deposit Amount</label>
                     <input 
                       type="number" 
                       value={depositAmount}
                       onChange={(e) => setDepositAmount(e.target.value)}
-                      className="w-full bg-black/30 border border-white/10 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <button 
@@ -212,7 +212,7 @@ export default function BillingDashboard() {
                     disabled={isDepositing}
                     onMouseEnter={playHover}
                     onClick={playClick}
-                    className={`w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${isDepositing ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
+                    className={`w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${isDepositing ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'}`}
                   >
                     {isDepositing ? 'Processing on Stellar...' : 'Fund Escrow Contract'}
                   </button>

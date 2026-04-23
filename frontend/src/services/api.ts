@@ -48,7 +48,7 @@ export interface Operation {
   proofData: string;
   publicSignals?: string[];
   isZK?: boolean;
-  status: 'pending' | 'verified' | 'failed';
+  status: 'pending' | 'pending_approval' | 'verified' | 'failed';
   txHash?: string;
   createdAt: string;
 }

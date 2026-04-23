@@ -116,7 +116,7 @@ export default function Dashboard() {
       const isSuccess = data.type.toLowerCase() === 'success';
       addNotification(data.message, isSuccess ? 'success' : 'error');
       if (isSuccess) playSuccess(); else playError();
-      addLiveLog(`AUTORUN: ${data.message}`, 'text-blue-400');
+      addLiveLog(`AUTORUN: ${data.message}`, 'text-blue-500 dark:text-blue-400');
       loadData();
     };
 
@@ -149,7 +149,7 @@ export default function Dashboard() {
         const settings = await fetchSystemSettings(token);
         setSystemPaused(settings.protocolHalt);
         if (settings.protocolHalt) {
-          addLiveLog('ALRT: System currently in OVERRIDE mode. Operations frozen.', 'text-red-500');
+          addLiveLog('ALRT: System currently in OVERRIDE mode. Operations frozen.', 'text-red-600 dark:text-red-500');
         }
       } catch (err) {
         console.error('Failed to sync system status');
@@ -188,7 +188,7 @@ export default function Dashboard() {
     setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 5000);
   };
 
-  const addLiveLog = (m: string, c: string = 'text-slate-400') => {
+  const addLiveLog = (m: string, c: string = 'text-slate-500 dark:text-slate-400') => {
     const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     setLiveLogs(prev => [{ t, m, c }, ...prev].slice(0, 50));
   };
@@ -206,11 +206,11 @@ export default function Dashboard() {
         msg: result ? 'Logic predicate satisfied.' : 'Logic predicate failed.'
       });
       if (result) playSuccess(); else playError();
-      addLiveLog(`SIM: Logic evaluation returned ${result}`, 'text-indigo-400');
+      addLiveLog(`SIM: Logic evaluation returned ${result}`, 'text-indigo-600 dark:text-indigo-400');
     } catch (err: any) {
       setSimResult({ status: 'error', msg: err.message });
       playError();
-      addLiveLog(`SIM_ERR: ${err.message}`, 'text-red-400');
+      addLiveLog(`SIM_ERR: ${err.message}`, 'text-red-600 dark:text-red-400');
     }
   };
 
@@ -262,7 +262,7 @@ export default function Dashboard() {
       setActiveTab('overview');
       addNotification('Infrastructure Rule deployed successfully.', 'success');
       playExecution();
-      addLiveLog(`DEPLOY: New rule ${formState.name} committed to Stellar.`, 'text-emerald-400');
+      addLiveLog(`DEPLOY: New rule ${formState.name} committed to Stellar.`, 'text-emerald-600 dark:text-emerald-400');
       loadData();
     } catch (err: any) {
       addNotification('Deployment failed.', 'error');
@@ -279,7 +279,7 @@ export default function Dashboard() {
       const auth = await signActionRequest(wallet.address, 'REQUEST_PROOF', `RuleID: ${ruleId}`);
       await requestProof(token, ruleId, auth);
       addNotification('Proof generation initiated.', 'success');
-      addLiveLog(`PROOF_REQ: Rule_${ruleId.slice(-6)} processing...`, 'text-blue-400');
+      addLiveLog(`PROOF_REQ: Rule_${ruleId.slice(-6)} processing...`, 'text-blue-600 dark:text-blue-400');
       loadData();
     } catch (err) {
       addNotification('Proof generation failed.', 'error');
@@ -293,7 +293,7 @@ export default function Dashboard() {
       const auth = await signActionRequest(wallet.address, 'SUBMIT_PROOF', `OpID: ${opId}`);
       await submitProof(token, opId, auth);
       addNotification('Attestation successful.', 'success');
-      addLiveLog(`ATTEST: Op_${opId.slice(-6)} verified on Stellar.`, 'text-emerald-400');
+      addLiveLog(`ATTEST: Op_${opId.slice(-6)} verified on Stellar.`, 'text-emerald-600 dark:text-emerald-400');
       loadData();
     } catch (err) {
       addNotification('Attestation failed.', 'error');
@@ -312,20 +312,20 @@ export default function Dashboard() {
   ];
 
   if (loading && !rules.length) return (
-     <div className="min-h-screen bg-zypher-bg flex flex-col items-center justify-center">
+     <div className="min-h-screen bg-white dark:bg-zypher-bg flex flex-col items-center justify-center">
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="w-12 h-12 border-2 border-blue-500/20 border-t-blue-500 rounded-full mb-6" 
         />
-        <div className="text-[10px] font-black text-blue-400/60 uppercase tracking-[0.4em] animate-pulse">Syncing Telemetry...</div>
+        <div className="text-[10px] font-black text-blue-600 dark:text-blue-400/60 uppercase tracking-[0.4em] animate-pulse">Syncing Telemetry...</div>
      </div>
   );
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-zypher-bg text-slate-200">
-      <div className="fixed inset-0 blueprint-bg opacity-20 pointer-events-none" />
+      <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
+      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
       <Navbar />
 
       <PayloadModal 
@@ -344,7 +344,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className={`p-4 rounded-xl border-2 glass backdrop-blur-xl flex items-center gap-3 ${n.type === 'error' ? 'border-red-500/30 text-red-400' : 'border-blue-500/30 text-blue-400'}`}
+              className={`p-4 rounded-xl border-2 glass backdrop-blur-xl flex items-center gap-3 ${n.type === 'error' ? 'border-red-500/30 text-red-600 dark:text-red-400' : 'border-blue-500/30 text-blue-600 dark:text-blue-400'}`}
             >
               <div className={`w-2 h-2 rounded-full ${n.type === 'error' ? 'bg-red-500' : 'bg-blue-500'} animate-pulse`} />
               <span className="text-[11px] font-black tracking-tighter uppercase">{n.text}</span>
@@ -367,12 +367,12 @@ export default function Dashboard() {
               <div className="p-8 rounded-[2.5rem] bg-red-600/10 border-2 border-red-600/30 flex flex-col md:flex-row items-center justify-between gap-6 relative group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-600/5 to-transparent animate-pulse" />
                 <div className="flex items-center gap-6 relative z-10">
-                  <div className="w-16 h-16 bg-red-600/20 rounded-[1.5rem] flex items-center justify-center text-red-500 border border-red-600/20">
+                  <div className="w-16 h-16 bg-red-600/20 rounded-[1.5rem] flex items-center justify-center text-red-600 dark:text-red-500 border border-red-600/20">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-black text-white uppercase tracking-tighter">Emergency Protocol Override Active_</h4>
-                    <p className="text-[10px] text-red-400 font-bold uppercase tracking-widest mt-1 opacity-80">Infrastructure write-operations are cryptographically halted by Overseer.</p>
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Emergency Protocol Override Active_</h4>
+                    <p className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-widest mt-1 opacity-80">Infrastructure write-operations are cryptographically halted by Overseer.</p>
                   </div>
                 </div>
                 <div className="px-8 py-3 bg-red-600 text-white rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-red-600/30 relative z-10">
@@ -384,48 +384,48 @@ export default function Dashboard() {
         </AnimatePresence>
         
          <header className="mb-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-white/[0.02] border border-white/5 p-8 rounded-[3rem] backdrop-blur-3xl shadow-2xl">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 p-8 rounded-[3rem] backdrop-blur-3xl shadow-2xl">
                <div className="flex items-center gap-8">
                   <div className="space-y-1">
                      <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">SYSTEM_INFRA_V2</span>
-                        <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${wallet.tier === 'Pro' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : wallet.tier === 'Basic' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                        <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">SYSTEM_INFRA_V2</span>
+                        <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${wallet.tier === 'Pro' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20' : wallet.tier === 'Basic' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20'}`}>
                           {wallet.tier || 'Free'} TIER
                         </span>
                      </div>
-                     <h1 className="text-5xl font-black text-white tracking-tighter mt-4">Protocol Hub_</h1>
+                     <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mt-4">Protocol Hub_</h1>
                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] ml-1">Node ID: {wallet.address ? wallet.address.slice(0, 16) : 'GUEST'}</p>
                   </div>
                </div>
 
                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-3 bg-black/40 px-6 py-4 rounded-3xl border border-white/5">
-                     <div className="text-center px-4 border-r border-white/10">
+                  <div className="flex items-center gap-3 bg-slate-100 dark:bg-black/40 px-6 py-4 rounded-3xl border border-slate-200 dark:border-white/5">
+                     <div className="text-center px-4 border-r border-slate-200 dark:border-white/10">
                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Connections</div>
-                        <div className="text-xl font-bold text-white">{systemStats.connections}</div>
+                        <div className="text-xl font-bold text-slate-900 dark:text-white">{systemStats.connections}</div>
                      </div>
                      <div className="text-center px-4">
                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">System Load</div>
-                        <div className={`text-xl font-bold ${systemStats.load === 'LOW' ? 'text-emerald-400' : 'text-amber-400'}`}>{systemStats.load}</div>
+                        <div className={`text-xl font-bold ${systemStats.load === 'LOW' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>{systemStats.load}</div>
                      </div>
                   </div>
                   <button 
                      onMouseEnter={playHover}
                      onClick={() => { playClick(); router.push('/billing'); }}
-                     className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:scale-105 active:scale-95"
+                     className="px-8 py-4 bg-slate-200 dark:bg-white/5 hover:bg-slate-300 dark:hover:bg-white/10 text-slate-900 dark:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-slate-300 dark:border-white/10 hover:scale-105 active:scale-95"
                   >
                      Manage Billing
                   </button>
                </div>
             </div>
 
-            <nav className="flex gap-4 mt-8 bg-white/[0.01] p-2 rounded-2xl border border-white/[0.02] w-fit">
+            <nav className="flex gap-4 mt-8 bg-slate-50 dark:bg-white/[0.01] p-2 rounded-2xl border border-slate-200 dark:border-white/[0.02] w-fit">
                {['overview', 'builder', 'automation', 'history', 'governance'].map((tab) => (
                   <button
                      key={tab}
                      onMouseEnter={playHover}
                      onClick={() => { playClick(); setActiveTab(tab as any); }}
-                     className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                     className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`}
                   >
                      {tab}
                   </button>
@@ -452,13 +452,13 @@ export default function Dashboard() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {stats.map((stat, i) => (
-                      <div key={i} className="p-10 rounded-[3rem] glass-premium border-white/[0.03] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
+                      <div key={i} className="p-10 rounded-[3rem] glass border-slate-200 dark:border-white/[0.03] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                             {stat.label}
                          </h3>
-                         <div className="text-5xl font-black text-white tracking-tighter mb-4">{stat.value}</div>
+                         <div className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">{stat.value}</div>
                          <div className="h-10 mt-6">
                             <Sparkline color={stat.color} />
                          </div>
@@ -466,33 +466,33 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  <section className="rounded-[2.5rem] glass border-white/5 overflow-hidden">
-                    <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                      <h3 className="text-xl font-bold text-white px-2 uppercase tracking-tighter">Registered Infrastructure Rules</h3>
+                  <section className="rounded-[2.5rem] glass border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div className="p-8 border-b border-slate-200 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-white/[0.01]">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 uppercase tracking-tighter">Registered Infrastructure Rules</h3>
                     </div>
                     {rules.length === 0 ? (
-                      <div className="p-20 text-center text-slate-600 italic uppercase font-black tracking-widest opacity-30">No active logic registries</div>
+                      <div className="p-20 text-center text-slate-400 dark:text-slate-600 italic uppercase font-black tracking-widest opacity-30">No active logic registries</div>
                     ) : (
                       <div className="overflow-x-auto">
                         <table className="w-full text-left">
                           <tbody>
                             {rules.map((rule) => (
-                              <tr key={rule._id} className="border-b border-white/5 group hover:bg-blue-600/[0.01] transition-colors">
+                              <tr key={rule._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.01] transition-colors">
                                 <td className="p-8">
-                                  <div className="text-lg font-bold text-white flex items-center gap-4">
-                                    <span className="uppercase tracking-tighter group-hover:text-blue-400 transition-colors">{rule.name}</span>
+                                  <div className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-4">
+                                    <span className="uppercase tracking-tighter group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{rule.name}</span>
                                     {rule.automationConfig?.autoExecute && (
-                                       <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded font-black">AUTO_ENABLE</span>
+                                       <span className="text-[8px] px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded font-black">AUTO_ENABLE</span>
                                     )}
                                   </div>
                                   <div className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-black opacity-50">v{rule.version || 1.1} // ID_{rule._id.slice(-6)}</div>
                                 </td>
                                 <td className="p-8 text-right space-x-3">
-                                  <button onClick={() => openInspector('Logic Payload', rule)} className="px-4 py-2 bg-white/5 text-slate-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors">Inspect</button>
+                                  <button onClick={() => openInspector('Logic Payload', rule)} className="px-4 py-2 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors">Inspect</button>
                                   <button 
                                     onClick={() => handleRequestProof(rule._id)} 
                                     disabled={systemPaused}
-                                    className={`px-8 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl transition-all ${systemPaused ? 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50' : 'bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-500 scale-95 hover:scale-100'}`}
+                                    className={`px-8 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl transition-all ${systemPaused ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-600 cursor-not-allowed opacity-50' : 'bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-500 scale-95 hover:scale-100'}`}
                                   >
                                     {systemPaused ? 'SYSTEM_HALTED' : 'Trigger Proof'}
                                   </button>
@@ -515,19 +515,19 @@ export default function Dashboard() {
                   exit={{ opacity: 0, scale: 0.98 }}
                   className="space-y-12"
                 >
-                   <form onSubmit={handleCreateRule} className="p-10 rounded-[3rem] glass-blue border-blue-500/10">
+                   <form onSubmit={handleCreateRule} className="p-10 rounded-[3rem] bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-500/10">
                       <div className="flex justify-between items-center mb-10">
                         <div>
-                          <h3 className="text-3xl font-black text-white tracking-tighter">Logic Architect_</h3>
-                          <p className="text-blue-400/60 text-xs font-bold uppercase tracking-widest mt-1">Design trustless multi-chain predicates</p>
+                          <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Logic Architect_</h3>
+                          <p className="text-blue-600 dark:text-blue-400/60 text-xs font-bold uppercase tracking-widest mt-1">Design trustless multi-chain predicates</p>
                         </div>
-                        <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5">
+                        <div className="flex bg-slate-200 dark:bg-black/40 p-1.5 rounded-2xl border border-slate-300 dark:border-white/5">
                            {['state', 'time', 'event'].map((type) => (
                              <button
                                key={type}
                                type="button"
                                onClick={() => setFormState({...formState, triggerType: type})}
-                               className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formState.triggerType === type ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+                               className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formState.triggerType === type ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                              >
                                {type}_BASED
                              </button>
@@ -543,7 +543,7 @@ export default function Dashboard() {
                             value={formState.name}
                             onChange={e => setFormState({...formState, name: e.target.value})}
                             placeholder="e.g. LIQUIDITY_GATEKEEPER"
-                            className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                            />
                         </div>
                         <div className="space-y-3">
@@ -551,7 +551,7 @@ export default function Dashboard() {
                            <select 
                             value={formState.targetChain}
                             onChange={e => setFormState({...formState, targetChain: e.target.value})}
-                            className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-blue-500 outline-none"
+                            className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-blue-500 outline-none"
                            >
                              <option value="Ethereum (Simulated)">Ethereum (Simulated)</option>
                              <option value="Base (L2)">Base (L2)</option>
@@ -572,22 +572,22 @@ export default function Dashboard() {
                             className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
                           >
                              <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-amber-500 tracking-widest px-2">Scheduled Execution (UTC)</label>
+                                <label className="text-[10px] font-black uppercase text-amber-600 dark:text-amber-500 tracking-widest px-2">Scheduled Execution (UTC)</label>
                                 <input 
                                    type="datetime-local"
                                    value={formState.scheduledAt}
                                    onChange={e => setFormState({...formState, scheduledAt: e.target.value})}
-                                   className="w-full bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-white focus:border-amber-500 outline-none"
+                                   className="w-full bg-white dark:bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-amber-500 outline-none"
                                 />
                              </div>
                              <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-amber-500 tracking-widest px-2">Recurrence (Seconds)</label>
+                                <label className="text-[10px] font-black uppercase text-amber-600 dark:text-amber-500 tracking-widest px-2">Recurrence (Seconds)</label>
                                 <input 
                                    type="number"
                                    value={formState.recurrenceInterval}
                                    onChange={e => setFormState({...formState, recurrenceInterval: parseInt(e.target.value)})}
                                    placeholder="0 for one-time"
-                                   className="w-full bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-white focus:border-amber-500 outline-none"
+                                   className="w-full bg-white dark:bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-amber-500 outline-none"
                                 />
                              </div>
                           </motion.div>
@@ -602,23 +602,23 @@ export default function Dashboard() {
                             className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
                           >
                              <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-emerald-500 tracking-widest px-2">Contract Address</label>
+                                <label className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-500 tracking-widest px-2">Contract Address</label>
                                 <input 
                                    type="text"
                                    value={formState.triggerContractAddress}
                                    onChange={e => setFormState({...formState, triggerContractAddress: e.target.value})}
                                    placeholder="0x..."
-                                   className="w-full bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-white focus:border-emerald-500 outline-none"
+                                   className="w-full bg-white dark:bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
                                 />
                              </div>
                              <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-emerald-500 tracking-widest px-2">Event Signature (Topic0)</label>
+                                <label className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-500 tracking-widest px-2">Event Signature (Topic0)</label>
                                 <input 
                                    type="text"
                                    value={formState.triggerEventSignature}
                                    onChange={e => setFormState({...formState, triggerEventSignature: e.target.value})}
                                    placeholder="Transfer(address,address,uint256)"
-                                   className="w-full bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-white focus:border-emerald-500 outline-none"
+                                   className="w-full bg-white dark:bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
                                 />
                              </div>
                           </motion.div>
@@ -629,15 +629,15 @@ export default function Dashboard() {
                       <div className="mb-12 p-8 rounded-3xl bg-indigo-500/[0.03] border border-indigo-500/10">
                         <div className="flex items-center justify-between mb-8">
                            <div>
-                              <h4 className="text-white font-bold text-lg">Enterprise Governance_</h4>
-                              <p className="text-[9px] text-indigo-400 font-black uppercase tracking-widest mt-1">Require cryptographic quorum for execution</p>
+                              <h4 className="text-slate-900 dark:text-white font-bold text-lg">Enterprise Governance_</h4>
+                              <p className="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-widest mt-1">Require cryptographic quorum for execution</p>
                            </div>
                            <button 
                              type="button"
                              onClick={() => setFormState({...formState, isMultiSig: !formState.isMultiSig})}
-                             className={`w-14 h-8 rounded-full relative transition-all ${formState.isMultiSig ? 'bg-indigo-600' : 'bg-slate-800'}`}
+                             className={`w-14 h-8 rounded-full relative transition-all ${formState.isMultiSig ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-800'}`}
                            >
-                             <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${formState.isMultiSig ? 'right-1' : 'left-1'}`} />
+                             <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${formState.isMultiSig ? 'right-1' : 'left-1'}`} />
                            </button>
                         </div>
 
@@ -650,22 +650,22 @@ export default function Dashboard() {
                               className="grid grid-cols-1 md:grid-cols-2 gap-8"
                             >
                                <div className="space-y-3">
-                                  <label className="text-[10px] font-black uppercase text-indigo-400 tracking-widest px-2">Approval Threshold (Quorum)</label>
+                                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest px-2">Approval Threshold (Quorum)</label>
                                   <input 
                                      type="number"
                                      value={formState.requiredApprovals}
                                      onChange={e => setFormState({...formState, requiredApprovals: parseInt(e.target.value)})}
-                                     className="w-full bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                                     className="w-full bg-white dark:bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
                                   />
                                </div>
                                <div className="space-y-3">
-                                  <label className="text-[10px] font-black uppercase text-indigo-400 tracking-widest px-2">Authorized Approvers (CSV)</label>
+                                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest px-2">Authorized Approvers (CSV)</label>
                                   <input 
                                      type="text"
                                      value={formState.approvers}
                                      onChange={e => setFormState({...formState, approvers: e.target.value})}
                                      placeholder="0x..., 0x..."
-                                     className="w-full bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none text-xs"
+                                     className="w-full bg-white dark:bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none text-xs"
                                   />
                                </div>
                             </motion.div>
@@ -676,41 +676,41 @@ export default function Dashboard() {
                       {/* Phase 1: Cross-Chain Details */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                         <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-400">Target Contract Address</label>
+                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-600 dark:text-indigo-400">Target Contract Address</label>
                            <input 
                               type="text"
                               value={formState.targetContract}
                               onChange={e => setFormState({...formState, targetContract: e.target.value})}
                               placeholder="0x71C... or Stellar_Address"
-                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                              className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
                            />
                         </div>
                         <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-400">Execution Payload (Hex)</label>
+                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-600 dark:text-indigo-400">Execution Payload (Hex)</label>
                            <input 
                               type="text"
                               value={formState.targetPayload}
                               onChange={e => setFormState({...formState, targetPayload: e.target.value})}
                               placeholder="0xa9059cbb..."
-                              className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-indigo-500 outline-none"
+                              className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
                            />
                         </div>
                       </div>
 
                       <div className="p-8 bg-indigo-500/5 rounded-3xl border border-indigo-500/20 flex items-center justify-between mb-12">
                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400">
+                            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             </div>
                             <div>
-                               <div className="text-sm font-bold text-white uppercase tracking-tighter">Gas Abstraction Service</div>
+                               <div className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Gas Abstraction Service</div>
                                <div className="text-[9px] text-slate-500 font-bold uppercase mt-1">Pay destination gas with your ZYP credits</div>
                             </div>
                          </div>
                          <button 
                           type="button"
                           onClick={() => setFormState({...formState, useGasAbstraction: !formState.useGasAbstraction})}
-                          className={`w-12 h-6 rounded-full transition-all relative ${formState.useGasAbstraction ? 'bg-indigo-600' : 'bg-slate-700'}`}
+                          className={`w-12 h-6 rounded-full transition-all relative ${formState.useGasAbstraction ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                          >
                             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formState.useGasAbstraction ? 'left-7' : 'left-1'}`} />
                          </button>
@@ -725,18 +725,18 @@ export default function Dashboard() {
                                   onChange={e => setFormState({...formState, logic: e.target.value})}
                                   placeholder="return (msg.sender_balance > 1000);"
                                   rows={8}
-                                  className="w-full bg-black/60 border border-white/10 rounded-[2rem] px-8 py-6 text-blue-400 font-mono text-sm focus:border-blue-500 outline-none shadow-inner"
+                                  className="w-full bg-slate-50 dark:bg-black/60 border border-slate-200 dark:border-white/10 rounded-[2rem] px-8 py-6 text-blue-600 dark:text-blue-400 font-mono text-sm focus:border-blue-500 outline-none shadow-inner"
                                />
                             </div>
-                            <div className="p-6 bg-white/5 rounded-3xl border border-white/10 flex items-center justify-between">
+                            <div className="p-6 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 flex items-center justify-between">
                                <div>
-                                  <div className="text-[10px] font-black text-white uppercase tracking-widest">Autonomous Execution</div>
+                                  <div className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Autonomous Execution</div>
                                   <div className="text-[9px] text-slate-500 font-bold uppercase mt-1">Retry and attest via background worker if satisfied</div>
                                </div>
                                <button 
                                 type="button"
                                 onClick={() => setFormState({...formState, autoExecute: !formState.autoExecute})}
-                                className={`w-12 h-6 rounded-full transition-all relative ${formState.autoExecute ? 'bg-blue-600' : 'bg-slate-700'}`}
+                                className={`w-12 h-6 rounded-full transition-all relative ${formState.autoExecute ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                                >
                                   <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formState.autoExecute ? 'left-7' : 'left-1'}`} />
                                </button>
@@ -758,7 +758,7 @@ export default function Dashboard() {
                                       key={i} 
                                       type="button" 
                                       onClick={() => setFormState({...formState, logic: t.code})}
-                                      className="p-4 text-left glass border-white/5 rounded-xl text-[9px] font-black uppercase text-slate-400 hover:text-white hover:border-blue-500/40 transition-all"
+                                      className="p-4 text-left glass border-slate-200 dark:border-white/5 rounded-xl text-[9px] font-black uppercase text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all"
                                     >
                                       {t.label}
                                     </button>
@@ -768,18 +768,18 @@ export default function Dashboard() {
                          </div>
                       </div>
 
-                      <div className="mt-12 flex justify-end gap-4 border-t border-white/5 pt-8">
+                      <div className="mt-12 flex justify-end gap-4 border-t border-slate-200 dark:border-white/5 pt-8">
                          <button 
                             type="button"
                             onClick={handleRunSimulation}
-                            className="px-10 py-4 bg-indigo-600/20 text-indigo-400 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-600 hover:text-white transition-all shadow-xl shadow-indigo-600/10"
+                            className="px-10 py-4 bg-indigo-600/10 text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-600 hover:text-white transition-all shadow-xl shadow-indigo-600/10"
                          >
                            Simulate State
                          </button>
                          <button 
                             type="submit" 
                             disabled={submitting || systemPaused}
-                            className={`px-12 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl ${submitting || systemPaused ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-white text-slate-950 hover:bg-blue-600 hover:text-white shadow-white/5'}`}
+                            className={`px-12 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl ${submitting || systemPaused ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-600 cursor-not-allowed' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 hover:bg-blue-600 hover:text-white shadow-white/5'}`}
                          >
                            {systemPaused ? 'PROTOCOL_HALTED' : (submitting ? 'Committing...' : 'Deploy to Protocol')}
                          </button>
@@ -798,13 +798,11 @@ export default function Dashboard() {
                                </svg>
                             </div>
                             <div>
-                               <h4 className="text-xl font-bold uppercase tracking-tighter">Simulation Feedback_</h4>
-                               <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${simResult.status === 'pass' ? 'text-emerald-400' : 'text-red-400'}`}>{simResult.msg}</p>
+                               <div className={`text-xl font-black uppercase tracking-tighter ${simResult.status === 'pass' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>Simulation Result_</div>
+                               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{simResult.msg}</p>
                             </div>
                          </div>
-                         <div className="text-[9px] font-mono text-slate-500 bg-black/40 px-6 py-3 rounded-2xl border border-white/5 max-w-sm">
-                            {mockState.replace(/\s+/g, ' ')}
-                         </div>
+                         <button onClick={() => setSimResult(null)} className="text-[10px] font-black text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase tracking-widest transition-colors">Dismiss</button>
                       </motion.div>
                    )}
                 </motion.section>
@@ -812,270 +810,156 @@ export default function Dashboard() {
 
               {activeTab === 'automation' && (
                 <motion.section 
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="p-16 rounded-[4rem] glass-blue border-white/5 text-center"
+                  key="automation"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-8"
                 >
-                   <div className="w-24 h-24 bg-blue-600/10 rounded-[2.5rem] flex items-center justify-center text-blue-400 mx-auto mb-10 border border-blue-500/20">
-                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                   </div>
-                   <h3 className="text-4xl font-black text-white tracking-tighter mb-4">Autonomous Verifier_</h3>
-                   <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-12 opacity-60">System-wide automation for recurring logic attestations</p>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                      <div className="p-8 bg-black/40 rounded-[2.5rem] border border-white/5 text-left group hover:border-blue-500/30 transition-all">
-                         <div className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-4">API Webhooks</div>
-                         <div className="text-xl font-bold text-white mb-2">REST_TRIGGER</div>
-                         <p className="text-[10px] text-slate-500 font-medium">Trigger verification via external systems using your secure API keys.</p>
+                   <div className="p-12 rounded-[3rem] glass border-slate-200 dark:border-white/5">
+                      <div className="flex items-center gap-6 mb-12">
+                         <div className="w-16 h-16 bg-blue-600/10 rounded-[1.8rem] flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                         </div>
+                         <div>
+                            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Automation Scheduler_</h3>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage background workers and recurrent jobs</p>
+                         </div>
                       </div>
-                      <div className="p-8 bg-black/40 rounded-[2.5rem] border border-white/5 text-left group hover:border-blue-500/30 transition-all">
-                         <div className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-4">Scheduled Batch</div>
-                         <div className="text-xl font-bold text-white mb-2">B_RUN_60s</div>
-                         <p className="text-[10px] text-slate-500 font-medium">Background workers check your rules every 60 seconds automatically.</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div className="p-8 bg-slate-50 dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
+                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4">Worker Status</div>
+                            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">RUNNING_0x42</div>
+                            <p className="text-[10px] text-slate-500 font-medium">Listening for cross-chain state events and block timestamps.</p>
+                         </div>
+                         <div className="p-8 bg-slate-50 dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
+                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4">Job Density</div>
+                            <div className="text-xl font-bold text-slate-900 dark:text-white mb-2">12 Active Tasks</div>
+                            <p className="text-[10px] text-slate-500 font-medium">8 Recurrent, 4 Event-based triggers currently indexed.</p>
+                         </div>
                       </div>
                    </div>
-                </motion.section>
-              )}
-              
-              {activeTab === 'history' && (
-                <motion.section 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="rounded-[2.5rem] glass border-white/5 overflow-hidden"
-                >
-                   <div className="p-8 border-b border-white/5 bg-white/[0.01] flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Execution Archive</h3>
-                    <button className="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest px-4 transition-colors">Export Logs (JSON)</button>
-                  </div>
-                  <div className="overflow-x-auto text-[11px] font-bold">
-                    {operations.length === 0 ? (
-                       <div className="p-20 text-center opacity-30 italic uppercase font-black tracking-widest">No archival data found</div>
-                    ) : (
-                      <table className="w-full text-left">
-                        <tbody>
-                          {operations.map((op) => (
-                            <tr key={op._id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
-                              <td className="p-8">
-                                <div className="text-sm font-bold text-white uppercase group-hover:text-blue-400">{(op.ruleId as any)?.name || 'Op_' + op._id.slice(-6)}</div>
-                                <div className="text-[9px] text-slate-500 mt-1 uppercase font-black opacity-60">TX_HASH: CDTF..{op._id.slice(-12)}</div>
-                              </td>
-                              <td className="p-8">
-                                 <div className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase flex items-center gap-2 ${op.status === 'verified' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700/10 text-slate-500'}`}>
-                                    <div className="w-1 h-1 rounded-full bg-current" />
-                                    {op.status}
-                                 </div>
-                              </td>
-                              <td className="p-8 text-right font-mono text-[10px] text-slate-600">
-                                {new Date(op.createdAt).toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
                 </motion.section>
               )}
 
               {activeTab === 'governance' && (
                 <motion.section 
                   key="governance"
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
                   className="space-y-8"
                 >
-                   <div className="p-12 rounded-[3rem] glass-blue border-indigo-500/10 flex items-center justify-between">
-                      <div>
-                         <h3 className="text-4xl font-black text-white tracking-tighter mb-2">Governance Hub_</h3>
-                         <p className="text-[10px] text-indigo-400 font-black uppercase tracking-[0.3em] opacity-60">Cryptographic Quorum & Multi-Sig Verification</p>
-                      </div>
-                      <div className="flex gap-4">
-                         <div className="bg-indigo-600/10 border border-indigo-500/20 px-8 py-4 rounded-2xl text-center">
-                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Pending Consensys</div>
-                            <div className="text-2xl font-bold text-white">{pendingGov.length}</div>
+                   <div className="p-12 rounded-[3rem] glass border-slate-200 dark:border-white/5">
+                      <div className="flex items-center gap-6 mb-12">
+                         <div className="w-16 h-16 bg-indigo-600/10 rounded-[1.8rem] flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                         </div>
+                         <div>
+                            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Enterprise Governance_</h3>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage rule approvals and protocol quorum</p>
                          </div>
                       </div>
-                   </div>
 
-                   <div className="grid grid-cols-1 gap-6">
-                      {pendingGov.length === 0 ? (
-                        <div className="p-20 text-center rounded-[3rem] glass border-white/5 opacity-30 italic uppercase font-black tracking-widest">
-                           No pending approvals found for your authorized addresses
-                        </div>
-                      ) : (
-                        pendingGov.map(gov => (
-                          <div key={gov._id} className="p-10 rounded-[3rem] glass border-white/5 flex items-center justify-between group hover:border-indigo-500/30 transition-all">
-                             <div className="flex items-center gap-8">
-                                <div className="w-16 h-16 bg-indigo-600/20 rounded-3xl flex items-center justify-center text-indigo-400 border border-indigo-500/20">
-                                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 21.355r-.015.015V21a11.952 11.952 0 00-8.618-3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                   </svg>
-                                </div>
-                                <div>
-                                   <div className="text-2xl font-black text-white tracking-tighter">{gov.ruleId.name}</div>
-                                   <div className="flex gap-4 mt-2">
-                                      <div className="text-[9px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-500/5 px-3 py-1 rounded-lg border border-indigo-500/10">Quorum: {gov.signatures.length}/{gov.ruleId.requiredApprovals}</div>
-                                      <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Rule_ID: {gov.ruleId._id.slice(-8)}</div>
-                                   </div>
-                                </div>
-                             </div>
-                             <button 
-                                onClick={async () => {
-                                   try {
-                                      const signature = await signActionRequest(wallet.address, `Approve execution of rule ${gov.ruleId._id}`);
-                                      const res = await fetch(`${API_BASE}/api/governance/approve`, {
-                                         method: 'POST',
-                                         headers: { 
-                                            'Content-Type': 'application/json',
-                                            'Authorization': `Bearer ${token}`
-                                         },
-                                         body: JSON.stringify({ proofId: gov._id, signature })
-                                      });
-                                      if (res.ok) {
-                                         addNotification('Consensus signature recorded.', 'success');
-                                         setPendingGov(prev => prev.filter(p => p._id !== gov._id));
-                                      }
-                                   } catch (e) { addNotification('Signing failed', 'error'); }
-                                }}
-                                className="px-10 py-5 bg-white text-slate-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-xl"
-                             >
-                                Confirm_Quorum
-                             </button>
-                          </div>
-                        ))
-                      )}
+                      <div className="space-y-4">
+                         {pendingGov.length === 0 ? (
+                            <div className="p-20 text-center glass border-slate-200 dark:border-white/5 rounded-[2rem] opacity-30 italic font-black uppercase tracking-widest text-[10px]">No pending quorum requests</div>
+                         ) : pendingGov.map(gov => (
+                            <div key={gov._id} className="p-8 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-3xl flex justify-between items-center group hover:bg-indigo-500/[0.03] transition-all">
+                               <div>
+                                  <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">{gov.ruleName}</div>
+                                  <div className="flex gap-4 mt-1">
+                                     <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Approvals: {gov.currentApprovals} / {gov.requiredApprovals}</span>
+                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">OpID: {gov._id.slice(-8)}</span>
+                                  </div>
+                               </div>
+                               <button 
+                                 className="px-8 py-3 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all"
+                               >
+                                  Sign Approval
+                               </button>
+                            </div>
+                         ))}
+                      </div>
                    </div>
                 </motion.section>
+              )}
+
+              {activeTab === 'history' && (
+                <motion.div 
+                  key="history"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="rounded-[2.5rem] glass border-slate-200 dark:border-white/5 overflow-hidden"
+                >
+                  <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.01]">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 uppercase tracking-tighter">Attestation Records</h3>
+                  </div>
+                  {operations.length === 0 ? (
+                    <div className="p-20 text-center text-slate-400 dark:text-slate-600 italic uppercase font-black tracking-widest opacity-30">No execution history indexed</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <tbody>
+                          {operations.map((op) => (
+                            <tr key={op._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-emerald-500/[0.01] transition-colors">
+                              <td className="p-8">
+                                <div className="text-md font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                                  <span className="uppercase tracking-tighter">{(op.ruleId as any)?.name || 'Op_' + op._id.slice(-6)}</span>
+                                  <span className={`text-[8px] font-black px-2 py-0.5 rounded uppercase ${op.status === 'verified' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400'}`}>{op.status}</span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 mt-1 uppercase font-mono opacity-50">TX: {op.txHash || 'NULL_COMMIT'}</div>
+                              </td>
+                              <td className="p-8 text-right space-x-3">
+                                {op.status === 'pending' && (
+                                  <button onClick={() => handleSubmitProof(op._id)} className="px-8 py-3 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:scale-105 transition-all">Submit to Stellar</button>
+                                )}
+                                <button onClick={() => openInspector('Operation Trace', op)} className="px-4 py-2 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors">Trace</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Infrastructure Sidebar ( telemetry ) */}
-          <div className="lg:col-span-1">
-             <div className="sticky top-32 space-y-8">
-                {/* Real-time Telemetry Stream */}
-                <div className="p-8 rounded-[3rem] glass-dark border-white/[0.03] relative overflow-hidden flex flex-col h-[600px] shadow-2xl">
-                   <div className="flex items-center justify-between mb-8">
-                      <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                         Live Telemetry
-                      </h3>
-                      <span className="text-[8px] font-bold text-slate-700 font-mono">0.0.0.1_UPLINK</span>
-                   </div>
-                   
-                   <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                      {liveLogs.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                           <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-slate-700 mb-4">
-                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                           </div>
-                           <p className="text-[9px] text-slate-700 font-bold uppercase tracking-widest leading-relaxed">Awaiting protocol events and interchain handshakes...</p>
-                        </div>
-                      ) : (
-                        liveLogs.map((log, i) => (
-                           <div key={i} className="group cursor-default">
-                              <div className="flex items-center gap-3 mb-1">
-                                 <span className="text-[8px] text-slate-600 font-mono">[{log.t}]</span>
-                                 <div className="h-[1px] flex-1 bg-white/[0.03]" />
-                              </div>
-                              <p className={`text-[10px] font-bold tracking-tight leading-relaxed break-words ${log.c}`}>
-                                 {log.m}
-                              </p>
-                           </div>
-                        ))
-                      )}
-                   </div>
+          {/* Sidebar / Logs */}
+          <aside className="space-y-12">
+            
+            <section className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-[500px]">
+              <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.01]">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Protocol telemetry</h3>
+              </div>
+              <div className="flex-1 p-8 space-y-6 overflow-y-auto bg-slate-100/50 dark:bg-black/20 font-mono text-[10px]" style={{ scrollbarWidth: 'none' }}>
+                {liveLogs.length === 0 ? (
+                   <div className="opacity-20 italic text-slate-500">Awaiting stream...</div>
+                ) : liveLogs.map((log, i) => (
+                  <div key={i} className="flex gap-4 items-start border-l-2 border-slate-200 dark:border-white/5 pl-4 ml-1">
+                    <span className="opacity-30 flex-shrink-0 font-bold">{log.t}</span>
+                    <span className={`${log.c} font-bold leading-relaxed`}>{log.m}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="p-6 bg-blue-600/5 text-center mt-auto border-t border-slate-200 dark:border-white/5 font-mono text-[9px] font-black text-blue-600 dark:text-blue-400 tracking-widest">
+                REALTIME_FEED: ACTIVE
+              </div>
+            </section>
 
-                   <div className="mt-8 pt-6 border-t border-white/5">
-                      <div className="flex items-center gap-3 px-4 py-3 bg-black/40 rounded-xl border border-white/5">
-                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                         <span className="text-[9px] font-black text-white uppercase tracking-widest">WSS_LINK_ACTIVE</span>
-                      </div>
-                   </div>
-                </div>
+            <div className="p-8 rounded-[3rem] glass border-slate-200 dark:border-white/5 bg-gradient-to-br from-blue-600/5 to-transparent relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-24 h-24 bg-blue-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Quick Actions</h4>
+               <div className="space-y-3">
+                  <button onClick={() => setActiveTab('builder')} className="w-full py-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">New Infrastructure Rule</button>
+                  <button onClick={() => router.push('/billing')} className="w-full py-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">Top up Gas Credits</button>
+               </div>
+            </div>
 
-                {/* Additional Sidebar Context */}
-                <div className="p-10 rounded-[3rem] glass-premium border-white/[0.03] space-y-6">
-                   <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                      Protocol Health
-                   </div>
-                   <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Latency</span>
-                         <span className="text-[10px] text-emerald-400 font-black">12ms</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Uptime</span>
-                         <span className="text-[10px] text-blue-400 font-black">99.99%</span>
-                      </div>
-                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-2">
-                         <motion.div 
-                           initial={{ width: 0 }}
-                           animate={{ width: '99.99%' }}
-                           className="h-full bg-blue-500"
-                         />
-                      </div>
-                   </div>
-                </div>
-
-                {/* Phase 3: Identity & Trust (DID) */}
-                <div className="p-10 rounded-[3rem] glass-blue border-blue-500/10 space-y-6">
-                   <div className="flex justify-between items-center">
-                      <div className="text-[9px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                         Identity_Trust
-                      </div>
-                      {user?.isDIDVerified ? (
-                         <span className="text-[7px] px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded font-black uppercase">DID_VERIFIED</span>
-                      ) : (
-                         <span className="text-[7px] px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-black uppercase">UNVERIFIED</span>
-                      )}
-                   </div>
-                   
-                   <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight leading-relaxed mb-6">
-                         Link your self-sovereign identity to enable enterprise-tier operations and trustless KYC.
-                      </p>
-                      
-                      {user?.isDIDVerified ? (
-                         <div className="p-4 bg-black/40 rounded-2xl border border-emerald-500/10">
-                            <div className="text-[8px] text-emerald-500 uppercase font-black mb-1">Decentralized ID</div>
-                            <div className="text-[10px] font-mono text-white truncate">{user.did}</div>
-                         </div>
-                      ) : (
-                         <button 
-                            onClick={async () => {
-                               setIsVerifyingDID(true);
-                               try {
-                                  const signature = await signActionRequest(wallet.address, "Verify DID Identity for Zypherion");
-                                  const res = await fetch(`${API_BASE}/api/auth/verify-did`, {
-                                     method: 'POST',
-                                     headers: { 
-                                        'Content-Type': 'application/json',
-                                        'Authorization': `Bearer ${token}`
-                                     },
-                                     body: JSON.stringify({ 
-                                        did: `did:zypher:${wallet.address.slice(0, 10)}`,
-                                        didDocument: { verificationMethod: 'Ed25519Signature2018', signature }
-                                     })
-                                  });
-                                  if (res.ok) {
-                                     addNotification('DID verified and linked.', 'success');
-                                     loadData();
-                                  }
-                               } catch (e) { addNotification('DID verification failed', 'error'); }
-                               setIsVerifyingDID(false);
-                            }}
-                            disabled={isVerifyingDID}
-                            className="w-full py-4 bg-blue-600 text-white rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-600/20 hover:scale-105 transition-all"
-                         >
-                            {isVerifyingDID ? 'VERIFYING...' : 'Link_DID_Protocol'}
-                         </button>
-                      )}
-                   </div>
-                </div>
-             </div>
-          </div>
+          </aside>
         </div>
       </main>
     </div>

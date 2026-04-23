@@ -2,16 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-color: #f8fafc; /* Slate 50 */
+  --text-color: #0f172a; /* Slate 900 */
+  --border-color: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --accent-color: #3b82f6;
+}
+
+.dark {
+  --bg-color: #020617; /* Slate 950 */
+  --text-color: #e2e8f0; /* Slate 200 */
+  --border-color: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --accent-color: #3b82f6;
+}
+
 body {
-  @apply bg-[#020617] text-slate-200 antialiased;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  @apply antialiased transition-colors duration-300;
 }
 
 .glass {
-  @apply bg-white/[0.03] backdrop-blur-3xl border border-white/[0.05];
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-premium {
-  @apply bg-white/[0.02] backdrop-blur-[100px] border border-white/[0.04] shadow-2xl;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(100px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  @apply shadow-2xl;
+}
+
+.dark .glass-premium {
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .glass-dark {
@@ -29,8 +58,18 @@ body {
   background-size: 40px 40px;
 }
 
+.dark .blueprint-bg {
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+}
+
 .text-gradient-blue {
   @apply bg-clip-text text-transparent bg-gradient-to-br from-blue-400 via-blue-200 to-white;
+}
+
+.dark .text-gradient-blue {
+  @apply from-blue-500 via-blue-300 to-white;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -40,5 +79,6 @@ body {
   @apply bg-transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20;
+  background-color: var(--border-color);
+  @apply rounded-full hover:bg-white/20;
 }
