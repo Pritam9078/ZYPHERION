@@ -1,12 +1,12 @@
 # Zypherion Protocol: System Architecture
 
-This document provides a detailed visual representation and technical breakdown of the Zypherion Protocol's architecture, logic flows, and security models.
+This document provides a detailed visual representation and technical breakdown of the Zypherion Protocol's architecture, logic flows, and security models, now enhanced with Zero-Knowledge (ZK) proof capabilities and identity-centric governance.
 
 ---
 
 ## 1. High-Level System Architecture
 
-This diagram shows the structural relationship between the four primary layers of the protocol: the Sovereign Interface, the SDK, the Orchestration Engine, and the Consensus Layer.
+This diagram shows the structural relationship between the protocol layers, including the new **ZK Prover Engine** and **Identity-Based Redirection**.
 
 ```mermaid
 graph TD
@@ -14,167 +14,139 @@ graph TD
         A[Dashboard & UI]
         B[Logic Architect]
         C[Governance Hub]
-        D[Billing System]
-        E[Freighter Wallet]
+        D[Developer Portal / API Keys]
+        E[Node Monitor]
+        F[Identity Redirection Service]
     end
 
     subgraph SDK["Zypherion SDK — TypeScript"]
-        F[Signature Engine]
-        G[Request Wrapper]
-        H[Module Registry]
+        G[Signature Engine]
+        H[ZK Proof Module]
+        I[Module Registry]
     end
 
     subgraph BE["Orchestration Engine — Backend"]
-        I[Express API Server]
-        J[Automation Worker / Cron]
-        K[Socket.io WebSocket Hub]
-        L[(MongoDB Instance)]
+        J[Express API Server]
+        K[Automation Worker / Chronos]
+        L[ZK Prover Engine — snarkjs/circom]
+        M[(MongoDB - Persistent State)]
+        N[Socket.io Real-time Hub]
     end
 
     subgraph CHAIN["Consensus Layer — Stellar Soroban"]
-        M[Logic Registry Contract]
-        N[Proof Verifier Contract]
-        O[Execution Router Contract]
+        O[Logic Registry Contract]
+        P[ZK-Proof Verifier Contract]
+        Q[Execution Router Contract]
     end
 
-    E -- "Cryptographic Signing" --> B
-    B -- "Signed Payload" --> F
-    F --> G
-    G -- "HTTPS / JWT" --> I
-    I -- "Persistence" --> L
-    J -- "State Monitoring" --> L
-    J -- "Batch Proof Submission" --> N
-    N --> O
-    O -- "Contract Events" --> M
-    K -- "Real-time Telemetry" --> A
+    F -- "Redirection" --> A
+    F -- "Redirection" --> E
+    B -- "Logic Rules" --> J
+    L -- "Witness Generation" --> K
+    K -- "Batch ZK Proof" --> P
+    P --> Q
+    Q -- "On-chain Exec" --> O
+    N -- "Telemetry" --> E
 ```
 
 ---
 
-## 2. Logic Execution & Batching Flow
+## 2. ZK-Proof Generation & Verification Flow
 
-This sequence diagram illustrates the full lifecycle of an automated rule — from user definition through recursive proof batching to on-chain finality.
+This sequence diagram illustrates the lifecycle of a Zero-Knowledge verified operation — from rule triggering to cryptographic finality.
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Frontend
-    participant Backend
-    participant Worker as Automation Worker
+    participant Worker as Chronos Engine
+    participant ZK as ZK Prover (Circom)
     participant DB as MongoDB
-    participant Stellar as Soroban Contracts
+    participant Stellar as Soroban Verifier
 
-    Note over User, Backend: Phase 1 — Rule Creation
-
-    User->>Frontend: Create Logic Rule (e.g. Scheduled Payment)
-    Frontend->>User: Request Signature (Freighter)
-    User-->>Frontend: Signed Message
-    Frontend->>Backend: POST /api/rules
-    Backend->>DB: Save Rule (status: active)
-
-    Note over Worker, DB: Phase 2 — Chronos Engine Polling (every 1 min)
-
-    Worker->>DB: Find Triggered Rules
-    Worker->>Worker: Verify Data Feeds / Time
-    Worker->>DB: Check Gas Abstraction Credits
-    Worker->>DB: Create Proof (status: pending)
-
-    Note over Worker, Stellar: Phase 3 — Recursive Batching Engine
-
-    Worker->>Worker: Aggregate 3+ Proofs into BatchProof
-    Worker->>Stellar: verify_proof(BatchProof)
-    Stellar-->>Worker: Verification Success
-    Worker->>Stellar: execute_action(Payload)
-    Stellar-->>Worker: EXECUTED_EVENT
-
-    Note over Worker, Frontend: Phase 4 — Notification
-
-    Worker->>Backend: Execution Success Update
-    Backend->>Frontend: Socket.io — Notify User
-    Frontend-->>User: Success Alert & Dashboard Update
+    Note over User, Worker: Phase 1 — Rule Triggering
+    Worker->>DB: Scan triggered logic rules
+    Worker->>Worker: Validate external data feeds
+    
+    Note over Worker, ZK: Phase 2 — ZK Proof Generation
+    Worker->>ZK: Generate Witness (Public Signals + Private Input)
+    ZK->>ZK: Compute ZK-SNARK (snarkjs)
+    ZK-->>Worker: Proof Payload (A, B, C) + Public Signals
+    
+    Note over Worker, Stellar: Phase 3 — On-chain Verification
+    Worker->>Stellar: verify_zk_proof(proof, signals)
+    Stellar-->>Worker: Verification Result (Boolean)
+    
+    Note over Worker, DB: Phase 4 — State Update
+    alt Success
+        Worker->>DB: Update Op Status: VERIFIED
+        Worker->>User: Notify via WebSocket (Success)
+    else Failure
+        Worker->>DB: Update Op Status: FAILED
+        Worker->>User: Notify via WebSocket (Invalid Proof)
+    end
 ```
 
 ---
 
-## 3. Governance & Security Model
+## 3. Governance & RBAC Model
 
-The protocol utilizes a multi-layered security model to ensure trustless execution and sovereign control over automation rules.
+The protocol utilizes an Identity-Based Access Control (RBAC) model to ensure specialized tooling for different ecosystem participants.
 
 ```mermaid
-flowchart LR
-    Admin(["Master Admin Wallet\nADMIN_WALLET_ADDRESS"])
+flowchart TD
+    Wallet["Freighter Wallet Connection"] --> Identity{"Select Identity"}
+    
+    Identity -- "Developer" --> DevDash["Developer Portal\nAPI Keys & Webhooks"]
+    Identity -- "Node Operator" --> NodeMon["Node Monitor\nTelemetry & Staking"]
+    Identity -- "DAO Admin" --> GovHub["Governance Hub\nMulti-Sig & Kill Switch"]
+    Identity -- "Guest" --> PubDash["Public Dashboard\nProtocol Stats"]
 
-    Admin -- Toggle --> KS{{"Kill Switch Active?"}}
-
-    KS -- YES --> STOP["BLOCK ALL OPERATIONS\nProtocol Frozen"]
-
-    KS -- NO --> Rules["Logic Rules\nActive Rule Queue"]
-
-    Rules -- "Requires Multi-Sig?" --> Quorum{{"Quorum Reached?"}}
-
-    Quorum -- "N/M Signatures" --> Batch["Proof Batching\nBatchProof Engine"]
-
-    Quorum -- "Pending" --> Wait["Governance Hub\nAwait Approver Signatures"]
-
-    Wait -. "Signatures Collected" .-> Quorum
-
-    Batch --> Finality["Stellar Ledger\nOn-chain Finality"]
+    subgraph SEC["Security Layer"]
+        KS{{"Protocol Kill Switch"}}
+        KS -- ACTIVE --> LOCK["Freeze All ZK-Proof Submissions"]
+    end
+    
+    DevDash --> SEC
+    NodeMon --> SEC
+    GovHub --> SEC
 ```
 
 ---
 
-## 4. Database Schema Relationships
+## 4. Enhanced Database Schema
 
-A high-level entity-relationship view of how the MongoDB models are interconnected across the protocol.
+The MongoDB models now support profile metadata, API credentials, and ZK-specific operation fields.
 
 ```mermaid
 erDiagram
     USER ||--o{ LOGIC_RULE : creates
-    USER ||--o{ BILLING : manages
-    LOGIC_RULE ||--o{ PROOF : generates
-    PROOF }|--|| BATCH_PROOF : aggregates
+    USER ||--o{ OPERATION : initiates
+    LOGIC_RULE ||--o{ OPERATION : generates
 
     USER {
-        string  address       PK  "Wallet public key"
-        string  tier              "free or pro or enterprise"
-        float   gasBalance        "Prepaid ZYP credits"
-        boolean isDIDVerified     "Self-sovereign identity"
-        string  didDocument       "did:zypher document"
+        string  address       PK
+        string  accountType      "Developer | NodeOperator | DAOAdmin"
+        string  apiKey           "ZYPH-TEST-..."
+        string  name             "Profile Name"
+        string  email            "Notification Email"
+        boolean isDIDVerified    "ZK-Identity Verified"
     }
 
     LOGIC_RULE {
-        string   id           PK  "Rule UUID"
-        string   userId       FK  "Owner wallet"
-        string   name             "Human-readable label"
-        string   logic            "Encoded rule payload"
-        string   status           "active or pending or executed"
-        datetime scheduledAt      "Trigger timestamp"
-        boolean  isMultiSig       "Requires N-of-M sigs"
-        array    approvers        "Authorised signer list"
+        string   id           PK
+        string   userId       FK
+        json     conditions       "Logic predicates"
+        boolean  useZK            "Enable snarkjs verification"
+        string   status           "active | disabled"
     }
 
-    PROOF {
-        string   id           PK  "Proof UUID"
-        string   ruleId       FK  "Parent rule"
-        string   status           "pending or verified or batched"
-        string   txHash           "Soroban tx reference"
-        datetime createdAt        "Generation timestamp"
-    }
-
-    BATCH_PROOF {
-        string   id           PK  "Batch UUID"
-        array    proofIds     FK  "Aggregated proof refs"
-        string   aggregatedData   "Recursive SNARK payload"
-        string   txHash           "On-chain finality hash"
-        string   status           "pending or submitted or confirmed"
-    }
-
-    BILLING {
-        string   id           PK  "Billing record UUID"
-        string   userId       FK  "Owner wallet"
-        float    credits          "Total deposited credits"
-        float    spent            "Credits consumed"
-        datetime updatedAt        "Last deduction timestamp"
+    OPERATION {
+        string   id           PK
+        string   ruleId       FK
+        string   status           "pending | verified | failed"
+        string   proofData        "ZK-SNARK Payload"
+        array    publicSignals    "ZK Public Inputs"
+        string   txHash           "Stellar Finality Hash"
     }
 ```
 
@@ -182,35 +154,58 @@ erDiagram
 
 ## 5. Component Dependency Map
 
-This map outlines the core technologies and dependencies used across each layer of the stack.
+This diagram visualizes the interconnected nature of the Zypherion ecosystem, illustrating how data and logic flow between the client, orchestration, and settlement tiers.
 
 ```mermaid
-graph LR
-    subgraph FE["Frontend"]
-        next["Next.js 14"]
-        tw["TailwindCSS"]
-        fm["Framer Motion"]
-        sio_c["socket.io-client"]
-        freighter["Freighter SDK"]
+graph TD
+    subgraph Client["Client Tier (Frontend)"]
+        UI[Next.js 14 UI]
+        V_SDK[Zypherion SDK]
+        WS_C[Socket.io Client]
     end
 
-    subgraph BE["Backend"]
-        express["Express"]
-        mongoose["Mongoose / MongoDB"]
-        cron["node-cron"]
-        jwt["jsonwebtoken"]
-        sio_s["socket.io"]
+    subgraph Logic["Orchestration Tier (Backend)"]
+        API[Express REST API]
+        AUTH[RBAC & Identity]
+        CHRONOS[Chronos Worker]
+        ZKP[ZK Prover — snarkjs]
     end
 
-    subgraph CHAIN["Blockchain"]
-        stellar["Stellar SDK"]
-        soroban["Soroban Client"]
+    subgraph Data["Persistence & State"]
+        MDB[(MongoDB)]
+        SIO[Socket.io Hub]
     end
 
-    next --> express
-    sio_c --> sio_s
-    freighter --> stellar
-    express --> mongoose
-    cron --> soroban
-    soroban --> stellar
+    subgraph Ledger["Settlement Tier (Stellar)"]
+        SOROBAN[Soroban Contracts]
+        FREIGHTER[Freighter Wallet]
+    end
+
+    %% Dependencies
+    UI -- "REST Calls" --> API
+    UI -- "SDK Wrappers" --> V_SDK
+    V_SDK -- "Transaction Signing" --> FREIGHTER
+    WS_C -- "Real-time Telemetry" --> SIO
+    API -- "Authentication" --> AUTH
+    AUTH -- "Identity State" --> MDB
+    CHRONOS -- "Rule Execution" --> MDB
+    CHRONOS -- "Proof Generation" --> ZKP
+    CHRONOS -- "On-chain Attestation" --> SOROBAN
+    ZKP -- "Witness Input" --> ZK_CIRC["Circom Circuits"]
+    SOROBAN -- "Finality" --> STELLAR["Stellar Network"]
 ```
+
+### Technology Stack Summary
+
+| Layer | Core Technologies |
+| :--- | :--- |
+| **Frontend** | Next.js 14, Framer Motion, TailwindCSS |
+| **Backend** | Node.js, Express, snarkjs, Circom 2.1 |
+| **Database** | MongoDB (Persistence), Redis (Optional/Caching) |
+| **Smart Contracts** | Rust (Soroban SDK), ZK-Verifier |
+| **Identity** | Stellar Freighter, ZK-Identity Protocol |
+
+---
+
+> [!IMPORTANT]
+> The ZK Prover Engine currently supports Groth16 proofs generated via Circom circuits. The **Batch Aggregator** module enables the protocol to combine multiple state transitions into a single on-chain verification, significantly reducing gas costs.
