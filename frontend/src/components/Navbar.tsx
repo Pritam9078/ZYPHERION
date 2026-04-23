@@ -23,12 +23,12 @@ const Navbar = () => {
           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
             <img src="/logo.png" alt="Zypherion Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="text-lg font-bold tracking-widest text-white group-hover:text-blue-400 transition-colors">
+          <span className="text-lg font-bold tracking-[0.15em] text-white group-hover:text-blue-400 transition-colors">
             ZYPHERION
           </span>
         </Link>
         
-        <div className="hidden lg:flex gap-8 text-[11px] font-semibold uppercase tracking-wider">
+        <div className="hidden lg:flex gap-8 text-[11px] font-semibold uppercase tracking-wide">
           <Link 
             href="/dashboard" 
             className={`transition-colors ${router.pathname === '/dashboard' ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
