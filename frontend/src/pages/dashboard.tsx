@@ -9,6 +9,7 @@ import PayloadModal from '../components/PayloadModal';
 import NetworkMap from '../components/NetworkMap';
 import AIAssistant from '../components/AIAssistant';
 import { useWallet } from '../hooks/useWallet';
+import { useSound } from '../hooks/useSound';
 import { 
   fetchRules, 
   createRule, 
@@ -39,6 +40,7 @@ const Sparkline = ({ color = '#3b82f6' }) => (
 export default function Dashboard() {
   const router = useRouter();
   const { wallet } = useWallet();
+  const { playHover, playClick, playSuccess, playError, playExecution } = useSound();
   const socketRef = useRef<Socket | null>(null);
   
   const [token, setToken] = useState<string | null>(null);
@@ -111,7 +113,9 @@ export default function Dashboard() {
     };
 
     const onExecutionUpdate = (data: any) => {
-      addNotification(data.message, data.type.toLowerCase() === 'success' ? 'success' : 'error');
+      const isSuccess = data.type.toLowerCase() === 'success';
+      addNotification(data.message, isSuccess ? 'success' : 'error');
+      if (isSuccess) playSuccess(); else playError();
       addLiveLog(`AUTORUN: ${data.message}`, 'text-blue-400');
       loadData();
     };
@@ -201,9 +205,11 @@ export default function Dashboard() {
         status: result ? 'pass' : 'fail',
         msg: result ? 'Logic predicate satisfied.' : 'Logic predicate failed.'
       });
+      if (result) playSuccess(); else playError();
       addLiveLog(`SIM: Logic evaluation returned ${result}`, 'text-indigo-400');
     } catch (err: any) {
       setSimResult({ status: 'error', msg: err.message });
+      playError();
       addLiveLog(`SIM_ERR: ${err.message}`, 'text-red-400');
     }
   };
@@ -255,10 +261,12 @@ export default function Dashboard() {
       });
       setActiveTab('overview');
       addNotification('Infrastructure Rule deployed successfully.', 'success');
+      playExecution();
       addLiveLog(`DEPLOY: New rule ${formState.name} committed to Stellar.`, 'text-emerald-400');
       loadData();
     } catch (err: any) {
       addNotification('Deployment failed.', 'error');
+      playError();
     } finally {
       setSubmitting(false);
     }
@@ -402,7 +410,8 @@ export default function Dashboard() {
                      </div>
                   </div>
                   <button 
-                     onClick={() => router.push('/billing')}
+                     onMouseEnter={playHover}
+                     onClick={() => { playClick(); router.push('/billing'); }}
                      className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 hover:scale-105 active:scale-95"
                   >
                      Manage Billing
@@ -414,7 +423,8 @@ export default function Dashboard() {
                {['overview', 'builder', 'automation', 'history', 'governance'].map((tab) => (
                   <button
                      key={tab}
-                     onClick={() => setActiveTab(tab as any)}
+                     onMouseEnter={playHover}
+                     onClick={() => { playClick(); setActiveTab(tab as any); }}
                      className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
                   >
                      {tab}

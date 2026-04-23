@@ -10,6 +10,7 @@ import { API_BASE } from '../services/api';
 import { signActionRequest } from '../services/signing';
 import { useWallet } from '../hooks/useWallet';
 import { fetchSystemSettings, toggleProtocolHalt } from '../services/api';
+import { useSound } from '../hooks/useSound';
 
 interface UserData {
   _id: string;
@@ -45,6 +46,7 @@ const Sparkline = ({ color = '#3b82f6' }) => (
 export default function AdminDashboard() {
   const router = useRouter();
   const { wallet } = useWallet();
+  const { playHover, playClick, playSuccess, playError, playExecution, playEmergency } = useSound();
   const socketRef = useRef<Socket | null>(null);
   
   const [token, setToken] = useState<string | null>(null);
@@ -167,9 +169,13 @@ export default function AdminDashboard() {
       if (res.ok) {
         setUsers(prev => prev.map(u => u._id === userId ? { ...u, status: newStatus as any } : u));
         addTelemetryLog(`GOV: Entity_${userId.slice(-6)} state changed to ${newStatus}`, 'text-amber-400');
+        playExecution();
+      } else {
+        playError();
       }
     } catch (err) {
       console.error('Action denied');
+      playError();
     }
   };
 
@@ -189,9 +195,13 @@ export default function AdminDashboard() {
       if (res.ok) {
         setUsers(prev => prev.map(u => u._id === userId ? { ...u, approved: true, kycStatus: 'verified' } : u));
         addTelemetryLog(`GOV: Entity_${userId.slice(-6)} KYC verified and access approved.`, 'text-blue-400');
+        playSuccess();
+      } else {
+        playError();
       }
     } catch (err) {
       console.error('Approval denied');
+      playError();
     }
   };
 
@@ -211,9 +221,13 @@ export default function AdminDashboard() {
       if (res.ok) {
         setDeposits(prev => prev.map(d => d._id === depositId ? { ...d, status: 'confirmed' } : d));
         addTelemetryLog(`TREASURY: Deposit_${depositId.slice(-6)} verified and escrow funded.`, 'text-blue-400');
+        playSuccess();
+      } else {
+        playError();
       }
     } catch (err) {
       console.error('Deposit approval denied');
+      playError();
     }
   };
 
@@ -224,6 +238,8 @@ export default function AdminDashboard() {
     
     if (newState && !confirm('WARNING: This will freeze all protocol operations immediately. Proceed with signature?')) return;
 
+    if (newState) playEmergency();
+
     setHalting(true);
     try {
       addTelemetryLog(`GOV: Preparing ${statusMsg}...`, 'text-blue-400');
@@ -232,8 +248,10 @@ export default function AdminDashboard() {
       const res = await toggleProtocolHalt(token, newState, auth);
       setSystemPaused(res.protocolHalt);
       addTelemetryLog(`GOV: Protocol state updated to ${newState ? 'HALTED' : 'OPERATIONAL'}`, newState ? 'text-red-500' : 'text-emerald-400');
+      if (!newState) playExecution();
     } catch (err: any) {
       addTelemetryLog(`ERR: Protocol override failed - ${err.message}`, 'text-red-600');
+      playError();
     } finally {
       setHalting(false);
     }
@@ -256,9 +274,13 @@ export default function AdminDashboard() {
       if (res.ok) {
         setUsers(prev => prev.map(u => u._id === userId ? { ...u, role: newRole as any } : u));
         addTelemetryLog(`SEC: Entity_${userId.slice(-6)} role updated to ${newRole}`, 'text-blue-400');
+        playExecution();
+      } else {
+        playError();
       }
     } catch (err) {
       console.error('Role update denied');
+      playError();
     }
   };
 
@@ -278,9 +300,13 @@ export default function AdminDashboard() {
       if (res.ok) {
         setRules(prev => prev.filter(r => r._id !== ruleId));
         addTelemetryLog(`SEC: Registry_${ruleId.slice(-6)} purged from protocol.`, 'text-red-400');
+        playExecution();
+      } else {
+        playError();
       }
     } catch (err) {
        console.error('Purge failed');
+       playError();
     }
   };
 
@@ -326,7 +352,8 @@ export default function AdminDashboard() {
               {['security', 'entities', 'governance', 'cluster', 'treasury'].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab as any)}
+                  onMouseEnter={playHover}
+                  onClick={() => { playClick(); setActiveTab(tab as any); }}
                   className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-red-600 text-white shadow-xl shadow-red-600/20 scale-105' : 'text-slate-500 hover:text-slate-300'}`}
                 >
                   {tab}

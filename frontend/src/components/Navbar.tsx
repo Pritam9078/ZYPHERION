@@ -2,10 +2,19 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useWallet } from '../hooks/useWallet';
+import { toggleGlobalMute, getGlobalIsMuted } from '../hooks/useSound';
 
 const Navbar = () => {
   const router = useRouter();
   const { wallet, connect, disconnect } = useWallet();
+  const [isMuted, setIsMuted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMuted(getGlobalIsMuted());
+    const handleMuteChange = () => setIsMuted(getGlobalIsMuted());
+    window.addEventListener('zypher_mute_toggled', handleMuteChange);
+    return () => window.removeEventListener('zypher_mute_toggled', handleMuteChange);
+  }, []);
 
   return (
     <nav className="px-8 py-4 flex justify-between items-center border-b border-white/[0.05] bg-zypher-bg/80 backdrop-blur-xl sticky top-0 z-40">
@@ -53,6 +62,18 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        <button
+          onClick={() => toggleGlobalMute()}
+          className="p-2 rounded-full border border-white/10 hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+          title={isMuted ? "Unmute sounds" : "Mute sounds"}
+        >
+          {isMuted ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5z" /></svg>
+          )}
+        </button>
+
         <button 
           onClick={wallet.address ? disconnect : () => connect()}
           className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-xs font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95"

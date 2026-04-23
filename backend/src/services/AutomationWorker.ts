@@ -100,8 +100,17 @@ export const initAutomationWorker = (io: any) => {
             if (!response.ok) throw new Error(`HTTP_${response.status}`);
             
             const data = await response.json();
-            // Basic check: if data exists, it's verified for now (MVP)
-            // Future: Implement JSONPath verification via rule.dataSourcePath
+            
+            if (rule.dataSourcePath) {
+              const jp = require('jsonpath');
+              const extracted = jp.query(data, rule.dataSourcePath);
+              if (!extracted || extracted.length === 0) {
+                 throw new Error(`JSONPath '${rule.dataSourcePath}' returned no results.`);
+              }
+              console.log(`[Zypherion] Data Oracle Extracted Value:`, extracted[0]);
+              // In production, cryptographically sign this extracted value here
+            }
+
             console.log(`[Zypherion] External data verified for ${rule.name}`);
           } catch (dataErr) {
             console.error(`[Zypherion] Data fetch failed for ${rule.name}:`, dataErr);

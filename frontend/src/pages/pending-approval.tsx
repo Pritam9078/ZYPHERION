@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { useWalletContext } from '../context/WalletContext';
+import { useSound } from '../hooks/useSound';
 
 export default function PendingApproval() {
   const { wallet, connect } = useWalletContext();
+  const { playHover, playClick } = useSound();
   const [isChecking, setIsChecking] = useState(false);
 
   const handleRefresh = async () => {
@@ -49,7 +51,8 @@ export default function PendingApproval() {
 
           <div className="space-y-6">
             <button 
-              onClick={handleRefresh}
+              onClick={() => { playClick(); handleRefresh(); }}
+              onMouseEnter={playHover}
               disabled={isChecking}
               className={`w-full py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isChecking ? 'bg-white/5 text-slate-500 border-white/5 cursor-not-allowed' : 'bg-white text-black hover:bg-slate-200 border-white shadow-xl shadow-white/10'}`}
             >

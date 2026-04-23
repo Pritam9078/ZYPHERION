@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import AuthGuard from '../components/AuthGuard';
 import { useWalletContext } from '../context/WalletContext';
+import { useSound } from '../hooks/useSound';
 
 import { signTransaction } from '@stellar/freighter-api';
 import { Horizon, TransactionBuilder, Networks, Asset, Operation, Transaction } from '@stellar/stellar-sdk';
@@ -12,6 +13,7 @@ const ADMIN_WALLET = 'GB6U7APEDEHKWVXDTVO4UE5E3UDSMEOKB3DCLJ4PMAY3ABSOFK7PBUD7';
 
 export default function BillingDashboard() {
   const { wallet } = useWalletContext();
+  const { playHover, playClick, playSuccess, playError, playExecution } = useSound();
   const [depositAmount, setDepositAmount] = useState('100');
   const [isDepositing, setIsDepositing] = useState(false);
   const [balance, setBalance] = useState('0.00');
@@ -91,10 +93,12 @@ export default function BillingDashboard() {
         currency: 'XLM'
       });
 
+      playExecution();
       alert(`Successfully deposited ${depositAmount} XLM! Tx: ${submitResponse.hash}`);
       setDepositAmount('100');
     } catch (error: any) {
       console.error(error);
+      playError();
       alert(`Deposit failed: ${error.message}`);
     } finally {
       setIsDepositing(false);
@@ -206,6 +210,8 @@ export default function BillingDashboard() {
                   <button 
                     type="submit" 
                     disabled={isDepositing}
+                    onMouseEnter={playHover}
+                    onClick={playClick}
                     className={`w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${isDepositing ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
                   >
                     {isDepositing ? 'Processing on Stellar...' : 'Fund Escrow Contract'}

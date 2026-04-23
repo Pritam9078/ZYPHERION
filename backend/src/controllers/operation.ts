@@ -155,6 +155,32 @@ export const submitProof = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    try {
+      const { DNAProofSDK } = require('@dnaproof/sdk');
+      const sdk = new DNAProofSDK({
+        ethereum: {
+          rpcUrl: process.env.DNA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
+          registryAddress: process.env.DNA_REGISTRY_ADDRESS || "0x28f1C0A9fcd198D50Be49821585D60a6081BeCd6",
+          accessControlAddress: process.env.DNA_ACCESS_CONTROL_ADDRESS || "0x96FC568bC13eb9F4EAbB47190525158De9FCc99A",
+          auditLogsAddress: process.env.DNA_AUDIT_LOGS_ADDRESS || "0x0B67f4148c9b6Fdb0F8D691fEC5a86246F543A5e"
+        },
+        ipfs: {
+          gatewayUrl: "https://gateway.pinata.cloud/ipfs",
+          authHeader: `Bearer ${process.env.DNA_PINATA_JWT || ''}`
+        }
+      });
+      await sdk.init();
+      
+      const isVerified = await sdk.verifyDocument(proof.proofData);
+      if (!isVerified) {
+        return res.status(400).json({ message: 'DNAProof Verification Failed: Document hash is invalid or not registered.' });
+      }
+      console.log(`[Zypherion] DNAProof Oracle Verification Success for Hash: ${proof.proofData}`);
+    } catch (dnaError: any) {
+      console.error('[Zypherion] DNAProof Verification Error:', dnaError);
+      return res.status(500).json({ message: 'DNAProof Oracle Error: ' + dnaError.message });
+    }
+
     // Mock contract interaction
     proof.status = 'verified';
     proof.txHash = '0x' + Math.random().toString(16).padEnd(64, '0').substring(2, 66);
