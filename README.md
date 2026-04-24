@@ -107,7 +107,7 @@ No intermediaries. No assumptions. Just math.
 
 ## ✦ Verified Testnet Addresses
 
-The following Stellar Testnet wallets have verifiably interacted with the Zypherion Protocol. Inspect any on [Stellar Expert](https://stellar.expert/explorer/testnet).
+The following Stellar Testnet wallets have verifiably interacted with the Zypherion Protocol. Inspect any on Stellar Expert
 
 ```
 GCGEXUG76FMVLCQHMVEUIQ2GPDEZSSNXQZQITISFUR433LZCD4UPGMYT
