@@ -45,10 +45,10 @@ No intermediaries. No assumptions. Just math.
 |---|---|
 | 🔋 **Gas Abstraction Service** | Automated balance deduction and simulated escrow — execute logic without juggling gas tokens |
 | ♾️ **Zero-Knowledge Proofs** | Integrated **snarkjs & circom** for verifiable off-chain computation and batching |
-| 🏛️ **Role-Based Identity** | Dedicated dashboards for **Developers**, **Node Operators**, and **DAO Admins** with tailored tooling |
-| 🪪 **Sovereign Profile** | Centralized management of identity metadata, DIDs, and API credentials |
+| 🏛️ **Role-Based Identity** | Dedicated dashboards for **Developers**, **Node Operators**, and **DAO Admins** with automated admin promotion |
+| 🪪 **Sovereign Profile** | Centralized management of identity metadata, DIDs, and synchronization across session logins |
 | ⏱️ **Chronos Engine** | Autonomous scheduled & event-based triggers via verifiable external oracle data feeds |
-| 💎 **3D Sovereign Interface** | A hardware-accelerated, high-fidelity UI featuring immersive 3D telemetry and tactile aesthetics |
+| 💎 **3D Sovereign Interface** | A hardware-accelerated, glassmorphism-inspired UI featuring dynamic telemetry and high-fidelity aesthetics |
 
 ---
 
@@ -57,9 +57,9 @@ No intermediaries. No assumptions. Just math.
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      ZYPHERION STACK                        │
-├─────────────────┬───────────────────────────────────────────┤
+|─────────────────┬───────────────────────────────────────────┤
 │  Frontend       │  Next.js 14 · Framer Motion · TailwindCSS │
-│                 │  Socket.io-client · Zypherion SDK         │
+│                 │  Socket.io-client · Glassmorphism Design  │
 ├─────────────────┼───────────────────────────────────────────┤
 │  Backend        │  Node.js · Express · MongoDB (Mongoose)   │
 │                 │  snarkjs (ZK-SNARK Prover) · Socket.io    │
@@ -78,7 +78,7 @@ No intermediaries. No assumptions. Just math.
 
 <div align="center">
 
-> A glimpse of the Zypherion dashboard — built for power users who demand precision.
+> The Zypherion Interface — A clean, high-fidelity command center designed for cryptographic precision.
 
 <table>
   <tr>
@@ -133,12 +133,13 @@ The following core protocol contracts are deployed on the **Stellar Testnet**.
 
 ## ✦ Protocol Identity & RBAC
 
-Zypherion implements a sovereign identity model where your wallet is your passport. Access is governed by specific protocol roles:
+Zypherion implements a sovereign identity model where your wallet is your passport. Access is governed by specific protocol roles with **automated profile synchronization**:
 
+- **🏛️ System Administrator**: Automatic promotion for the configured Admin Wallet. Full governance oversight and global Kill Switch access.
 - **👨‍💻 Developer**: Access to the Developer Portal, API Key management, and Sandbox environments.
 - **📡 Node Operator**: Access to real-time network telemetry, health monitoring, and staking metrics.
-- **🏛️ DAO Admin**: Governance oversight, multi-sig rule approval, and the global Protocol Kill Switch.
-- **👤 Guest**: Public view of protocol analytics and global telemetry.
+- **🏛️ DAO Admin**: Protocol governance oversight and multi-sig rule approval.
+- **👤 Guest**: Explore the protocol with public analytics and global telemetry.
 
 ---
 

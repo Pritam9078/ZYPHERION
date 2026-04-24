@@ -69,7 +69,12 @@ const Navbar = () => {
               Admin_Panel
             </Link>
           )}
-          <a href="#" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Documentation</a>
+          <Link 
+            href="/docs" 
+            className={`transition-colors ${router.pathname.startsWith('/docs') ? 'text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+          >
+            Documentation
+          </Link>
         </div>
       </div>
 

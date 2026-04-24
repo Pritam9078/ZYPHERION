@@ -51,18 +51,6 @@ body {
   @apply bg-blue-500/[0.03] backdrop-blur-3xl border border-blue-500/10;
 }
 
-.blueprint-bg {
-  background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-.dark .blueprint-bg {
-  background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-}
 
 .text-gradient-blue {
   @apply bg-clip-text text-transparent bg-gradient-to-br from-blue-400 via-blue-200 to-white;

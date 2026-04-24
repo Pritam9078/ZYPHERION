@@ -69,16 +69,7 @@ const ThreeDBackground: React.FC = () => {
           />
         ))}
 
-        {/* 3D Grid Floor (Perspective) */}
-        <div 
-          className="absolute bottom-0 w-[200%] h-[50%] bg-[linear-gradient(transparent_0%,rgba(37,99,235,0.1)_100%)] opacity-30"
-          style={{
-            transform: 'rotateX(75deg) translateY(200px)',
-            backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px)`,
-            backgroundSize: '100px 100px',
-            maskImage: 'linear-gradient(to bottom, transparent, black)',
-          }}
-        />
+
 
         {/* Global Noise Overlay */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"

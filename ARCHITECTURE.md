@@ -90,7 +90,7 @@ sequenceDiagram
 
 ## 3. Governance & RBAC Model
 
-The protocol utilizes an Identity-Based Access Control (RBAC) model to ensure specialized tooling for different ecosystem participants.
+The protocol utilizes an Identity-Based Access Control (RBAC) model to ensure specialized tooling for different ecosystem participants. The backend enforces **Automated Profile Synchronization**, ensuring that system administrators and other roles maintain their persistent status across sessions.
 
 ```mermaid
 flowchart TD
@@ -111,6 +111,9 @@ flowchart TD
     GovHub --> SEC
 ```
 
+> [!NOTE]
+> **Automatic Admin Promotion**: The protocol backend automatically promotes the wallet address defined in `ADMIN_WALLET_ADDRESS` to the `DAOAdmin` account type and `Enterprise` tier during the login handshake, bypassing manual selection constraints.
+
 ---
 
 ## 4. Enhanced Database Schema
@@ -125,7 +128,9 @@ erDiagram
 
     USER {
         string  address       PK
-        string  accountType      "Developer | NodeOperator | DAOAdmin"
+        string  role             "user | admin"
+        string  accountType      "Developer | NodeOperator | DAOAdmin | Guest"
+        string  tier             "Free | Enterprise"
         string  apiKey           "ZYPH-TEST-..."
         string  name             "Profile Name"
         string  email            "Notification Email"
@@ -221,11 +226,11 @@ graph LR
 
 ## 7. 3D Sovereign Interface Layer
 
-The frontend utilizes a custom **3D Performance Layer** to provide an immersive administrative experience without the overhead of heavy WebGL libraries.
+The frontend utilizes a custom **3D Performance Layer** to provide an immersive administrative experience using premium glassmorphism and hardware-accelerated animations.
 
 - **Hardware Acceleration**: Uses CSS `perspective` and `transform-style: preserve-3d` for GPU-accelerated rendering.
+- **Glassmorphism Aesthetic**: Replaced legacy grid-based structures with frosted-glass surfaces, subtle noise overlays, and vibrant radial gradients.
 - **Dynamic Assets**: Rotating wireframe octahedrons and orbiting data particles that respond to system state.
-- **Tactile UI**: Integrated SVG noise filters and radial gradients create a premium, high-fidelity aesthetic.
 
 ---
 

@@ -20,7 +20,7 @@ export default function PendingApproval() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
+
       <Navbar />
       
       <main className="flex items-center justify-center min-h-[85vh] px-6">

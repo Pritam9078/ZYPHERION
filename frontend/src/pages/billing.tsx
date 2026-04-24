@@ -5,7 +5,8 @@ import AuthGuard from '../components/AuthGuard';
 import { useWalletContext } from '../context/WalletContext';
 import { useSound } from '../hooks/useSound';
 
-import { signTransaction } from '@stellar/freighter-api';
+import freighter from '@stellar/freighter-api';
+const { signTransaction } = freighter;
 import { Horizon, TransactionBuilder, Networks, Asset, Operation, Transaction } from '@stellar/stellar-sdk';
 import { recordDeposit, fetchUserDeposits } from '../services/api';
 
@@ -108,7 +109,7 @@ export default function BillingDashboard() {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-        <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
+
         <Navbar />
 
         <main className="relative z-10 container mx-auto px-6 py-12">

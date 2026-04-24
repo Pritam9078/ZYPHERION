@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { isConnected, getAddress, signMessage, setAllowed } from '@stellar/freighter-api';
+import { StellarWalletsKit, Networks } from '@creit.tech/stellar-wallets-kit';
+
 import { useRouter } from 'next/router';
 import { API_BASE } from '../services/api';
+import WalletSelectorModal from '../components/WalletSelectorModal';
+import IdentitySelectorModal from '../components/IdentitySelectorModal';
 
 interface WalletState {
   address: string | null;
@@ -13,11 +16,12 @@ interface WalletState {
   approved?: boolean;
   creditsBalance?: number;
   gasBalance?: number;
+  walletType: string | null;
 }
 
 interface WalletContextType {
   wallet: WalletState;
-  connect: (accountType?: string) => Promise<void>;
+  connect: (accountType?: string) => void;
   disconnect: () => void;
 }
 
@@ -29,15 +33,56 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     address: null,
     status: 'idle',
     role: null,
+    walletType: null,
   });
+
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [isIdentityOpen, setIsIdentityOpen] = useState(false);
+  const [pendingAccountType, setPendingAccountType] = useState<string | undefined>(undefined);
+  const [isKitInitialized, setIsKitInitialized] = useState(false);
+
+  // Initialize the kit with the required modules
+  useEffect(() => {
+    const initKit = async () => {
+      try {
+        // @ts-ignore
+        const { FreighterModule } = await import('@creit.tech/stellar-wallets-kit/modules/freighter');
+        // @ts-ignore
+        const { AlbedoModule } = await import('@creit.tech/stellar-wallets-kit/modules/albedo');
+        // @ts-ignore
+        const { xBullModule } = await import('@creit.tech/stellar-wallets-kit/modules/xbull');
+        // @ts-ignore
+        const { HanaModule } = await import('@creit.tech/stellar-wallets-kit/modules/hana');
+
+        StellarWalletsKit.init({
+          modules: [
+            new FreighterModule(),
+            new AlbedoModule(),
+            new xBullModule(),
+            new HanaModule(),
+          ],
+          network: Networks.TESTNET
+        });
+        setIsKitInitialized(true);
+      } catch (err) {
+        console.error('[Zypherion Context] Kit init failed:', err);
+      }
+    };
+    initKit();
+  }, []);
 
   // Session Restoration
   useEffect(() => {
     const restoreSession = async () => {
       const token = localStorage.getItem('zypher_token');
-      if (token) {
+      const savedWalletType = localStorage.getItem('zypher_wallet_type');
+      
+      if (token && savedWalletType) {
         setWallet(prev => ({ ...prev, status: 'connecting' }));
         try {
+          // Set the wallet in the kit
+          StellarWalletsKit.setWallet(savedWalletType);
+
           const res = await fetch(`${API_BASE}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
@@ -54,9 +99,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
               approved: user.approved,
               creditsBalance: user.creditsBalance,
               gasBalance: user.gasBalance,
+              walletType: savedWalletType,
             });
           } else {
             localStorage.removeItem('zypher_token');
+            localStorage.removeItem('zypher_wallet_type');
             setWallet(prev => ({ ...prev, status: 'idle' }));
           }
         } catch (e) {
@@ -65,38 +112,28 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     };
-    restoreSession();
-  }, []);
+    if (isKitInitialized) {
+      restoreSession();
+    }
+  }, [isKitInitialized]);
 
-  const connect = async (accountType?: string) => {
+  const executeConnect = async (selectedWalletType: string, accountType?: string) => {
     setWallet(prev => ({ ...prev, status: 'connecting' }));
     try {
-      // Robust detection with retry loop
-      let isActuallyConnected = false;
-      for (let i = 0; i < 3; i++) {
-        const connected = await isConnected();
-        isActuallyConnected = typeof connected === 'boolean' ? connected : (connected as any)?.isConnected;
-        if (isActuallyConnected) break;
-        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for injection
-      }
+      // Set the wallet in the kit
+      StellarWalletsKit.setWallet(selectedWalletType);
 
-      if (!isActuallyConnected) {
-        alert('Freighter wallet not detected. Please install the extension and refresh the page.');
-        setWallet(prev => ({ ...prev, status: 'error' }));
-        return;
-      }
-
-      await setAllowed();
-      const addressResult = await getAddress();
-      const address = typeof addressResult === 'string' ? addressResult : (addressResult as any)?.address;
-
-      if (!address) throw new Error("No address returned from Freighter.");
+      // Get Address
+      const { address } = await StellarWalletsKit.fetchAddress();
+      
+      if (!address) throw new Error("No address returned from wallet.");
 
       const message = "Authenticate with Zypherion Protocol";
-      const signedResult = await signMessage(message);
-      if (!signedResult) throw new Error("Signing failed.");
-
-      const signature = typeof signedResult === 'string' ? signedResult : (signedResult as any)?.signedMessage;
+      
+      // Sign Message
+      const { signedMessage: signature } = await StellarWalletsKit.signMessage(message);
+      
+      if (!signature) throw new Error("Signing failed.");
 
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
@@ -107,6 +144,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('zypher_token', data.token);
+        localStorage.setItem('zypher_wallet_type', selectedWalletType);
+        
         setWallet({
           address,
           status: 'connected',
@@ -117,15 +156,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           approved: data.user.approved,
           creditsBalance: data.user.creditsBalance,
           gasBalance: data.user.gasBalance,
+          walletType: selectedWalletType,
         });
         
         // Handle Identity-based routing
-        if (data.user.role !== 'admin' && !data.user.approved && data.user.accountType !== 'Guest') {
+        if (data.user.role !== 'admin' && !data.user.approved && data.user.accountType !== 'Guest' && data.user.accountType !== 'Developer') {
           router.push('/pending-approval');
         } else if (data.user.role === 'admin' || data.user.accountType === 'DAOAdmin') {
           router.push('/admin');
         } else if (data.user.accountType === 'NodeOperator') {
           router.push('/node-operator');
+        } else if (data.user.accountType === 'Developer') {
+          router.push('/developer');
         } else {
           router.push('/dashboard');
         }
@@ -133,21 +175,48 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(data.message);
       }
     } catch (err: any) {
-      console.error(err);
+      console.error('[Zypherion Context] Connection error:', err);
       setWallet(prev => ({ ...prev, status: 'error' }));
       alert(err.message || 'Connection failed');
     }
   };
 
+  const connect = (accountType?: string) => {
+    if (accountType) {
+      setPendingAccountType(accountType);
+      setIsSelectorOpen(true);
+    } else {
+      setIsIdentityOpen(true);
+    }
+  };
+
   const disconnect = () => {
     localStorage.removeItem('zypher_token');
-    setWallet({ address: null, status: 'idle', role: null });
+    localStorage.removeItem('zypher_wallet_type');
+    setWallet({ address: null, status: 'idle', role: null, walletType: null });
     router.push('/');
   };
 
   return (
     <WalletContext.Provider value={{ wallet, connect, disconnect }}>
       {children}
+      <IdentitySelectorModal
+        isOpen={isIdentityOpen}
+        onClose={() => setIsIdentityOpen(false)}
+        onSelect={(role) => {
+          setIsIdentityOpen(false);
+          setPendingAccountType(role);
+          setIsSelectorOpen(true);
+        }}
+      />
+      <WalletSelectorModal 
+        isOpen={isSelectorOpen}
+        onClose={() => setIsSelectorOpen(false)}
+        onSelect={(type) => {
+          setIsSelectorOpen(false);
+          executeConnect(type, pendingAccountType);
+        }}
+      />
     </WalletContext.Provider>
   );
 };
@@ -159,3 +228,6 @@ export const useWalletContext = () => {
   }
   return context;
 };
+
+
+

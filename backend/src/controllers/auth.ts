@@ -100,15 +100,45 @@ export const login = async (req: Request, res: Response) => {
       user = await User.create({
         address,
         role,
-        accountType: accountType || 'Guest',
-        tier: 'Free',
+        accountType: (role === 'admin' && (!accountType || accountType === 'Guest')) ? 'DAOAdmin' : (accountType || 'Guest'),
+        tier: role === 'admin' ? 'Enterprise' : 'Free',
         approved: role === 'admin' ? true : false, // Admins auto-approved
         apiKey: (accountType === 'Developer' || role === 'admin') ? `ZYPH-TEST-${require('crypto').randomBytes(4).toString('hex').toUpperCase()}-${require('crypto').randomBytes(2).toString('hex').toUpperCase()}` : undefined
       });
       console.log('[Auth] New user registered:', address);
-    } else if (user.role !== role) {
-      user.role = role;
-      await user.save();
+    } else {
+      // Update existing user properties if they've changed
+      let hasChanges = false;
+      
+      if (user.role !== role) {
+        user.role = role;
+        hasChanges = true;
+      }
+
+      // If they are a system admin, ensure they have the right accountType and Tier
+      if (role === 'admin') {
+        if (user.accountType !== 'DAOAdmin') {
+          user.accountType = 'DAOAdmin';
+          hasChanges = true;
+        }
+        if (user.tier !== 'Enterprise') {
+          user.tier = 'Enterprise';
+          hasChanges = true;
+        }
+        if (!user.approved) {
+          user.approved = true;
+          hasChanges = true;
+        }
+      } else if (accountType && user.accountType !== accountType) {
+        // For standard users, update their accountType to match their current selection
+        user.accountType = accountType as any;
+        hasChanges = true;
+      }
+
+      if (hasChanges) {
+        await user.save();
+        console.log('[Auth] User profile synchronized:', address);
+      }
     }
 
     // 4. Issue JWT

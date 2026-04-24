@@ -326,9 +326,9 @@ export default function AdminDashboard() {
   );
 
   return (
-    <AuthGuard requireAdmin>
+    <AuthGuard requireAdmin allowedAccountTypes={['DAOAdmin']}>
       <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
+
       <Navbar />
 
       <PayloadModal 

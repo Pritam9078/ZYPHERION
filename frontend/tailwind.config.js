@@ -14,9 +14,6 @@ module.exports = {
         'zypher-accent': '#0ea5e9', // Sky 500
         'zypher-navy': '#0f172a', // Slate 900
       },
-      backgroundImage: {
-        'blueprint': "radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0)",
-      }
     },
   },
   plugins: [],

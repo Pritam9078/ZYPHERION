@@ -1,4 +1,5 @@
-import { signMessage } from '@stellar/freighter-api';
+import freighter from '@stellar/freighter-api';
+const { signMessage } = freighter;
 
 /**
  * Prepares and signs a structured action request with Freighter.

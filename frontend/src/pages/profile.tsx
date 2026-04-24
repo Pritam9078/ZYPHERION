@@ -86,7 +86,7 @@ export default function ProfilePage() {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-        <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-10 pointer-events-none" />
+
         <Navbar />
 
         <main className="relative z-10 container mx-auto px-6 py-12 max-w-4xl">
@@ -121,15 +121,24 @@ export default function ProfilePage() {
                 <div className="space-y-4 w-full">
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Role</span>
-                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">{user?.accountType || 'Guest'}</span>
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">
+                      {user?.role === 'admin' ? 'System Administrator' : 
+                       user?.accountType === 'DAOAdmin' ? 'DAO Administrator' :
+                       user?.accountType === 'NodeOperator' ? 'Node Operator' :
+                       user?.accountType || 'Guest'}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tier</span>
-                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">{user?.tier || 'Free'}</span>
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">
+                      {user?.role === 'admin' ? 'Enterprise_Access' : (user?.tier || 'Free')}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">SLA</span>
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">ACTIVE_99.9</span>
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                      {user?.role === 'admin' ? 'PRIORITY_99.99' : 'ACTIVE_99.9'}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 interface AuthGuardProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  allowedAccountTypes?: string[];
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false }) => {
+const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false, allowedAccountTypes }) => {
   const { wallet } = useWallet();
   const router = useRouter();
 
@@ -23,13 +24,37 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false })
         return;
       }
 
-      // 2. Admin required but user is not admin
-      if (requireAdmin && wallet.role !== 'admin' && wallet.status === 'connected') {
-        router.push('/dashboard');
+      // 2. Authorization Check
+      let isAuthorized = true;
+      
+      // If we are connected and not a global admin, we must check restrictions
+      if (wallet.status === 'connected' && wallet.role !== 'admin') {
+        // If it requires admin role specifically
+        if (requireAdmin) {
+          isAuthorized = false;
+        }
+        
+        // If it requires specific account types
+        if (allowedAccountTypes && wallet.accountType) {
+          if (!allowedAccountTypes.includes(wallet.accountType)) {
+            isAuthorized = false;
+          } else {
+            // If they are in the allowed types, they are authorized even if requireAdmin was true
+            isAuthorized = true;
+          }
+        }
+      }
+
+      if (!isAuthorized) {
+        // Redirect logic
+        if (wallet.accountType === 'Developer') router.push('/developer');
+        else if (wallet.accountType === 'NodeOperator') router.push('/node-operator');
+        else if (wallet.accountType === 'DAOAdmin') router.push('/admin');
+        else router.push('/dashboard');
         return;
       }
     }
-  }, [wallet.status, wallet.role, router, requireAdmin]);
+  }, [wallet.status, wallet.role, wallet.accountType, router, requireAdmin, allowedAccountTypes]);
 
   if (wallet.status === 'connecting' || wallet.status === 'idle') {
     return (
@@ -51,6 +76,11 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false })
   // Final check: if user is logged in, but we need admin and they aren't, don't show children yet
   if (requireAdmin && wallet.role !== 'admin') {
      return null;
+  }
+
+  // Final check for account types
+  if (allowedAccountTypes && wallet.accountType && !allowedAccountTypes.includes(wallet.accountType) && wallet.role !== 'admin') {
+    return null;
   }
 
   return <>{children}</>;

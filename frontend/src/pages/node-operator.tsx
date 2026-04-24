@@ -32,9 +32,9 @@ export default function NodeOperatorDashboard() {
   ];
 
   return (
-    <AuthGuard>
+    <AuthGuard allowedAccountTypes={['NodeOperator']}>
       <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-        <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-10 pointer-events-none" />
+
         <Navbar />
 
         <main className="relative z-10 container mx-auto px-6 py-12">

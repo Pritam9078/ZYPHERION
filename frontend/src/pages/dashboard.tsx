@@ -5,6 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import SocketService from '../services/socket';
 import Navbar from '../components/Navbar';
 import AuthGuard from '../components/AuthGuard';
+import ProfileCard from '../components/ProfileCard';
 import PayloadModal from '../components/PayloadModal';
 import NetworkMap from '../components/NetworkMap';
 import AIAssistant from '../components/AIAssistant';
@@ -47,7 +48,7 @@ export default function Dashboard() {
   const [rules, setRules] = useState<LogicRule[]>([]);
   const [operations, setOperations] = useState<Operation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'builder' | 'automation' | 'history' | 'governance'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'network' | 'history'>('overview');
   
   // Real-time Logs State
   const [liveLogs, setLiveLogs] = useState<{t: string, m: string, c: string}[]>([]);
@@ -323,9 +324,9 @@ export default function Dashboard() {
   );
 
   return (
-    <AuthGuard>
+    <AuthGuard allowedAccountTypes={['Guest']}>
       <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
-      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
+
       <Navbar />
 
       <PayloadModal 
@@ -420,7 +421,7 @@ export default function Dashboard() {
             </div>
 
             <nav className="flex gap-4 mt-8 bg-slate-50 dark:bg-white/[0.01] p-2 rounded-2xl border border-slate-200 dark:border-white/[0.02] w-fit">
-               {['overview', 'builder', 'automation', 'history', 'governance'].map((tab) => (
+               {['overview', 'network', 'history'].map((tab) => (
                   <button
                      key={tab}
                      onMouseEnter={playHover}
@@ -430,6 +431,12 @@ export default function Dashboard() {
                      {tab}
                   </button>
                ))}
+               <button
+                  onClick={() => router.push('/developer')}
+                  className="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-dashed border-slate-300 dark:border-white/10 hover:border-blue-500/50 hover:text-blue-500 transition-all"
+               >
+                  Upgrade to Developer_
+               </button>
             </nav>
          </header>
 
@@ -450,6 +457,44 @@ export default function Dashboard() {
                   {/* Global Network Visualization */}
                   <NetworkMap />
                   
+                  {/* Developer Upgrade Teaser */}
+                  <div className="p-10 rounded-[3rem] bg-gradient-to-br from-indigo-600/10 via-blue-600/5 to-transparent border-2 border-blue-500/20 relative overflow-hidden group">
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                      <div className="max-w-xl">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                          <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em]">Developer Access_</span>
+                        </div>
+                        <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Unlock the Sovereign Infrastructure Engine_</h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                          As a Guest, you are observing the global state in real-time. Upgrade to a <span className="text-blue-600 dark:text-blue-400 font-bold">Developer Account</span> to deploy custom ZK-logic, automate cross-chain executions, and integrate the DNAProof Oracle into your own DApps.
+                        </p>
+                        <div className="flex flex-wrap gap-4">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10">
+                            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                            <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Logic Architect</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10">
+                            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                            <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">API Key Generation</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10">
+                            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                            <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider">Gas Abstraction</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => router.push('/developer')}
+                        className="px-10 py-5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-600/40 hover:bg-blue-500 hover:scale-105 transition-all group"
+                      >
+                        Initialize Upgrade
+                        <svg className="w-4 h-4 inline-block ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {stats.map((stat, i) => (
                       <div key={i} className="p-10 rounded-[3rem] glass border-slate-200 dark:border-white/[0.03] relative overflow-hidden group hover:scale-[1.02] transition-all duration-500">
@@ -507,384 +552,7 @@ export default function Dashboard() {
                 </motion.div>
               )}
 
-              {activeTab === 'builder' && (
-                <motion.section 
-                  key="builder"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  className="space-y-12"
-                >
-                   <form onSubmit={handleCreateRule} className="p-10 rounded-[3rem] bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-500/10">
-                      <div className="flex justify-between items-center mb-10">
-                        <div>
-                          <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Logic Architect_</h3>
-                          <p className="text-blue-600 dark:text-blue-400/60 text-xs font-bold uppercase tracking-widest mt-1">Design trustless multi-chain predicates</p>
-                        </div>
-                        <div className="flex bg-slate-200 dark:bg-black/40 p-1.5 rounded-2xl border border-slate-300 dark:border-white/5">
-                           {['state', 'time', 'event'].map((type) => (
-                             <button
-                               key={type}
-                               type="button"
-                               onClick={() => setFormState({...formState, triggerType: type})}
-                               className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formState.triggerType === type ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-                             >
-                               {type}_BASED
-                             </button>
-                           ))}
-                        </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2">Infrastructure Identifier</label>
-                           <input 
-                            type="text" 
-                            value={formState.name}
-                            onChange={e => setFormState({...formState, name: e.target.value})}
-                            placeholder="e.g. LIQUIDITY_GATEKEEPER"
-                            className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-blue-500 outline-none"
-                           />
-                        </div>
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2">Target Protocol Source</label>
-                           <select 
-                            value={formState.targetChain}
-                            onChange={e => setFormState({...formState, targetChain: e.target.value})}
-                            className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-blue-500 outline-none"
-                           >
-                             <option value="Ethereum (Simulated)">Ethereum (Simulated)</option>
-                             <option value="Base (L2)">Base (L2)</option>
-                             <option value="Arbitrum (One)">Arbitrum (One)</option>
-                             <option value="Stellar (Mainnet)">Stellar (Mainnet)</option>
-                           </select>
-                        </div>
-                      </div>
-
-                      {/* Phase 2: Dynamic Trigger Parameters */}
-                      <AnimatePresence mode="wait">
-                        {formState.triggerType === 'time' && (
-                          <motion.div 
-                            key="time"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
-                          >
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-amber-600 dark:text-amber-500 tracking-widest px-2">Scheduled Execution (UTC)</label>
-                                <input 
-                                   type="datetime-local"
-                                   value={formState.scheduledAt}
-                                   onChange={e => setFormState({...formState, scheduledAt: e.target.value})}
-                                   className="w-full bg-white dark:bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-amber-500 outline-none"
-                                />
-                             </div>
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-amber-600 dark:text-amber-500 tracking-widest px-2">Recurrence (Seconds)</label>
-                                <input 
-                                   type="number"
-                                   value={formState.recurrenceInterval}
-                                   onChange={e => setFormState({...formState, recurrenceInterval: parseInt(e.target.value)})}
-                                   placeholder="0 for one-time"
-                                   className="w-full bg-white dark:bg-black/40 border border-amber-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-amber-500 outline-none"
-                                />
-                             </div>
-                          </motion.div>
-                        )}
-
-                        {formState.triggerType === 'event' && (
-                          <motion.div 
-                            key="event"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
-                          >
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-500 tracking-widest px-2">Contract Address</label>
-                                <input 
-                                   type="text"
-                                   value={formState.triggerContractAddress}
-                                   onChange={e => setFormState({...formState, triggerContractAddress: e.target.value})}
-                                   placeholder="0x..."
-                                   className="w-full bg-white dark:bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
-                                />
-                             </div>
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-500 tracking-widest px-2">Event Signature (Topic0)</label>
-                                <input 
-                                   type="text"
-                                   value={formState.triggerEventSignature}
-                                   onChange={e => setFormState({...formState, triggerEventSignature: e.target.value})}
-                                   placeholder="Transfer(address,address,uint256)"
-                                   className="w-full bg-white dark:bg-black/40 border border-emerald-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-emerald-500 outline-none"
-                                />
-                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Phase 3: Enterprise Governance (Multi-Sig) */}
-                      <div className="mb-12 p-8 rounded-3xl bg-indigo-500/[0.03] border border-indigo-500/10">
-                        <div className="flex items-center justify-between mb-8">
-                           <div>
-                              <h4 className="text-slate-900 dark:text-white font-bold text-lg">Enterprise Governance_</h4>
-                              <p className="text-[9px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-widest mt-1">Require cryptographic quorum for execution</p>
-                           </div>
-                           <button 
-                             type="button"
-                             onClick={() => setFormState({...formState, isMultiSig: !formState.isMultiSig})}
-                             className={`w-14 h-8 rounded-full relative transition-all ${formState.isMultiSig ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-800'}`}
-                           >
-                             <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${formState.isMultiSig ? 'right-1' : 'left-1'}`} />
-                           </button>
-                        </div>
-
-                        <AnimatePresence>
-                          {formState.isMultiSig && (
-                            <motion.div 
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              className="grid grid-cols-1 md:grid-cols-2 gap-8"
-                            >
-                               <div className="space-y-3">
-                                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest px-2">Approval Threshold (Quorum)</label>
-                                  <input 
-                                     type="number"
-                                     value={formState.requiredApprovals}
-                                     onChange={e => setFormState({...formState, requiredApprovals: parseInt(e.target.value)})}
-                                     className="w-full bg-white dark:bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
-                                  />
-                               </div>
-                               <div className="space-y-3">
-                                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest px-2">Authorized Approvers (CSV)</label>
-                                  <input 
-                                     type="text"
-                                     value={formState.approvers}
-                                     onChange={e => setFormState({...formState, approvers: e.target.value})}
-                                     placeholder="0x..., 0x..."
-                                     className="w-full bg-white dark:bg-black/40 border border-indigo-500/20 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none text-xs"
-                                  />
-                               </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-
-                      {/* Phase 1: Cross-Chain Details */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-600 dark:text-indigo-400">Target Contract Address</label>
-                           <input 
-                              type="text"
-                              value={formState.targetContract}
-                              onChange={e => setFormState({...formState, targetContract: e.target.value})}
-                              placeholder="0x71C... or Stellar_Address"
-                              className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
-                           />
-                        </div>
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2 text-indigo-600 dark:text-indigo-400">Execution Payload (Hex)</label>
-                           <input 
-                              type="text"
-                              value={formState.targetPayload}
-                              onChange={e => setFormState({...formState, targetPayload: e.target.value})}
-                              placeholder="0xa9059cbb..."
-                              className="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-slate-900 dark:text-white focus:border-indigo-500 outline-none"
-                           />
-                        </div>
-                      </div>
-
-                      <div className="p-8 bg-indigo-500/5 rounded-3xl border border-indigo-500/20 flex items-center justify-between mb-12">
-                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            </div>
-                            <div>
-                               <div className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Gas Abstraction Service</div>
-                               <div className="text-[9px] text-slate-500 font-bold uppercase mt-1">Pay destination gas with your ZYP credits</div>
-                            </div>
-                         </div>
-                         <button 
-                          type="button"
-                          onClick={() => setFormState({...formState, useGasAbstraction: !formState.useGasAbstraction})}
-                          className={`w-12 h-6 rounded-full transition-all relative ${formState.useGasAbstraction ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                         >
-                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formState.useGasAbstraction ? 'left-7' : 'left-1'}`} />
-                         </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-                         <div className="lg:col-span-3 space-y-6">
-                            <div className="space-y-3">
-                               <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest px-2">Smart Predicate (JS_Core)</label>
-                               <textarea 
-                                  value={formState.logic}
-                                  onChange={e => setFormState({...formState, logic: e.target.value})}
-                                  placeholder="return (msg.sender_balance > 1000);"
-                                  rows={8}
-                                  className="w-full bg-slate-50 dark:bg-black/60 border border-slate-200 dark:border-white/10 rounded-[2rem] px-8 py-6 text-blue-600 dark:text-blue-400 font-mono text-sm focus:border-blue-500 outline-none shadow-inner"
-                               />
-                            </div>
-                            <div className="p-6 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 flex items-center justify-between">
-                               <div>
-                                  <div className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Autonomous Execution</div>
-                                  <div className="text-[9px] text-slate-500 font-bold uppercase mt-1">Retry and attest via background worker if satisfied</div>
-                               </div>
-                               <button 
-                                type="button"
-                                onClick={() => setFormState({...formState, autoExecute: !formState.autoExecute})}
-                                className={`w-12 h-6 rounded-full transition-all relative ${formState.autoExecute ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                               >
-                                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formState.autoExecute ? 'left-7' : 'left-1'}`} />
-                               </button>
-                            </div>
-                         </div>
-
-                         <div className="lg:col-span-2 space-y-8">
-                            <AIAssistant logic={formState.logic} />
-                            
-                            <div className="space-y-4">
-                               <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Quick Templates</div>
-                               <div className="grid grid-cols-1 gap-2">
-                                  {[
-                                    { label: 'Balance Threshold', code: 'return (balance > 100);' },
-                                    { label: 'Token Holding', code: 'return (tokens.zyph > 500);' },
-                                    { label: 'DAO Pass Check', code: 'return (votes.passed === true);' }
-                                  ].map((t, i) => (
-                                    <button 
-                                      key={i} 
-                                      type="button" 
-                                      onClick={() => setFormState({...formState, logic: t.code})}
-                                      className="p-4 text-left glass border-slate-200 dark:border-white/5 rounded-xl text-[9px] font-black uppercase text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/40 transition-all"
-                                    >
-                                      {t.label}
-                                    </button>
-                                  ))}
-                               </div>
-                            </div>
-                         </div>
-                      </div>
-
-                      <div className="mt-12 flex justify-end gap-4 border-t border-slate-200 dark:border-white/5 pt-8">
-                         <button 
-                            type="button"
-                            onClick={handleRunSimulation}
-                            className="px-10 py-4 bg-indigo-600/10 text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-600 hover:text-white transition-all shadow-xl shadow-indigo-600/10"
-                         >
-                           Simulate State
-                         </button>
-                         <button 
-                            type="submit" 
-                            disabled={submitting || systemPaused}
-                            className={`px-12 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl ${submitting || systemPaused ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-600 cursor-not-allowed' : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 hover:bg-blue-600 hover:text-white shadow-white/5'}`}
-                         >
-                           {systemPaused ? 'PROTOCOL_HALTED' : (submitting ? 'Committing...' : 'Deploy to Protocol')}
-                         </button>
-                      </div>
-                   </form>
-
-                   {simResult && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                        className={`p-10 rounded-[2.5rem] glass border-2 flex items-center justify-between ${simResult.status === 'pass' ? 'border-emerald-500/30' : 'border-red-500/30'}`}
-                      >
-                         <div className="flex items-center gap-6">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${simResult.status === 'pass' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
-                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  {simResult.status === 'pass' ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />}
-                               </svg>
-                            </div>
-                            <div>
-                               <div className={`text-xl font-black uppercase tracking-tighter ${simResult.status === 'pass' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>Simulation Result_</div>
-                               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{simResult.msg}</p>
-                            </div>
-                         </div>
-                         <button onClick={() => setSimResult(null)} className="text-[10px] font-black text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase tracking-widest transition-colors">Dismiss</button>
-                      </motion.div>
-                   )}
-                </motion.section>
-              )}
-
-              {activeTab === 'automation' && (
-                <motion.section 
-                  key="automation"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="space-y-8"
-                >
-                   <div className="p-12 rounded-[3rem] glass border-slate-200 dark:border-white/5">
-                      <div className="flex items-center gap-6 mb-12">
-                         <div className="w-16 h-16 bg-blue-600/10 rounded-[1.8rem] flex items-center justify-center text-blue-600 dark:text-blue-400">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                         </div>
-                         <div>
-                            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Automation Scheduler_</h3>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage background workers and recurrent jobs</p>
-                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                         <div className="p-8 bg-slate-50 dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
-                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4">Worker Status</div>
-                            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">RUNNING_0x42</div>
-                            <p className="text-[10px] text-slate-500 font-medium">Listening for cross-chain state events and block timestamps.</p>
-                         </div>
-                         <div className="p-8 bg-slate-50 dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5">
-                            <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4">Job Density</div>
-                            <div className="text-xl font-bold text-slate-900 dark:text-white mb-2">12 Active Tasks</div>
-                            <p className="text-[10px] text-slate-500 font-medium">8 Recurrent, 4 Event-based triggers currently indexed.</p>
-                         </div>
-                      </div>
-                   </div>
-                </motion.section>
-              )}
-
-              {activeTab === 'governance' && (
-                <motion.section 
-                  key="governance"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8"
-                >
-                   <div className="p-12 rounded-[3rem] glass border-slate-200 dark:border-white/5">
-                      <div className="flex items-center gap-6 mb-12">
-                         <div className="w-16 h-16 bg-indigo-600/10 rounded-[1.8rem] flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                         </div>
-                         <div>
-                            <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">Enterprise Governance_</h3>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Manage rule approvals and protocol quorum</p>
-                         </div>
-                      </div>
-
-                      <div className="space-y-4">
-                         {pendingGov.length === 0 ? (
-                            <div className="p-20 text-center glass border-slate-200 dark:border-white/5 rounded-[2rem] opacity-30 italic font-black uppercase tracking-widest text-[10px]">No pending quorum requests</div>
-                         ) : pendingGov.map(gov => (
-                            <div key={gov._id} className="p-8 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-3xl flex justify-between items-center group hover:bg-indigo-500/[0.03] transition-all">
-                               <div>
-                                  <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter">{gov.ruleName}</div>
-                                  <div className="flex gap-4 mt-1">
-                                     <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Approvals: {gov.currentApprovals} / {gov.requiredApprovals}</span>
-                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">OpID: {gov._id.slice(-8)}</span>
-                                  </div>
-                               </div>
-                               <button 
-                                 className="px-8 py-3 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all"
-                               >
-                                  Sign Approval
-                               </button>
-                            </div>
-                         ))}
-                      </div>
-                   </div>
-                </motion.section>
-              )}
 
               {activeTab === 'history' && (
                 <motion.div 
@@ -954,7 +622,7 @@ export default function Dashboard() {
                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-600/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Quick Actions</h4>
                <div className="space-y-3">
-                  <button onClick={() => setActiveTab('builder')} className="w-full py-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">New Infrastructure Rule</button>
+                  <button onClick={() => router.push('/developer')} className="w-full py-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">View Documentation</button>
                   <button onClick={() => router.push('/billing')} className="w-full py-4 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">Top up Gas Credits</button>
                </div>
             </div>

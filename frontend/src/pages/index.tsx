@@ -9,25 +9,19 @@ import ThreeDBackground from '../components/ThreeDBackground';
 
 export default function LandingPage() {
   const [loading, setLoading] = useState(true);
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('Developer');
   const { wallet, connect } = useWallet();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1500);
   }, []);
 
-  const handleConnect = () => {
-    setIsRoleModalOpen(false);
-    connect(selectedRole);
-  };
+
 
   if (loading) return <Preloader />;
 
   return (
     <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 selection:bg-blue-500/30 overflow-x-hidden transition-colors duration-300">
-      {/* Blueprint & Grid Background */}
-      <div className="fixed inset-0 blueprint-bg opacity-[0.03] dark:opacity-20 pointer-events-none" />
+
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.05),transparent)] pointer-events-none" />
       
       {/* 3D Background Layer */}
@@ -81,16 +75,16 @@ export default function LandingPage() {
                </Link>
             ) : (
               <button 
-                onClick={() => setIsRoleModalOpen(true)}
+                onClick={() => connect()}
                 className="px-12 py-5 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] shadow-2xl shadow-blue-600/20 hover:bg-blue-500 transition-all transform hover:-translate-y-1 active:scale-95"
               >
                 Establish Secure Uplink_
               </button>
             )}
             
-            <button className="px-12 py-5 glass text-slate-900 dark:text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] hover:bg-black/5 dark:hover:bg-white/5 transition-all border border-slate-200 dark:border-white/10">
+            <Link href="/docs" className="px-12 py-5 glass text-slate-900 dark:text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] hover:bg-black/5 dark:hover:bg-white/5 transition-all border border-slate-200 dark:border-white/10 text-center">
               Technical Documentation
-            </button>
+            </Link>
           </div>
         </motion.div>
 
@@ -299,7 +293,7 @@ export default function LandingPage() {
                   <div className="text-sm font-bold text-slate-900 dark:text-white">{plan.proofs}</div>
                 </div>
                 <button 
-                  onClick={() => setIsRoleModalOpen(true)}
+                  onClick={() => connect()}
                   className={`w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all ${idx === 2 ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300'}`}
                 >
                   {idx === 3 ? 'Contact Sales' : 'Deploy Now'}
@@ -310,45 +304,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Role Selection Modal */}
-      {isRoleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md glass border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 relative"
-          >
-            <button 
-              onClick={() => setIsRoleModalOpen(false)}
-              className="absolute top-6 right-6 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Select Identity_</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-8">Choose your role to initialize the correct telemetry and SLA profiles.</p>
-            
-            <div className="space-y-3 mb-8">
-              {['Developer', 'DAOAdmin', 'NodeOperator', 'Guest'].map((role) => (
-                <button
-                  key={role}
-                  onClick={() => setSelectedRole(role)}
-                  className={`w-full p-4 rounded-2xl border text-left flex justify-between items-center transition-all ${selectedRole === role ? 'bg-blue-500/10 border-blue-500/50 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10'}`}
-                >
-                  <span className="font-bold text-sm">{role === 'DAOAdmin' ? 'DAO Administrator' : role === 'NodeOperator' ? 'Verifier Node Operator' : role}</span>
-                  {selectedRole === role && <div className="w-2 h-2 rounded-full bg-blue-500" />}
-                </button>
-              ))}
-            </div>
 
-            <button 
-              onClick={handleConnect}
-              className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] transition-all"
-            >
-              Sign Request
-            </button>
-          </motion.div>
-        </div>
-      )}
 
       <footer className="border-t border-slate-200 dark:border-white/[0.05] p-16 text-center">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">
