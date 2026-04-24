@@ -67,7 +67,7 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="w-full max-w-xl glass border border-white/10 rounded-[3rem] p-10 relative overflow-hidden"
+            className="w-full max-w-xl glass border border-white/10 rounded-[2.5rem] p-8 relative overflow-hidden max-h-[95vh] flex flex-col"
           >
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-32 -mt-32" />
@@ -75,28 +75,28 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
 
             <button
               onClick={onClose}
-              className="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors"
+              className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="relative z-10">
-              <div className="mb-10 text-center">
+            <div className="relative z-10 overflow-y-auto pr-1 scrollbar-hide">
+              <div className="mb-6 text-center">
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-4"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-[9px] font-bold text-blue-400 uppercase tracking-wider mb-3"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                   Security Protocol_04
                 </motion.div>
-                <h2 className="text-3xl font-bold text-white tracking-tighter mb-3">Select Uplink Provider_</h2>
-                <p className="text-slate-400 text-sm max-w-md mx-auto font-medium">Choose a supported Stellar wallet to establish your secure identity on the Zypherion network.</p>
+                <h2 className="text-2xl font-bold text-white tracking-tighter mb-2">Select Uplink Provider_</h2>
+                <p className="text-slate-400 text-[11px] max-w-xs mx-auto font-medium">Choose a supported Stellar wallet to establish your secure identity on the Zypherion network.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {WALLETS.map((wallet, idx) => (
                   <motion.button
                     key={wallet.id}
@@ -104,20 +104,20 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     onClick={() => onSelect(wallet.id)}
-                    className="flex flex-col items-start p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group text-left relative overflow-hidden"
+                    className="flex flex-col items-start p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group text-left relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-slate-400 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-3 text-slate-400 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
                       {wallet.icon}
                     </div>
                     
-                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{wallet.name}</h3>
-                    <p className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors leading-relaxed">{wallet.description}</p>
+                    <h3 className="text-base font-bold text-white mb-0.5 group-hover:text-blue-400 transition-colors">{wallet.name}</h3>
+                    <p className="text-[10px] text-slate-500 group-hover:text-slate-400 transition-colors leading-tight">{wallet.description}</p>
                     
-                    <div className="mt-4 flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-blue-500 opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                    <div className="mt-3 flex items-center gap-2 text-[8px] font-bold uppercase tracking-wider text-blue-500 opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
                       Initialize Link
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -125,8 +125,8 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
                 ))}
               </div>
 
-              <div className="mt-10 pt-8 border-t border-white/5 text-center">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+              <div className="mt-8 pt-6 border-t border-white/5 text-center">
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
                   Encrypted via Curve25519_
                 </p>
               </div>

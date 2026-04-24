@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import AuthGuard from '../components/AuthGuard';
+import Preloader from '../components/Preloader';
 import { useWallet } from '../hooks/useWallet';
 import { useSound } from '../hooks/useSound';
 import { fetchUserProfile, updateUserProfile, API_BASE } from '../services/api';
@@ -72,16 +73,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-white dark:bg-zypher-bg flex flex-col items-center justify-center space-y-6">
-      <motion.div 
-        animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="w-16 h-16 border-4 border-blue-500/10 border-t-blue-500 rounded-full" 
-      />
-      <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400/60 uppercase tracking-[0.5em] animate-pulse">Initializing Identity_Core</div>
-    </div>
-  );
+  if (loading) return <Preloader />;
 
   return (
     <AuthGuard>

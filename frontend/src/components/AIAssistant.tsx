@@ -22,23 +22,26 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ logic }) => {
   };
 
   return (
-    <div className="p-8 rounded-[2.5rem] bg-indigo-600/10 border border-indigo-500/20 relative overflow-hidden">
+    <div className="p-8 rounded-[2.5rem] bg-indigo-600/10 border border-indigo-500/20 relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 blur-3xl rounded-full" />
-      <div className="flex items-center gap-3 mb-6">
+      {analyzing && <div className="absolute inset-0 animate-shimmer pointer-events-none" />}
+      
+      <div className="flex items-center gap-3 mb-6 relative z-10">
         <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Zypher_AI Assistant</span>
+        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Zypher_AI Assistant</span>
       </div>
 
-      <p className="text-xs text-slate-400 mb-6 font-medium leading-relaxed">
+      <p className="text-xs text-slate-400 mb-6 font-medium leading-relaxed relative z-10">
         Our integrated intelligence scans your logic for gas efficiency and cross-chain compatibility.
       </p>
 
       <button 
         onClick={analyzeLogic}
         disabled={analyzing}
-        className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-50"
+        className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-50 relative z-10 overflow-hidden"
       >
-        {analyzing ? 'Processing Logic...' : 'Analyze Predicate'}
+        <span className="relative z-10">{analyzing ? 'Processing Logic...' : 'Analyze Predicate'}</span>
+        {analyzing && <div className="absolute inset-0 bg-white/10 animate-shimmer" />}
       </button>
 
       <AnimatePresence>
@@ -46,7 +49,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ logic }) => {
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="mt-6 p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/20"
+            className="mt-6 p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/20 relative z-10"
           >
             <p className="text-[10px] text-indigo-300 font-bold leading-relaxed">
               {suggestion}

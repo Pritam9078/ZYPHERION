@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useWallet } from '../hooks/useWallet';
+import Preloader from '../components/Preloader';
 
 export default function DashboardRedirector() {
   const router = useRouter();
@@ -22,9 +23,5 @@ export default function DashboardRedirector() {
     }
   }, [wallet.status, wallet.role, wallet.accountType, router]);
 
-  return (
-    <div className="min-h-screen bg-zypher-bg flex items-center justify-center">
-       <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
-    </div>
-  );
+  return <Preloader />;
 }

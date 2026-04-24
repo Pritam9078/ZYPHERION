@@ -69,62 +69,78 @@ export default function LandingPage() {
             Zypherion lets you write a simple rule, prove it on-chain, and trigger actions automatically — no middlemen, no oracles, no manual steps.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            {wallet.address ? (
-                <Link 
-                 href={
-                   wallet.role === 'admin' ? '/admin' : 
-                   wallet.accountType === 'NodeOperator' ? '/node-operator' : 
-                   '/dashboard'
-                 }
-                 className="px-12 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-2xl font-bold text-[11px] uppercase tracking-wider shadow-2xl shadow-blue-500/10 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white transition-all transform hover:-translate-y-1"
-                >
-                  Launch Sovereign Command
-                </Link>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-stretch">
+              {wallet.address ? (
+                  <Link 
+                   href={
+                     wallet.role === 'admin' ? '/admin' : 
+                     wallet.accountType === 'NodeOperator' ? '/node-operator' : 
+                     '/dashboard'
+                   }
+                   className="px-12 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-2xl font-bold text-[11px] uppercase tracking-wider shadow-2xl shadow-blue-500/10 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white transition-all transform hover:-translate-y-1 flex items-center justify-center"
+                  >
+                    Launch Sovereign Command
+                  </Link>
+              ) : (
                 <button 
                   onClick={() => connect()}
-                  className="px-12 py-5 bg-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-wider shadow-2xl shadow-blue-600/20 hover:bg-blue-500 transition-all transform hover:-translate-y-1 active:scale-95"
+                  className="px-12 py-5 bg-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-wider shadow-2xl shadow-blue-600/20 hover:bg-blue-500 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center"
                 >
                   Get Started — Create First Rule
                 </button>
-                <a href="https://laboratory.stellar.org/#account-creator?network=test" target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-wider transition-colors">
-                  Get Free Test XLM (Friendbot) &rarr;
-                </a>
-              </div>
+              )}
+              
+              <Link href="/docs" className="px-12 py-5 glass text-slate-900 dark:text-white rounded-2xl font-bold text-[11px] uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/5 transition-all border border-slate-200 dark:border-white/10 text-center flex items-center justify-center">
+                Technical Documentation
+              </Link>
+            </div>
+
+            {!wallet.address && (
+              <a href="https://laboratory.stellar.org/#account-creator?network=test" target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-widest transition-colors flex items-center gap-2 group">
+                <span className="w-4 h-px bg-blue-500/30 group-hover:w-6 transition-all" />
+                Get Free Test XLM (Friendbot) &rarr;
+              </a>
             )}
-            
-            <Link href="/docs" className="px-12 py-5 glass text-slate-900 dark:text-white rounded-2xl font-bold text-[11px] uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/5 transition-all border border-slate-200 dark:border-white/10 text-center flex items-center justify-center">
-              Technical Documentation
-            </Link>
           </div>
 
           {/* 3-Step Onboarding Stepper */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0">
+          <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-4">
             {[
-              { icon: '🔑', step: '01', label: 'Connect Wallet' },
+              { icon: '🔑', step: '01', label: 'Connect Wallet', action: 'Get Test XLM →', link: 'https://laboratory.stellar.org/#account-creator?network=testnet' },
               { icon: '⚙️', step: '02', label: 'Create Rule' },
               { icon: '🚀', step: '03', label: 'Run Automation' },
             ].map((s, i) => (
-              <div key={i} className="flex items-center">
-                <div className="flex flex-col items-center gap-2 px-6">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl">{s.icon}</div>
-                  <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{s.step}</div>
-                  <div className="text-[10px] font-bold text-slate-700 dark:text-slate-300">{s.label}</div>
-                  {i === 0 && (
-                    <a 
-                      href="https://laboratory.stellar.org/#account-creator?network=testnet" 
-                      target="_blank" 
-                      rel="noreferrer"
-                      className="text-[8px] font-bold uppercase text-blue-500 hover:underline mt-1"
-                    >
-                      Get Test XLM &rarr;
-                    </a>
-                  )}
+              <React.Fragment key={i}>
+                <div className="flex flex-col items-center group w-32 sm:w-40">
+                  <div className="w-16 h-16 rounded-[2rem] bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                    {s.icon}
+                  </div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-blue-500/60 mb-1">{s.step}</div>
+                  <div className="flex flex-col items-center text-center min-h-[40px]">
+                    <div className="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-tight mb-1">{s.label}</div>
+                    {s.action ? (
+                      <a 
+                        href={s.link}
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-[9px] font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider whitespace-nowrap"
+                      >
+                        {s.action}
+                      </a>
+                    ) : (
+                      <div className="h-[13px]" /> 
+                    )}
+                  </div>
                 </div>
-                {i < 2 && <div className="hidden sm:block w-12 h-px bg-blue-500/20" />}
-              </div>
+                {i < 2 && (
+                  <div className="hidden sm:flex items-center px-4 opacity-20">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
 

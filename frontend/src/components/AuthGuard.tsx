@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useWallet } from '../hooks/useWallet';
 import { motion } from 'framer-motion';
 import { getRouteConfig } from '../services/routes';
+import Preloader from './Preloader';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -66,20 +67,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin: propsRequ
   }, [wallet.status, wallet.role, wallet.accountType, router.pathname]);
 
   if (wallet.status === 'connecting' || wallet.status === 'idle') {
-    return (
-      <div className="min-h-screen bg-zypher-bg flex flex-col items-center justify-center p-6 text-center">
-        <motion.div 
-          animate={{ 
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360] 
-          }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-16 h-16 border-2 border-blue-500/20 border-t-blue-500 rounded-full mb-8"
-        />
-        <h2 className="text-xl font-bold text-white uppercase tracking-tighter mb-2">Establishing Secure Uplink_</h2>
-        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] animate-pulse">Verifying Protocol Permissions</p>
-      </div>
-    );
+    return <Preloader />;
   }
 
   // Final check: if user is logged in, but we need admin and they aren't, 
