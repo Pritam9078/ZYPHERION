@@ -23,10 +23,10 @@ const ThreeDBackground: React.FC = () => {
           {[...Array(8)].map((_, i) => (
             <div
               key={i}
-              className="absolute inset-0 border border-blue-500/30"
+              className="absolute inset-0"
               style={{
                 transform: `rotateY(${i * 45}deg) rotateX(45deg) translateZ(150px)`,
-                background: 'linear-gradient(to bottom, rgba(59, 130, 246, 0.05), transparent)',
+                background: 'linear-gradient(to bottom, rgba(59, 130, 246, 0.08), transparent)',
               }}
             />
           ))}
@@ -71,10 +71,9 @@ const ThreeDBackground: React.FC = () => {
 
 
 
-        {/* Global Noise Overlay */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
-        />
+        {/* Ambient background light */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.08),transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(99,102,241,0.05),transparent_50%)] pointer-events-none" />
       </div>
     </div>
   );

@@ -71,6 +71,33 @@ export const fetchRules = async (token: string): Promise<LogicRule[]> => {
   return response.json();
 };
 
+export const listRules = fetchRules;
+
+export const deleteRule = async (token: string, id: string): Promise<void> => {
+  const response = await fetch(`${API_BASE}/api/rules/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(token),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to delete rule' }));
+    throw new Error(error.message || 'Failed to delete rule');
+  }
+};
+
+export const listWebhooks = async (token: string): Promise<any[]> => {
+  const response = await fetch(`${API_BASE}/api/webhooks`, {
+    headers: getAuthHeaders(token),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to fetch webhooks' }));
+    throw new Error(error.message || 'Failed to fetch webhooks');
+  }
+
+  return response.json();
+};
+
 export const fetchOperations = async (token: string): Promise<Operation[]> => {
   const response = await fetch(`${API_BASE}/api/ops`, {
     headers: getAuthHeaders(token),
@@ -252,6 +279,24 @@ export const approveDeposit = async (
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Failed to approve deposit' }));
     throw new Error(error.message || 'Failed to approve deposit');
+  }
+
+  return response.json();
+};
+
+export const purgeRules = async (
+  token: string,
+  auth: { signature: string; message: string; nonce: string }
+): Promise<any> => {
+  const response = await fetch(`${API_BASE}/api/admin/system/purge-rules`, {
+    method: 'POST',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify({ ...auth }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to purge rules' }));
+    throw new Error(error.message || 'Failed to purge rules');
   }
 
   return response.json();

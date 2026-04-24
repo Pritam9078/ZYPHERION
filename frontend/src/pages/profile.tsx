@@ -79,7 +79,7 @@ export default function ProfilePage() {
         transition={{ duration: 2, repeat: Infinity }}
         className="w-16 h-16 border-4 border-blue-500/10 border-t-blue-500 rounded-full" 
       />
-      <div className="text-[10px] font-black text-blue-600 dark:text-blue-400/60 uppercase tracking-[0.5em] animate-pulse">Initializing Identity_Core</div>
+      <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400/60 uppercase tracking-[0.5em] animate-pulse">Initializing Identity_Core</div>
     </div>
   );
 
@@ -92,10 +92,10 @@ export default function ProfilePage() {
         <main className="relative z-10 container mx-auto px-6 py-12 max-w-4xl">
           <header className="mb-16">
             <div className="flex items-center gap-4 mb-6">
-              <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-500/20">Identity_Management</span>
+              <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-500 rounded-lg text-[9px] font-bold uppercase tracking-wider border border-blue-500/20">Identity_Management</span>
               <div className="h-[1px] flex-1 bg-slate-200 dark:bg-white/5" />
             </div>
-            <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter uppercase mb-4">User Profile_</h1>
+            <h1 className="text-5xl font-bold text-slate-900 dark:text-white tracking-tighter uppercase mb-4">User Profile_</h1>
             <p className="text-slate-500 font-medium tracking-tight">Configure your sovereign identity and protocol metadata.</p>
           </header>
 
@@ -120,7 +120,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-4 w-full">
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Role</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Role</span>
                     <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">
                       {user?.role === 'admin' ? 'System Administrator' : 
                        user?.accountType === 'DAOAdmin' ? 'DAO Administrator' :
@@ -129,13 +129,13 @@ export default function ProfilePage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Tier</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Tier</span>
                     <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">
                       {user?.role === 'admin' ? 'Enterprise_Access' : (user?.tier || 'Free')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-transparent">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">SLA</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">SLA</span>
                     <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
                       {user?.role === 'admin' ? 'PRIORITY_99.99' : 'ACTIVE_99.9'}
                     </span>
@@ -144,7 +144,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="p-8 rounded-[3rem] glass border-slate-200 dark:border-white/5">
-                <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6">Protocol Usage</h3>
+                <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-6">Protocol Usage</h3>
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between text-[10px] font-bold text-slate-900 dark:text-white mb-2 uppercase">
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                     <button 
                       onClick={() => router.push('/billing')}
                       onMouseEnter={playHover}
-                      className="w-full py-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-transparent"
+                      className="w-full py-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-transparent"
                     >
                       Refill Treasury
                     </button>
@@ -185,7 +185,7 @@ export default function ProfilePage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className={`p-4 rounded-2xl border text-xs font-bold uppercase tracking-widest ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'}`}
+                      className={`p-4 rounded-2xl border text-xs font-bold uppercase tracking-wider ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'}`}
                     >
                       {message.text}
                     </motion.div>
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Identity Name</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-4">Identity Name</label>
                     <input 
                       type="text"
                       value={formData.name}
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Secure Email</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-4">Secure Email</label>
                     <input 
                       type="email"
                       value={formData.email}
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Identity Bio</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-4">Identity Bio</label>
                   <textarea 
                     rows={4}
                     value={formData.bio}
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Avatar Endpoint (URL)</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] ml-4">Avatar Endpoint (URL)</label>
                   <input 
                     type="text"
                     value={formData.avatar}
@@ -243,7 +243,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     onMouseEnter={playHover}
                     onClick={() => playClick()}
-                    className="px-12 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/20 transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:transform-none"
+                    className="px-12 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/20 transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:transform-none"
                   >
                     {saving ? 'SYNCHRONIZING...' : 'Commit Changes_'}
                   </button>
@@ -254,17 +254,17 @@ export default function ProfilePage() {
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                  <div className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5 flex items-center justify-between group">
                     <div>
-                      <div className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">DID Verification</div>
+                      <div className="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-1">DID Verification</div>
                       <div className="text-[9px] text-slate-500 uppercase font-bold">Unlink or rotate DID</div>
                     </div>
-                    <button className="px-5 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-xl text-[9px] font-black uppercase text-slate-500 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 group-hover:text-white transition-all">Verify</button>
+                    <button className="px-5 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-xl text-[9px] font-bold uppercase text-slate-500 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 group-hover:text-white transition-all">Verify</button>
                  </div>
                  <div className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5 flex items-center justify-between group">
                     <div>
-                      <div className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest mb-1">API Access</div>
+                      <div className="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-1">API Access</div>
                       <div className="text-[9px] text-slate-500 uppercase font-bold">Revoke all sessions</div>
                     </div>
-                    <button className="px-5 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-xl text-[9px] font-black uppercase text-red-600 dark:text-red-500 group-hover:bg-red-600 group-hover:text-white transition-all">Revoke</button>
+                    <button className="px-5 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-xl text-[9px] font-bold uppercase text-red-600 dark:text-red-500 group-hover:bg-red-600 group-hover:text-white transition-all">Revoke</button>
                  </div>
               </div>
             </div>

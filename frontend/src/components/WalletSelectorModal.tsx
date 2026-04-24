@@ -62,7 +62,7 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -87,12 +87,12 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-4"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                   Security Protocol_04
                 </motion.div>
-                <h2 className="text-3xl font-black text-white tracking-tight mb-3">Select Uplink Provider_</h2>
+                <h2 className="text-3xl font-bold text-white tracking-tighter mb-3">Select Uplink Provider_</h2>
                 <p className="text-slate-400 text-sm max-w-md mx-auto font-medium">Choose a supported Stellar wallet to establish your secure identity on the Zypherion network.</p>
               </div>
 
@@ -115,7 +115,7 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
                     <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{wallet.name}</h3>
                     <p className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors leading-relaxed">{wallet.description}</p>
                     
-                    <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-blue-500 opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                    <div className="mt-4 flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider text-blue-500 opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
                       Initialize Link
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7-7 7" />
@@ -126,7 +126,7 @@ export default function WalletSelectorModal({ isOpen, onClose, onSelect }: Walle
               </div>
 
               <div className="mt-10 pt-8 border-t border-white/5 text-center">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                   Encrypted via Curve25519_
                 </p>
               </div>

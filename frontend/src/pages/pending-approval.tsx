@@ -42,10 +42,10 @@ export default function PendingApproval() {
             </motion.div>
           </div>
 
-          <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-6 uppercase">Awaiting Authorization_</h2>
+          <h2 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tighter mb-6 uppercase">Awaiting Authorization_</h2>
           
           <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed text-sm font-medium">
-            Your application for a <span className="text-amber-600 dark:text-amber-400 font-black tracking-widest uppercase">{wallet.accountType}</span> account is currently in the high-priority review queue. 
+            Your application for a <span className="text-amber-600 dark:text-amber-400 font-bold tracking-wider uppercase">{wallet.accountType}</span> account is currently in the high-priority review queue. 
             Administrator consensus is required to activate protocol-wide signing capabilities.
           </p>
 
@@ -54,14 +54,14 @@ export default function PendingApproval() {
               onClick={() => { playClick(); handleRefresh(); }}
               onMouseEnter={playHover}
               disabled={isChecking}
-              className={`w-full py-5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${isChecking ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5 cursor-not-allowed' : 'bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-slate-200 border-slate-900 dark:border-white shadow-xl shadow-slate-900/10 dark:shadow-white/10'}`}
+              className={`w-full py-5 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-wider transition-all border ${isChecking ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5 cursor-not-allowed' : 'bg-slate-900 dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-slate-200 border-slate-900 dark:border-white shadow-xl shadow-slate-900/10 dark:shadow-white/10'}`}
             >
               {isChecking ? 'Querying State...' : 'Check Status Now'}
             </button>
 
             <div className="flex items-center justify-center gap-4 py-4 px-8 bg-slate-100 dark:bg-black/40 rounded-2xl border border-slate-200 dark:border-white/5">
               <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Status: Review_In_Progress</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">System Status: Review_In_Progress</span>
             </div>
           </div>
 

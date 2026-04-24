@@ -81,7 +81,27 @@ export const getMyRules = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const rules = await LogicRule.find({ creator: req.user.address }).sort({ createdAt: -1 });
+    const rules = await LogicRule.aggregate([
+      { $match: { creator: req.user.address } },
+      { $sort: { createdAt: -1 } },
+      {
+        $lookup: {
+          from: 'proofs',
+          let: { ruleId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$ruleId', '$$ruleId'] } } },
+            { $sort: { createdAt: -1 } },
+            { $limit: 1 }
+          ],
+          as: 'latestProof'
+        }
+      },
+      {
+        $addFields: {
+          latestProof: { $arrayElemAt: ['$latestProof', 0] }
+        }
+      }
+    ]);
     res.json(rules);
   } catch (error) {
     console.error('Error fetching rules:', error);

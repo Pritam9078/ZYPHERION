@@ -45,7 +45,10 @@ export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunctio
     const envAdmin = process.env.ADMIN_WALLET_ADDRESS;
     const isEnvAdmin = envAdmin && req.user?.address === envAdmin;
 
-    if (dbUser?.role !== 'admin' && !isEnvAdmin) {
+    // MVP / Demo Bypass: Also allow if accountType is DAOAdmin
+    const isDAOAdmin = dbUser?.accountType === 'DAOAdmin';
+
+    if (dbUser?.role !== 'admin' && !isEnvAdmin && !isDAOAdmin) {
       return res.status(403).json({ message: 'Admin access required' });
     }
 

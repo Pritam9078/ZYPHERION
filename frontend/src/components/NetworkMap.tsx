@@ -3,12 +3,11 @@ import { motion } from 'framer-motion';
 
 const NetworkMap = () => {
   return (
-    <div className="relative w-full h-[550px] glass border-white/5 rounded-[3rem] overflow-hidden flex flex-col items-center justify-between pt-16 pb-8 px-12">
-      <div className="absolute inset-0 bg-blue-500/5 opacity-20 blueprint-bg" />
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] to-transparent pointer-events-none" />
+    <div className="relative w-full h-[550px] glass border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-between pt-12 pb-8 px-4 md:px-12">
+      {/* Background cleaned - Grid removed */}
       
       {/* Top Row: Target Chains */}
-      <div className="flex justify-between w-full relative z-10 px-24">
+      <div className="flex justify-between w-full relative z-10 px-4 md:px-24">
          {[
            { name: 'Ethereum', icon: 'Ξ', color: 'text-blue-400' },
            { name: 'Arbitrum', icon: 'A', color: 'text-indigo-400' },
@@ -20,10 +19,10 @@ const NetworkMap = () => {
              transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
              className="flex flex-col items-center gap-3"
            >
-              <div className="w-14 h-14 glass-premium border-white/10 rounded-2xl flex items-center justify-center text-xl font-black group-hover:border-blue-500/50 transition-all shadow-2xl">
+              <div className="w-14 h-14 glass-premium border-white/10 rounded-2xl flex items-center justify-center text-xl font-bold group-hover:border-blue-500/50 transition-all shadow-2xl">
                  <span className={chain.color}>{chain.icon}</span>
               </div>
-              <span className="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em]">{chain.name}</span>
+              <span className="text-[9px] font-bold uppercase text-slate-500 tracking-[0.2em]">{chain.name}</span>
            </motion.div>
          ))}
       </div>
@@ -66,7 +65,7 @@ const NetworkMap = () => {
                 className="w-32 h-32 bg-blue-600 rounded-[3rem] flex items-center justify-center text-white shadow-[0_0_100px_rgba(37,99,235,0.25)] border border-blue-400/50 relative z-10"
                >
                   <div className="flex flex-col items-center">
-                     <span className="font-black text-4xl tracking-tighter">Z_</span>
+                     <span className="font-bold text-4xl tracking-tighter">Z_</span>
                      <div className="flex gap-1.5 mt-2">
                         <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" />
                         <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse delay-75" />
@@ -75,13 +74,13 @@ const NetworkMap = () => {
                   </div>
                </motion.div>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-400 bg-blue-500/5 px-8 py-2 rounded-full border border-blue-500/10 shadow-2xl backdrop-blur-md">INTERCHAIN_V2_ORCHESTRATOR</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-blue-400 bg-blue-500/5 px-8 py-2 rounded-full border border-blue-500/10 shadow-2xl backdrop-blur-md">INTERCHAIN_V2_ORCHESTRATOR</span>
          </div>
       </div>
 
       {/* Bottom: Stellar Finality Layer */}
       <div className="relative z-10 flex flex-col items-center gap-4">
-         <div className="h-12 w-[1px] bg-gradient-to-b from-blue-500/30 to-transparent" />
+         <div className="h-8 md:h-12 w-[1px] bg-gradient-to-b from-blue-500/30 to-transparent" />
          <motion.div 
            animate={{ y: [0, 5, 0] }}
            transition={{ duration: 4, repeat: Infinity }}
@@ -91,11 +90,11 @@ const NetworkMap = () => {
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
          </motion.div>
-         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">Stellar_Finality_Ledger</span>
+         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 mb-4">Stellar_Finality_Ledger</span>
          
          {/* Live Verification Pings */}
          <div className="absolute top-8 right-8">
-            <div className="flex items-center gap-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10 backdrop-blur-md">
+            <div className="flex items-center gap-3 text-[9px] font-bold text-emerald-500 uppercase tracking-[0.2em] bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/10 backdrop-blur-md">
                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
                SECURED_ON_CHAIN
             </div>

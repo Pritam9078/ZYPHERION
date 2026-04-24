@@ -26,10 +26,10 @@ const SdkDocs = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.05] bg-black/20 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white text-xl group-hover:rotate-12 transition-transform">⬡</div>
-            <span className="font-black tracking-tight text-xl uppercase">Zypherion<span className="text-blue-500">_SDK</span></span>
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-xl group-hover:rotate-12 transition-transform">⬡</div>
+            <span className="font-bold tracking-tight text-xl uppercase">Zypherion<span className="text-blue-500">_SDK</span></span>
           </Link>
-          <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-wider">
+          <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-wider">
             <a href="https://github.com/Pritam9078/ZYPHERION" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">GitHub</a>
             <Link href="/" className="px-5 py-2.5 bg-white text-slate-950 rounded-lg hover:bg-blue-500 hover:text-white transition-all">Protocol Home</Link>
           </div>
@@ -40,7 +40,7 @@ const SdkDocs = () => {
         {/* Sidebar */}
         <aside className="hidden lg:block space-y-8 sticky top-32 h-fit">
           <div>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.1em] text-slate-500 mb-4">Documentation_</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-500 mb-4">Documentation_</h4>
             <ul className="space-y-2">
               {sections.map((s) => (
                 <li key={s.id}>
@@ -54,9 +54,9 @@ const SdkDocs = () => {
           </div>
           
           <div className="p-6 rounded-2xl bg-blue-500/5 border border-blue-500/10">
-            <h5 className="text-[10px] font-black text-blue-400 uppercase mb-2">Need Help?</h5>
+            <h5 className="text-[10px] font-bold text-blue-400 uppercase mb-2">Need Help?</h5>
             <p className="text-[10px] text-slate-500 leading-relaxed mb-4">Our engineers are available 24/7 on the developer discord for integration support.</p>
-            <button className="text-[10px] font-black text-white uppercase underline decoration-blue-500/50 hover:decoration-blue-500 transition-all">Join Discord</button>
+            <button className="text-[10px] font-bold text-white uppercase underline decoration-blue-500/50 hover:decoration-blue-500 transition-all">Join Discord</button>
           </div>
         </aside>
 
@@ -67,7 +67,7 @@ const SdkDocs = () => {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-6xl font-black text-white tracking-tight mb-6 uppercase"
+              className="text-6xl font-bold text-white tracking-tight mb-6 uppercase"
             >
               Integrate_Sovereignty.
             </motion.h1>
@@ -78,9 +78,9 @@ const SdkDocs = () => {
 
           {/* Installation */}
           <section id="install" className="scroll-mt-32">
-            <h2 className="text-3xl font-black text-white mb-8 tracking-tight">01. Installation_</h2>
+            <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">01. Installation_</h2>
             <div className="bg-black/40 rounded-3xl p-8 border border-white/5 relative group">
-              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Bash</div>
+              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Bash</div>
               <pre className="font-mono text-sm overflow-x-auto text-blue-300">
                 <code>npm install @zypherion/sdk</code>
               </pre>
@@ -92,10 +92,10 @@ const SdkDocs = () => {
 
           {/* Quick Start */}
           <section id="quickstart" className="scroll-mt-32">
-            <h2 className="text-3xl font-black text-white mb-8 tracking-tight">02. Quick Start_</h2>
+            <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">02. Quick Start_</h2>
             <p className="text-slate-400 mb-8 leading-relaxed">Initialize the client with your Sandbox API key (found in the Developer Dashboard) and start orchestrating logic rules in minutes.</p>
             <div className="bg-black/40 rounded-3xl p-8 border border-white/5 relative overflow-hidden">
-              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">TypeScript</div>
+              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-wider">TypeScript</div>
               <pre className="font-mono text-sm leading-relaxed overflow-x-auto">
                 <code>
                   <span className="text-purple-400">import</span> {'{ ZypherionSDK }'} <span className="text-purple-400">from</span> <span className="text-emerald-400">'@zypherion/sdk'</span>;<br /><br />
@@ -114,7 +114,7 @@ const SdkDocs = () => {
 
           {/* Authentication */}
           <section id="auth" className="scroll-mt-32">
-            <h2 className="text-3xl font-black text-white mb-8 tracking-tight">03. Authentication_</h2>
+            <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">03. Authentication_</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5">
                 <h3 className="text-xl font-bold text-white mb-4">API Key Access</h3>
@@ -129,10 +129,10 @@ const SdkDocs = () => {
 
           {/* Logic Rules */}
           <section id="rules" className="scroll-mt-32">
-            <h2 className="text-3xl font-black text-white mb-8 tracking-tight">04. Logic Rules_</h2>
+            <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">04. Logic Rules_</h2>
             <p className="text-slate-400 mb-8 leading-relaxed">Define predicates that trigger cross-chain actions. Rules are stored as immutable state objects and can be activated by verified network events.</p>
             <div className="bg-black/40 rounded-3xl p-8 border border-white/5 relative overflow-hidden">
-              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Example</div>
+              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Example</div>
               <pre className="font-mono text-sm leading-relaxed overflow-x-auto">
                 <code>
                   <span className="text-purple-400">await</span> sdk.rules.<span className="text-blue-400">deploy</span>({'{'}<br />
@@ -147,10 +147,10 @@ const SdkDocs = () => {
 
           {/* ZK Proofs */}
           <section id="proofs" className="scroll-mt-32">
-            <h2 className="text-3xl font-black text-white mb-8 tracking-tight">05. ZK Proofs_</h2>
+            <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">05. ZK Proofs_</h2>
             <p className="text-slate-400 mb-8 leading-relaxed">Zypherion uses Groth16 proofs to ensure that off-chain computations are verifiably correct without revealing sensitive data.</p>
             <div className="bg-black/40 rounded-3xl p-8 border border-white/5 relative overflow-hidden">
-              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Verification</div>
+              <div className="absolute top-4 right-6 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Verification</div>
               <pre className="font-mono text-sm leading-relaxed overflow-x-auto">
                 <code>
                   <span className="text-purple-400">const</span> isValid = <span className="text-purple-400">await</span> sdk.proofs.<span className="text-blue-400">verify</span>(proofId);<br />
@@ -164,7 +164,7 @@ const SdkDocs = () => {
 
           {/* API Reference */}
           <section className="pt-20 border-t border-white/5">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-12">Core_Module_Reference</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500 mb-12">Core_Module_Reference</h2>
             <div className="space-y-12">
               {[
                 { name: 'sdk.auth.handshake()', desc: 'Initiate a cryptographic signature request for user login.' },
@@ -184,7 +184,7 @@ const SdkDocs = () => {
 
       {/* Footer */}
       <footer className="border-t border-white/[0.05] py-16 text-center mt-40">
-        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600 mb-4">Built with conviction for the Stellar Ecosystem</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-600 mb-4">Built with conviction for the Stellar Ecosystem</p>
         <div className="flex justify-center gap-8 text-[10px] font-bold text-slate-500 uppercase">
           <Link href="/" className="hover:text-blue-500 transition-colors">Home</Link>
           <a href="#" className="hover:text-blue-500 transition-colors">Stellar Docs</a>

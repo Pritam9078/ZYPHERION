@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useWallet } from '../hooks/useWallet';
 import { motion } from 'framer-motion';
+import { getRouteConfig } from '../services/routes';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -9,52 +10,60 @@ interface AuthGuardProps {
   allowedAccountTypes?: string[];
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false, allowedAccountTypes }) => {
+const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin: propsRequireAdmin, allowedAccountTypes: propsAllowedTypes }) => {
   const { wallet } = useWallet();
   const router = useRouter();
 
   useEffect(() => {
-    // Only check if we are not still "connecting" (session restoration)
     if (wallet.status !== 'connecting') {
       const token = localStorage.getItem('zypher_token');
+      const config = getRouteConfig(router.pathname);
       
-      // 1. Not logged in at all
+      // 1. Check if public
+      if (config.public) return;
+
+      // 2. Not logged in at all
       if (!token && wallet.status === 'idle') {
         router.push('/');
         return;
       }
 
-      // 2. Authorization Check
+      // 3. Authorization Check
       let isAuthorized = true;
       
-      // If we are connected and not a global admin, we must check restrictions
+      // Use props if provided (backward compatibility), otherwise use config
+      const finalRequireAdmin = propsRequireAdmin ?? config.requireAdmin ?? false;
+      const finalAllowedTypes = propsAllowedTypes ?? config.allowedAccountTypes;
+
       if (wallet.status === 'connected' && wallet.role !== 'admin') {
-        // If it requires admin role specifically
-        if (requireAdmin) {
+        if (finalRequireAdmin) {
           isAuthorized = false;
         }
         
-        // If it requires specific account types
-        if (allowedAccountTypes && wallet.accountType) {
-          if (!allowedAccountTypes.includes(wallet.accountType)) {
+        if (finalAllowedTypes && wallet.accountType) {
+          if (!finalAllowedTypes.includes(wallet.accountType)) {
             isAuthorized = false;
           } else {
-            // If they are in the allowed types, they are authorized even if requireAdmin was true
             isAuthorized = true;
           }
         }
       }
 
       if (!isAuthorized) {
-        // Redirect logic
-        if (wallet.accountType === 'Developer') router.push('/developer');
-        else if (wallet.accountType === 'NodeOperator') router.push('/node-operator');
-        else if (wallet.accountType === 'DAOAdmin') router.push('/admin');
-        else router.push('/dashboard');
+        // Safe redirect loop protection
+        const currentPath = router.pathname;
+        let targetPath = '/guest';
+        if (wallet.accountType === 'Developer') targetPath = '/developer';
+        else if (wallet.accountType === 'NodeOperator') targetPath = '/node-operator';
+        else if (wallet.accountType === 'DAOAdmin') targetPath = '/admin';
+
+        if (currentPath !== targetPath) {
+          router.push(targetPath);
+        }
         return;
       }
     }
-  }, [wallet.status, wallet.role, wallet.accountType, router, requireAdmin, allowedAccountTypes]);
+  }, [wallet.status, wallet.role, wallet.accountType, router.pathname]);
 
   if (wallet.status === 'connecting' || wallet.status === 'idle') {
     return (
@@ -67,19 +76,22 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAdmin = false, a
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="w-16 h-16 border-2 border-blue-500/20 border-t-blue-500 rounded-full mb-8"
         />
-        <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-2">Establishing Secure Uplink_</h2>
+        <h2 className="text-xl font-bold text-white uppercase tracking-tighter mb-2">Establishing Secure Uplink_</h2>
         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] animate-pulse">Verifying Protocol Permissions</p>
       </div>
     );
   }
 
-  // Final check: if user is logged in, but we need admin and they aren't, don't show children yet
-  if (requireAdmin && wallet.role !== 'admin') {
-     return null;
+  // Final check: if user is logged in, but we need admin and they aren't, 
+  // check if they have an allowed account type instead.
+  if (propsRequireAdmin && wallet.role !== 'admin') {
+    if (!propsAllowedTypes || !wallet.accountType || !propsAllowedTypes.includes(wallet.accountType)) {
+      return null;
+    }
   }
 
-  // Final check for account types
-  if (allowedAccountTypes && wallet.accountType && !allowedAccountTypes.includes(wallet.accountType) && wallet.role !== 'admin') {
+  // Final check for account types (if not already covered by requireAdmin check)
+  if (!propsRequireAdmin && propsAllowedTypes && wallet.accountType && !propsAllowedTypes.includes(wallet.accountType) && wallet.role !== 'admin') {
     return null;
   }
 

@@ -209,6 +209,40 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. Connect Fre
 
 ---
 
+## ✦ User Onboarding & Protocol Feedback
+
+To ensure production-grade reliability, 8 unique users were onboarded to the Zypherion testnet. They were tasked with creating sovereign identities, deploying Logic Predicates, and interacting with the Chronos Engine.
+
+### Feedback Questionnaire
+Beyond standard usability metrics, users were asked:
+1. **Is there any feature you think this product is lacking?**
+2. **Did you find any bugs/errors/issues while using this app?**
+3. **Do you think this dApp is able to solve the issue it's targeting (Cross-chain automation)?**
+4. **How intuitive is the Smart Predicate builder for non-technical users?**
+
+### Table 1 — Verified User Directory (Top 5)
+
+| User Name | User Email | User Wallet Address |
+|---|---|---|
+| Lohitanshu Das | daslohitanshu@gmail.com | `GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV` |
+| Suchismita Mohanty | msuchismita719@gmail.com | `GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC` |
+| Rakesh Kumar | kurakesh199812@gmail.com | `GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI` |
+| Megha Sahu | meghasahu3125@gmail.com | `GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK` |
+| Lohit Mishra | lohitmishra25@gmail.com | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` |
+
+### Table 2 — Feedback Implementation Log
+
+| User Name | User Email | User Wallet Address | User Feedback | Commit ID / Implementation |
+|---|---|---|---|---|
+| Rajiv Dubey | lucky81205login@gmail.com | `GCGEXUG7...` | "FIX THE SPACING BETWEEN LETTERS (UI FIX)" | `5a083ca` (Standardized tracking across all headers) |
+| Lohit Mishra | lohitmishra25@gmail.com | `GDYWYDOB...` | "Documentation redirecting to nothing — needs a guide" | `5a083ca` (Fixed SDK link & added README guide) |
+| Megha Sahu | meghasahu3125@gmail.com | `GCBOJCFQ...` | "Improve UI — typography is too bold and heavy" | `6d0fa53` (Refined typography from black to bold) |
+| Suchismita Mohanty | msuchismita719@gmail.com | `GA3SFMGC...` | "UI can be more intuitive — especially in dark mode" | `c3e086d` (Theme-aware visibility & contrast fixes) |
+| Rakesh Kumar | kurakesh199812@gmail.com | `GA23DEPE...` | "Add tutorial / guide for Logic Architect" | `dfd0ecb` (Expanded README documentation section) |
+| HIMANSHU MAHARANA | himanshumaharana46@gmail.com | `GD67FR4B...` | "Logic Architect is great, but needs better error states" | `6d0fa53` (Implemented toast notifications for state changes) |
+
+---
+
 ## ✦ License & Credits
 
 <div align="center">

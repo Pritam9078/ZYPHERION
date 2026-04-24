@@ -89,6 +89,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           if (res.ok) {
             const data = await res.json();
             const user = data.user;
+            console.log('[Zypherion Context] Session restored:', user.address, user.accountType);
             setWallet({
               address: user.address,
               status: 'connected',
@@ -101,6 +102,21 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
               gasBalance: user.gasBalance,
               walletType: savedWalletType,
             });
+
+            // Handle Redirection for existing session
+            if (router.pathname === '/') {
+              if (user.role !== 'admin' && !user.approved && user.accountType !== 'Guest' && user.accountType !== 'Developer') {
+                router.push('/pending-approval');
+              } else if (user.role === 'admin' || user.accountType === 'DAOAdmin') {
+                router.push('/admin');
+              } else if (user.accountType === 'NodeOperator') {
+                router.push('/node-operator');
+              } else if (user.accountType === 'Developer') {
+                router.push('/developer');
+              } else {
+                router.push('/guest');
+              }
+            }
           } else {
             localStorage.removeItem('zypher_token');
             localStorage.removeItem('zypher_wallet_type');
@@ -128,12 +144,22 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       
       if (!address) throw new Error("No address returned from wallet.");
 
-      const message = "Authenticate with Zypherion Protocol";
+      const message = "Authenticate with Zypherion Protocol".trim();
       
       // Sign Message
-      const { signedMessage: signature } = await StellarWalletsKit.signMessage(message);
+      const signResult = await StellarWalletsKit.signMessage(message);
+      console.log("[Zypherion Auth] Full Sign Result:", signResult);
+      
+      const signatureRaw = (signResult as any).signedMessage || (signResult as any).signature || signResult;
+      const signature = typeof signatureRaw === 'string' ? signatureRaw : Buffer.from(signatureRaw as any).toString('base64');
       
       if (!signature) throw new Error("Signing failed.");
+      
+      console.log("[Zypherion Auth] Diagnostic Payload:", {
+        address,
+        sigPrefix: signature.slice(0, 10),
+        sigLength: signature.length
+      });
 
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
@@ -169,7 +195,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         } else if (data.user.accountType === 'Developer') {
           router.push('/developer');
         } else {
-          router.push('/dashboard');
+          router.push('/guest');
         }
       } else {
         throw new Error(data.message);
@@ -182,6 +208,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const connect = (accountType?: string) => {
+    console.log('[Zypherion Context] connect() triggered with type:', accountType || 'none (trigger identity selector)');
     if (accountType) {
       setPendingAccountType(accountType);
       setIsSelectorOpen(true);

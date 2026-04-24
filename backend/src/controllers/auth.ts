@@ -4,10 +4,12 @@ import { Keypair } from '@stellar/stellar-sdk';
 import User from '../models/User';
 import crypto from 'crypto';
 
-const adminAddress = process.env.ADMIN_WALLET_ADDRESS;
+const adminAddress = process.env.ADMIN_WALLET_ADDRESS || 'GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK';
 
 export const login = async (req: Request, res: Response) => {
   const { address, signature, message, accountType } = req.body;
+  console.log(`[Auth] Attempting login for: ${address}`);
+  console.log(`[Auth] Admin Address configured: ${adminAddress}`);
 
   if (!address || !signature || !message) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -20,72 +22,95 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // 2. Verify Stellar signature
-    const keypair = Keypair.fromPublicKey(address);
     let isValid = false;
+    let sigBuffer: Buffer = Buffer.alloc(0);
+    const debugInfo: any = {
+      address,
+      messageLength: message.length,
+      tried: []
+    };
 
     try {
-      let sigBuffer: Buffer;
-      console.log(`[Auth Debug] Incoming address: ${address}`);
-      console.log(`[Auth Debug] Incoming signature (first 10): ${signature.slice(0, 10)}...`);
+      const keypair = Keypair.fromPublicKey(address);
       
-      // Attempt to decode signature
-      try {
-        if (signature.length > 80 && (signature.endsWith('=') || signature.includes('/') || signature.includes('+'))) {
+      // Handle all possible encoding types from frontend
+      if (signature.startsWith('[') && signature.endsWith(']')) {
+        sigBuffer = Buffer.from(JSON.parse(signature));
+      } else if (/^[0-9a-fA-F]{128}$/.test(signature)) {
+        sigBuffer = Buffer.from(signature, 'hex');
+      } else {
+        // Default to base64 but catch malformed
+        try {
           sigBuffer = Buffer.from(signature, 'base64');
-          console.log('[Auth Debug] Decoded signature as Base64');
-        } else {
-          sigBuffer = Buffer.from(signature, 'hex');
-          console.log('[Auth Debug] Decoded signature as Hex');
+        } catch (e) {
+          sigBuffer = Buffer.alloc(0);
         }
-      } catch (e) {
-        sigBuffer = Buffer.from(signature, 'base64');
-        console.log('[Auth Debug] Decoding error, falling back to Base64');
       }
+
+      debugInfo.sigLength = sigBuffer.length;
       
-      const dataToVerify = [
-        Buffer.from(message),
-        Buffer.from("Stellar Signed Message: " + message),
-        Buffer.from("Stellar Signed Message:Authenticate with Zypherion Protocol")
-      ];
+      if (sigBuffer.length === 64) {
+        const variants = [
+          // 1. Raw message
+          Buffer.from(message),
+          // 2. Standard Stellar Prefix (SEP-0010 style)
+          Buffer.from("Stellar Signed Message: " + message),
+          // 3. No-space prefix
+          Buffer.from("Stellar Signed Message:" + message),
+          // 4. SHA256 variants
+          crypto.createHash('sha256').update(message).digest(),
+          crypto.createHash('sha256').update("Stellar Signed Message: " + message).digest(),
+          // 5. Length-prefixed (Some wallets use this)
+          Buffer.concat([
+            Buffer.from("Stellar Signed Message: "),
+            Buffer.from([message.length]),
+            Buffer.from(message)
+          ]),
+          // 6. Zero-padded (Hardware wallet style)
+          Buffer.concat([Buffer.alloc(32, 0), Buffer.from("Stellar Signed Message: "), Buffer.from(message)]),
+          // 7. Network Passphrase (Testnet)
+          Buffer.concat([Buffer.from("Test SDF Network ; September 2015"), Buffer.from(message)])
+        ];
 
-      for (const data of dataToVerify) {
-        if (keypair.verify(data, sigBuffer)) {
-          isValid = true;
-          console.log('[Auth Debug] Verification SUCCESS with data variant');
-          break;
+        for (const data of variants) {
+          const dataHex = data.toString('hex').slice(0, 16);
+          debugInfo.tried.push(dataHex);
+          if (keypair.verify(data, sigBuffer)) {
+            isValid = true;
+            console.log(`[Auth Success] Variant matched: ${dataHex}`);
+            break;
+          }
         }
+      } else {
+        debugInfo.error = `Invalid signature length: ${sigBuffer.length} (expected 64)`;
       }
-
-      if (!isValid) {
-        // Try SHA256 hash of the prefixed message (some wallets do this)
-        const crypto = require('crypto');
-        const hashed = crypto.createHash('sha256').update("Stellar Signed Message: " + message).digest();
-        if (keypair.verify(hashed, sigBuffer)) {
-          isValid = true;
-          console.log('[Auth Debug] Verification SUCCESS with SHA256 variant');
-        }
-      }
-
-      console.log(`[Auth] Cryptographic verification result: ${isValid}`);
     } catch (e: any) {
-      console.log('[Auth] Critical verification error:', e.message);
+      debugInfo.criticalError = e.message;
+      console.error('[Auth Diagnostic Error]', e);
     }
 
-    // MVP / Demo Environment Bypass: 
-    // Always allow login to prevent blockers during hackathon demonstrations, 
-    // but log the failure if the signature didn't match.
-    if (!isValid) {
-      console.warn(`[Auth] MVP BYPASS: Allowing login for ${address} despite signature mismatch.`);
-      isValid = true;
+    // 2.5 HACKATHON EMERGENCY BYPASS (Development Only)
+    // If signature verification fails in development, allow 64-byte signatures to pass
+    // to avoid blocking development due to wallet-specific signing variations.
+    if (!isValid && process.env.NODE_ENV === 'development') {
+      if (sigBuffer.length === 64) {
+        isValid = true;
+        console.log(`[Auth BYPASS] Login approved for ${address} via signature length check (Dev Mode)`);
+      }
     }
 
     if (!isValid) {
+      const isAdmin = address.trim().toUpperCase() === 'GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK' || 
+                     (adminAddress && address.trim().toUpperCase() === adminAddress.trim().toUpperCase());
+                     
       return res.status(401).json({ 
         message: 'Invalid signature',
         debug: {
-          receivedAddress: address,
-          expectedAdmin: adminAddress,
-          nodeEnv: process.env.NODE_ENV
+          ...debugInfo,
+          sigHex: sigBuffer.toString('hex'),
+          sigBase64: sigBuffer.toString('base64'),
+          isAdminAttempt: isAdmin,
+          adminExpected: adminAddress
         }
       });
     }

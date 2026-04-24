@@ -20,10 +20,19 @@
   --accent-color: #3b82f6;
 }
 
+html, body {
+  @apply max-w-full overflow-x-hidden m-0 p-0;
+  width: 100%;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  @apply antialiased transition-colors duration-300;
+  @apply antialiased transition-colors duration-300 min-h-screen relative;
+}
+
+.container {
+  @apply w-full max-w-[1440px] px-4 md:px-6 lg:px-8 mx-auto;
 }
 
 .glass {

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import SocketService from '../services/socket';
 import Navbar from '../components/Navbar';
+import Preloader from '../components/Preloader';
 import AuthGuard from '../components/AuthGuard';
 import PayloadModal from '../components/PayloadModal';
-import { API_BASE } from '../services/api';
+import ProfileCard from '../components/ProfileCard';
+import { API_BASE, fetchSystemSettings, toggleProtocolHalt } from '../services/api';
 import { signActionRequest } from '../services/signing';
 import { useWallet } from '../hooks/useWallet';
-import { fetchSystemSettings, toggleProtocolHalt } from '../services/api';
 import { useSound } from '../hooks/useSound';
 
 interface UserData {
@@ -30,7 +31,6 @@ interface Stats {
   successRate: string;
 }
 
-// Simple Sparkline Component
 const Sparkline = ({ color = '#3b82f6' }) => (
   <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none" className="opacity-40">
     <path
@@ -58,11 +58,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'security' | 'entities' | 'governance' | 'cluster' | 'treasury'>('security');
   
-  // Real-time Systems Telemetry
   const [telemetry, setTelemetry] = useState<{t: string, m: string, c: string}[]>([]);
   const [systemHealth, setSystemHealth] = useState({ connections: 0, load: 'LOW' });
 
-  // Inspector State
   const [inspector, setInspector] = useState<{isOpen: boolean, title: string, data: any}>({
     isOpen: false,
     title: '',
@@ -80,12 +78,10 @@ export default function AdminDashboard() {
     }
     setToken(storedToken);
 
-    // Initialize Socket.io via Singleton
     const socket = SocketService.getSocket();
     socketRef.current = socket;
 
     const onConnect = () => {
-      console.log('[Overseer] Real-time uplink secured.');
       socket.emit('join_protocol', 'ADMIN_ZONE');
     };
 
@@ -96,7 +92,6 @@ export default function AdminDashboard() {
     socket.on('connect', onConnect);
     socket.on('system_stats', onSystemStats);
     
-    // Only emit join if already connected
     if (socket.connected) onConnect();
 
     return () => {
@@ -127,7 +122,7 @@ export default function AdminDashboard() {
         setDeposits(await depositsRes.json().catch(() => []));
       } catch (err: any) {
         console.error(err);
-        setTimeout(() => { window.location.href = '/dashboard'; }, 2000);
+        setTimeout(() => { router.push('/dashboard'); }, 2000);
       } finally {
         setLoading(false);
       }
@@ -145,7 +140,11 @@ export default function AdminDashboard() {
       }
     };
     loadSettings();
-  }, [token, router]);
+
+    if (router.query.tab) {
+      setActiveTab(router.query.tab as any);
+    }
+  }, [token, router.query.tab]);
 
   const addTelemetryLog = (m: string, c: string = 'text-slate-500 dark:text-slate-400') => {
     const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -174,36 +173,10 @@ export default function AdminDashboard() {
         playError();
       }
     } catch (err) {
-      console.error('Action denied');
       playError();
     }
   };
 
-  const handleApproveUser = async (userId: string) => {
-    if (!token || !wallet.address) return;
-    try {
-      const auth = await signActionRequest(wallet.address, 'APPROVE_USER', `UserID: ${userId}`);
-      
-      const res = await fetch(`${API_BASE}/api/admin/users/${userId}/approve`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ...auth })
-      });
-      if (res.ok) {
-        setUsers(prev => prev.map(u => u._id === userId ? { ...u, approved: true, kycStatus: 'verified' } : u));
-        addTelemetryLog(`GOV: Entity_${userId.slice(-6)} KYC verified and access approved.`, 'text-blue-600 dark:text-blue-400');
-        playSuccess();
-      } else {
-        playError();
-      }
-    } catch (err) {
-      console.error('Approval denied');
-      playError();
-    }
-  };
 
   const handleApproveDeposit = async (depositId: string) => {
     if (!token || !wallet.address) return;
@@ -226,7 +199,6 @@ export default function AdminDashboard() {
         playError();
       }
     } catch (err) {
-      console.error('Deposit approval denied');
       playError();
     }
   };
@@ -279,7 +251,32 @@ export default function AdminDashboard() {
         playError();
       }
     } catch (err) {
-      console.error('Role update denied');
+      playError();
+    }
+  };
+
+  const handleApproveUser = async (userId: string) => {
+    if (!token || !wallet.address) return;
+    try {
+      addTelemetryLog(`SEC: Initiating KYC verification for Entity_${userId.slice(-6)}...`, 'text-blue-600 dark:text-blue-400');
+      const auth = await signActionRequest(wallet.address, 'APPROVE_USER', `UserID: ${userId}\nAction: VERIFY_KYC`);
+      
+      const res = await fetch(`${API_BASE}/api/admin/users/${userId}/approve`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...auth })
+      });
+      if (res.ok) {
+        setUsers(prev => prev.map(u => u._id === userId ? { ...u, approved: true, kycStatus: 'verified' } : u));
+        addTelemetryLog(`SEC: Entity_${userId.slice(-6)} approved and identity verified on-chain.`, 'text-emerald-600 dark:text-emerald-400');
+        playSuccess();
+      } else {
+        playError();
+      }
+    } catch (err) {
       playError();
     }
   };
@@ -305,7 +302,6 @@ export default function AdminDashboard() {
         playError();
       }
     } catch (err) {
-       console.error('Purge failed');
        playError();
     }
   };
@@ -314,343 +310,258 @@ export default function AdminDashboard() {
     setInspector({ isOpen: true, title, data });
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-white dark:bg-zypher-bg flex flex-col items-center justify-center space-y-6">
-      <motion.div 
-        animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="w-16 h-16 border-4 border-blue-500/10 border-t-blue-500 rounded-full" 
-      />
-      <div className="text-[10px] font-black text-blue-600 dark:text-blue-400/60 uppercase tracking-[0.5em] animate-pulse">Syncing Overseer_Core V2</div>
-    </div>
-  );
+  if (loading) return <Preloader />;
 
   return (
     <AuthGuard requireAdmin allowedAccountTypes={['DAOAdmin']}>
-      <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-zypher-bg text-slate-900 dark:text-slate-200 transition-colors duration-300 overflow-x-hidden">
+        <Navbar />
 
-      <Navbar />
-
-      <PayloadModal 
-        isOpen={inspector.isOpen}
-        onClose={() => setInspector({ ...inspector, isOpen: false })}
-        title={inspector.title}
-        data={inspector.data}
-      />
-      
-      <main className="relative z-10 container mx-auto px-6 py-12">
+        <PayloadModal 
+          isOpen={inspector.isOpen}
+          onClose={() => setInspector({ ...inspector, isOpen: false })}
+          title={inspector.title}
+          data={inspector.data}
+        />
         
-        {/* Overseer Command Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 border-b border-slate-200 dark:border-white/5 pb-8">
-           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-red-500/20">ADMIN_OVERRIDE_ACTIVE</span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Protocol Sovereignty Enabled</span>
-            </div>
-            <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Sovereign Command_</h2>
-            <div className="flex gap-1.5 overflow-x-auto pb-2">
-              {['security', 'entities', 'governance', 'cluster', 'treasury'].map((tab) => (
-                <button
-                  key={tab}
-                  onMouseEnter={playHover}
-                  onClick={() => { playClick(); setActiveTab(tab as any); }}
-                  className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-red-600 text-white shadow-xl shadow-red-600/20 scale-105' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
+        <main className="relative z-10 container py-8">
           
-          <div className="flex items-center gap-8 bg-slate-50 dark:bg-white/5 px-8 py-4 rounded-[2rem] border border-slate-200 dark:border-white/5">
-             <div className="text-center font-mono">
-                <div className="text-[9px] font-black text-slate-500 uppercase mb-1">Health Index</div>
-                <div className="text-emerald-600 dark:text-emerald-400 font-bold">OPTIMAL_1.0</div>
-             </div>
-             <div className="w-[1px] h-8 bg-slate-200 dark:bg-white/10" />
-             <div className="text-center font-mono">
-                <div className="text-[9px] font-black text-slate-500 uppercase mb-1">Verification Load</div>
-                <div className="text-slate-900 dark:text-white font-bold">{stats?.proofs} OPS_BATCH</div>
-             </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 text-sm">
-          
-          <div className="lg:col-span-2 space-y-12">
-            
-            <AnimatePresence mode="wait">
-              {activeTab === 'security' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="space-y-8"
-                >
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                      {[
-                        { label: 'Network Wallets', value: stats?.users || 0, color: '#3b82f6' },
-                        { label: 'Global Registries', value: stats?.rules || 0, color: '#8b5cf6' },
-                        { label: 'Active Verifications', value: stats?.proofs || 0, color: '#ec4899' },
-                        { label: 'Protocol Finality', value: stats?.successRate || '0%', color: '#10b981' },
-                      ].map((stat, i) => (
-                        <div key={i} className="p-6 rounded-[2rem] glass border-slate-200 dark:border-white/[0.05] relative overflow-hidden group bg-slate-50 dark:bg-white/5">
-                           <h3 className="text-[8px] font-black tracking-[0.1em] text-slate-500 mb-2 uppercase">{stat.label}</h3>
-                           <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">{stat.value}</div>
-                           <Sparkline color={stat.color} />
-                        </div>
-                      ))}
-                   </div>
-                   <div className="p-12 rounded-[3.5rem] bg-red-50 dark:bg-black/40 border border-red-100 dark:border-white/10 glass">
-                      <div className="flex items-center gap-4 mb-8">
-                         <div className="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse" />
-                         <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Emergency Protocol Override</h3>
-                      </div>
-                      
-                      <div className="p-8 bg-white dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5 flex items-center justify-between">
-                         <div>
-                            <div className="font-black text-slate-900 dark:text-white uppercase tracking-widest text-xs mb-2">PROOFS_VERIFICATION_HALT</div>
-                            <p className="text-[10px] text-slate-500 font-medium max-w-sm">Universal kill-switch to immediately freeze all on-chain cryptographic state attestations.</p>
-                         </div>
-                         <button 
-                          onClick={handleToggleProtocolHalt}
-                          disabled={halting}
-                          className={`w-24 h-10 rounded-full transition-all relative ${halting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'} ${systemPaused ? 'bg-red-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                         >
-                            <div className={`absolute top-1.5 left-1.5 w-7 h-7 bg-white rounded-full transition-all shadow-md transform ${systemPaused ? 'translate-x-14 shadow-[0_0_15px_rgba(255,255,255,0.4)]' : 'translate-x-0'}`} />
-                         </button>
-                      </div>
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5 bg-gradient-to-br from-red-600/5 to-transparent">
-                         <h4 className="text-[10px] font-black text-red-600 dark:text-red-500/60 uppercase tracking-widest mb-6">Threat Mitigation</h4>
-                         <div className="space-y-4">
-                            <button className="w-full py-4 glass border-slate-200 dark:border-white/5 text-[9px] font-black uppercase text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">Flush Operation Queue</button>
-                            <button className="w-full py-4 glass border-slate-200 dark:border-white/5 text-[9px] font-black uppercase text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all text-left px-6">Reject External API Requests</button>
-                         </div>
-                      </div>
-                      <div className="p-8 rounded-[2.5rem] glass border-slate-200 dark:border-white/5 text-center flex flex-col items-center justify-center">
-                         <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 rounded-full flex items-center justify-center mb-4">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                         </div>
-                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Security Score</div>
-                         <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tracking-tighter uppercase">STABLE_SEC_01</div>
-                      </div>
-                   </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'entities' && (
-                <motion.section 
-                  initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden"
-                >
-                  <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] flex justify-between items-center px-10">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white px-2 tracking-tighter uppercase">Wallet Ecosystem_</h3>
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-4 py-1.5 rounded-full">{users.length} ATTESTERS</span>
-                  </div>
-                  <div className="overflow-x-auto text-[11px] font-bold">
-                    <table className="w-full text-left">
-                      <tbody>
-                        {users.map(u => (
-                          <tr key={u._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-red-500/[0.02] transition-colors">
-                            <td className="p-10">
-                              <div className="text-md font-bold text-slate-900 dark:text-white flex items-center gap-4">
-                                <div className={`w-2.5 h-2.5 rounded-full ${u.status === 'banned' ? 'bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]' : 'bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]'}`} />
-                                <span className="font-mono tracking-tight">{u.address.slice(0, 32)}...</span>
-                              </div>
-                              <div className="text-[9px] text-slate-500 mt-2 uppercase tracking-[0.2em] font-black opacity-50 flex gap-4">
-                                <span>ROLE: {u.role}</span>
-                                <span>STATUS: {u.status}</span>
-                                <span className={u.approved ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-500'}>
-                                  KYC: {u.kycStatus || 'unverified'}
-                                </span>
-                              </div>
-                            </td>
-                             <td className="p-10 text-right space-x-3">
-                               <button 
-                                onClick={() => handleUpdateUserRole(u._id, u.role)}
-                                className={`px-5 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${u.role === 'admin' ? 'bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/5 hover:border-indigo-500/30'}`}
-                               >
-                                 {u.role === 'admin' ? 'REVOKE_ADMIN' : 'MAKE_ADMIN'}
-                               </button>
-                               <button 
-                                onClick={() => handleUpdateUserStatus(u._id, u.status)}
-                                className={`px-8 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${u.status === 'banned' ? 'bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-red-600/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-600 hover:text-white'}`}
-                               >
-                                 {u.status === 'banned' ? 'REVOKE_BAN' : 'RESTRICT_ID'}
-                               </button>
-                               {!u.approved && u.accountType !== 'Guest' && (
-                                 <button 
-                                  onClick={() => handleApproveUser(u._id)}
-                                  className="px-8 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-600 hover:text-white"
-                                 >
-                                   APPROVE_ACCESS
-                                 </button>
-                               )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </motion.section>
-              )}
-
-              {activeTab === 'governance' && (
-                <motion.section 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden"
-                >
-                   <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white px-2 tracking-tighter uppercase">Protocol-Wide Logic Repositories</h3>
-                  </div>
-                   <div className="overflow-x-auto text-[11px] font-bold">
-                    <table className="w-full text-left">
-                      <tbody>
-                        {rules.map(r => (
-                          <tr key={r._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.02] transition-colors">
-                            <td className="p-10">
-                               <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
-                                  {r.name}
-                                  <span className="text-[8px] font-black px-2 py-0.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded uppercase tracking-tighter opacity-50">{r.status}</span>
-                               </div>
-                               <div className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-black opacity-50">Origin: {r.creator?.address?.slice(0, 16)}...</div>
-                            </td>
-                            <td className="p-10 text-right space-x-3">
-                               <button onClick={() => openInspector('Rule Detailed View', r)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Audit</button>
-                               <button onClick={() => handlePurgeRule(r._id)} className="px-5 py-2.5 bg-red-600/10 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Purge</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="p-8 border-t border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white px-2 tracking-tighter uppercase">Global Operation Stream</h3>
-                  </div>
-                  <div className="overflow-x-auto text-[10px] font-bold">
-                    <table className="w-full text-left">
-                      <tbody>
-                        {ops.map(o => (
-                          <tr key={o._id} className="border-b border-slate-200 dark:border-white/5 hover:bg-emerald-500/[0.01]">
-                            <td className="p-8">
-                               <div className="text-slate-900 dark:text-white uppercase">{(o.ruleId as any)?.name || 'Op_' + o._id.slice(-6)}</div>
-                               <div className="text-slate-500 dark:text-slate-600 mt-1 uppercase font-mono">TX: {o.txHash || 'PENDING_COMMIT'}</div>
-                            </td>
-                            <td className="p-8">
-                               <span className={`px-2 py-1 rounded-md text-[8px] font-black uppercase ${o.status === 'verified' ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10' : 'text-slate-500 bg-slate-100 dark:bg-white/5'}`}>{o.status}</span>
-                            </td>
-                            <td className="p-8 text-right text-slate-500 dark:text-slate-600">
-                               {new Date(o.createdAt).toLocaleDateString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </motion.section>
-              )}
-
-              {activeTab === 'cluster' && (
-                <motion.section 
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="p-16 rounded-[4rem] bg-slate-50 dark:glass-blue border border-slate-200 dark:border-white/5 text-center"
-                >
-                   <div className="w-24 h-24 bg-red-600/10 rounded-[2.5rem] flex items-center justify-center text-red-600 dark:text-red-500 mx-auto mb-10 border border-red-500/20 shadow-[0_0_50px_rgba(220,38,38,0.1)]">
-                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.631.316a6 6 0 01-3.86.517l-2.387-.477a2 2 0 00-1.022.547l-1.162 1.163a2 2 0 00.597 3.301l1.544.515a2 2 0 001.265 0l1.544-.515a2 2 0 00.597-3.301l-1.162-1.163z" />
-                      </svg>
-                   </div>
-                   <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Master Cluster Monitor_</h3>
-                   <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-12 opacity-60">Real-time node telemetry and protocol orchestration</p>
-                   
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                      <div className="p-8 bg-white dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5 text-left group hover:border-red-500/30 transition-all">
-                         <div className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-4">Health Status</div>
-                         <div className="text-xl font-bold text-slate-900 dark:text-white mb-2 underline underline-offset-8">NODE_ALPHA_01</div>
-                         <p className="text-[10px] text-slate-500 font-medium">Core verification engine is responding within nominal latency parameters.</p>
-                      </div>
-                      <div className="p-8 bg-white dark:bg-black/40 rounded-[2.5rem] border border-slate-200 dark:border-white/5 text-left group hover:border-red-500/30 transition-all">
-                         <div className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-4">Uptime</div>
-                         <div className="text-xl font-bold text-slate-900 dark:text-white mb-2">99.999%_SYNC</div>
-                         <p className="text-[10px] text-slate-500 font-medium">Protocol state synchronized across all known validators globally.</p>
-                      </div>
-                   </div>
-                </motion.section>
-              )}
-
-              {activeTab === 'treasury' && (
-                <motion.section 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden"
-                >
-                   <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white px-2 tracking-tighter uppercase">Protocol Treasury & Escrow</h3>
-                  </div>
-                   <div className="overflow-x-auto text-[11px] font-bold">
-                    <table className="w-full text-left">
-                      <tbody>
-                        {deposits.length === 0 ? (
-                           <tr>
-                             <td className="p-10 text-center opacity-30 italic uppercase font-black tracking-widest">No deposits found</td>
-                           </tr>
-                        ) : deposits.map(d => (
-                          <tr key={d._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.02] transition-colors">
-                            <td className="p-10">
-                               <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
-                                  {d.depositAmount} {d.currency}
-                                  <span className={`text-[8px] font-black px-2 py-0.5 border rounded uppercase tracking-tighter ${d.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'}`}>{d.status}</span>
-                               </div>
-                               <div className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-black opacity-50">From: {d.userAddress?.slice(0, 16)}...</div>
-                               <div className="text-[8px] text-slate-500 dark:text-slate-600 mt-1 uppercase font-mono">TX: {d.txHash}</div>
-                            </td>
-                            <td className="p-10 text-right space-x-3">
-                               {d.status === 'pending' && (
-                                 <button 
-                                  onClick={() => handleApproveDeposit(d._id)} 
-                                  className="px-5 py-2.5 bg-blue-600/10 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-                                 >
-                                   Approve & Fund
-                                 </button>
-                               )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </motion.section>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Overseer Sidebar ( Protocol Logs ) */}
-          <aside className="space-y-12">
-            
-            <section className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-[650px]">
-              <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.01]">
-                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Protocol Audit logs</h3>
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-8 border-b border-slate-200 dark:border-white/5 pb-8">
+             <div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-500 rounded-lg text-[9px] font-bold uppercase tracking-wider border border-red-500/20">ADMIN_OVERRIDE_ACTIVE</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Protocol Sovereignty Enabled</span>
               </div>
-              <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-slate-100/50 dark:bg-black/20 font-mono text-[9px]" style={{ scrollbarWidth: 'none' }}>
-                {telemetry.length === 0 ? (
-                   <div className="opacity-20 italic text-slate-500">Awaiting stream...</div>
-                ) : telemetry.map((log, i) => (
-                  <div key={i} className="flex gap-4 items-start border-l-2 border-slate-200 dark:border-white/5 pl-4 ml-1">
-                    <span className="opacity-30 flex-shrink-0 font-bold">{log.t}</span>
-                    <span className={`${log.c} font-bold leading-relaxed break-all`}>{log.m}</span>
-                  </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tighter mb-4">Sovereign Command_</h2>
+              <div className="flex gap-1.5 overflow-x-auto pb-2">
+                {['security', 'entities', 'governance', 'cluster', 'treasury'].map((tab) => (
+                  <button
+                    key={tab}
+                    onMouseEnter={playHover}
+                    onClick={() => { playClick(); setActiveTab(tab as any); }}
+                    className={`px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? 'bg-red-600 text-white shadow-xl shadow-red-600/20 scale-105' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
+                  >
+                    {tab}
+                  </button>
                 ))}
               </div>
-              <div className="p-6 bg-red-600/5 text-center mt-auto border-t border-slate-200 dark:border-white/5 font-mono text-[8px] font-black text-red-600 dark:text-red-500 tracking-widest">
-                IMMUTABLE_LOG_STREAM: ENABLED
-              </div>
-            </section>
+            </div>
+            
+            <div className="flex items-center gap-8 bg-slate-50 dark:bg-white/5 px-8 py-4 rounded-[2rem] border border-slate-200 dark:border-white/5">
+               <div className="text-center font-mono">
+                  <div className="text-[9px] font-bold text-slate-500 uppercase mb-1">Health Index</div>
+                  <div className="text-emerald-600 dark:text-emerald-400 font-bold">OPTIMAL_1.0</div>
+               </div>
+               <div className="w-[1px] h-8 bg-slate-200 dark:bg-white/10" />
+               <div className="text-center font-mono">
+                  <div className="text-[9px] font-bold text-slate-500 uppercase mb-1">Verification Load</div>
+                  <div className="text-slate-900 dark:text-white font-bold">{stats?.proofs} OPS_BATCH</div>
+               </div>
+            </div>
+          </header>
 
-          </aside>
-        </div>
-      </main>
-    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 text-sm">
+            <div className="lg:col-span-2 space-y-12">
+              <AnimatePresence mode="wait">
+                {activeTab === 'security' && (
+                  <motion.div key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        {[
+                          { label: 'Network Wallets', value: stats?.users || 0, color: '#3b82f6' },
+                          { label: 'Global Registries', value: stats?.rules || 0, color: '#8b5cf6' },
+                          { label: 'Active Verifications', value: stats?.proofs || 0, color: '#ec4899' },
+                          { label: 'Protocol Finality', value: stats?.successRate || '0%', color: '#10b981' },
+                        ].map((stat, i) => (
+                          <div key={i} className="p-6 rounded-[2rem] glass border-slate-200 dark:border-white/[0.05] relative overflow-hidden group bg-slate-50 dark:bg-white/5">
+                             <h3 className="text-[8px] font-bold tracking-[0.1em] text-slate-500 mb-2 uppercase">{stat.label}</h3>
+                             <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">{stat.value}</div>
+                             <Sparkline color={stat.color} />
+                          </div>
+                        ))}
+                     </div>
+                      <div className="p-8 rounded-[2.5rem] bg-red-50 dark:bg-black/40 border border-red-100 dark:border-white/10 glass">
+                        <div className="flex items-center gap-4 mb-6">
+                           <div className="w-3 h-3 rounded-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] animate-pulse" />
+                           <h3 className="text-xl font-bold text-slate-900 dark:text-white uppercase tracking-tighter italic">Emergency Protocol Override</h3>
+                        </div>
+                        
+                        <div className="p-6 bg-white dark:bg-black/40 rounded-[2rem] border border-slate-200 dark:border-white/5 flex items-center justify-between">
+                           <div>
+                              <div className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs mb-1">PROOFS_VERIFICATION_HALT</div>
+                              <p className="text-[10px] text-slate-500 font-medium max-w-sm">Universal kill-switch to immediately freeze all on-chain cryptographic state attestations.</p>
+                           </div>
+                           <button onClick={handleToggleProtocolHalt} disabled={halting} className={`w-20 h-9 rounded-full transition-all relative ${halting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'} ${systemPaused ? 'bg-red-600' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                              <div className={`absolute top-1 left-1 w-7 h-7 bg-white rounded-full transition-all shadow-md transform ${systemPaused ? 'translate-x-11 shadow-[0_0_15px_rgba(255,255,255,0.4)]' : 'translate-x-0'}`} />
+                           </button>
+                        </div>
+                      </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'entities' && (
+                  <motion.section key="entities" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] flex justify-between items-center px-10">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 tracking-tighter uppercase italic">Wallet Ecosystem_</h3>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 dark:bg-white/5 px-4 py-1.5 rounded-full">{users.length} ATTESTERS</span>
+                    </div>
+                    <div className="overflow-x-auto text-[11px] font-bold">
+                      <table className="w-full text-left">
+                        <tbody>
+                          {users.map(u => (
+                            <tr key={u._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-red-500/[0.02] transition-colors">
+                              <td className="p-10">
+                                <div className="text-md font-bold text-slate-900 dark:text-white flex items-center gap-4">
+                                  <div className={`w-2.5 h-2.5 rounded-full ${u.status === 'banned' ? 'bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]' : !u.approved ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] animate-pulse' : 'bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.5)]'}`} />
+                                  <span className="font-mono tracking-tight">{u.address.slice(0, 32)}...</span>
+                                </div>
+                                <div className="text-[9px] text-slate-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-50 flex gap-4">
+                                  <span>ROLE: {u.role}</span>
+                                  <span>STATUS: {u.status}</span>
+                                  <span className={u.approved ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-500'}>KYC: {u.kycStatus || 'unverified'}</span>
+                                </div>
+                              </td>
+                              <td className="p-10 text-right space-x-3">
+                                 {!u.approved && (
+                                   <button 
+                                     onClick={() => handleApproveUser(u._id)} 
+                                     className="px-5 py-3 rounded-2xl text-[9px] font-bold uppercase tracking-wider bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all shadow-[0_0_15px_rgba(37,99,235,0.1)]"
+                                   >
+                                     VERIFY_KYC
+                                   </button>
+                                 )}
+                                 <button onClick={() => handleUpdateUserRole(u._id, u.role)} className={`px-5 py-3 rounded-2xl text-[9px] font-bold uppercase tracking-wider transition-all ${u.role === 'admin' ? 'bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/5 hover:border-indigo-500/30'}`}>
+                                   {u.role === 'admin' ? 'REVOKE_ADMIN' : 'MAKE_ADMIN'}
+                                 </button>
+                                 <button onClick={() => handleUpdateUserStatus(u._id, u.status)} className={`px-8 py-3 rounded-2xl text-[9px] font-bold uppercase tracking-wider transition-all ${u.status === 'banned' ? 'bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-red-600/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-600 hover:text-white'}`}>
+                                   {u.status === 'banned' ? 'REVOKE_BAN' : 'RESTRICT_ID'}
+                                 </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </motion.section>
+                )}
+
+                {activeTab === 'governance' && (
+                  <motion.div key="governance" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-12">
+                    <section className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden">
+                      <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 tracking-tighter uppercase italic">Logic Repositories</h3>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <tbody>
+                            {rules.map(r => (
+                              <tr key={r._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.02] transition-colors">
+                                <td className="p-10">
+                                   <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
+                                      {r.name}
+                                      <span className="text-[8px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded uppercase tracking-tighter opacity-50">{r.status}</span>
+                                   </div>
+                                </td>
+                                <td className="p-10 text-right space-x-3">
+                                   <button onClick={() => openInspector('Rule Detailed View', r)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all">Audit</button>
+                                   <button onClick={() => handlePurgeRule(r._id)} className="px-5 py-2.5 bg-red-600/10 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all">Purge</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </motion.div>
+                )}
+
+                {activeTab === 'treasury' && (
+                  <motion.section key="treasury" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 tracking-tighter uppercase italic">Protocol Treasury_</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <tbody>
+                          {deposits.map(d => (
+                            <tr key={d._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.02] transition-colors">
+                              <td className="p-10">
+                                 <div className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
+                                    {d.depositAmount} {d.currency}
+                                    <span className={`text-[8px] font-bold px-2 py-0.5 border rounded uppercase tracking-tighter ${d.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'}`}>{d.status}</span>
+                                 </div>
+                                 <div className="text-[8px] text-slate-500 dark:text-slate-600 mt-1 uppercase font-mono">TX: {d.txHash}</div>
+                              </td>
+                              <td className="p-10 text-right">
+                                 {d.status === 'pending' && (
+                                   <button onClick={() => handleApproveDeposit(d._id)} className="px-5 py-2.5 bg-blue-600/10 text-blue-600 dark:text-blue-500 hover:bg-blue-600 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all">Approve & Fund</button>
+                                 )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </motion.section>
+                )}
+
+                {activeTab === 'cluster' && (
+                  <motion.section key="cluster" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02] px-10">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white px-2 tracking-tighter uppercase italic">Cryptographic Operations_</h3>
+                    </div>
+                    <div className="overflow-x-auto text-[11px] font-bold">
+                      <table className="w-full text-left">
+                        <tbody>
+                          {ops.map(op => (
+                            <tr key={op._id} className="border-b border-slate-200 dark:border-white/5 group hover:bg-blue-600/[0.01] transition-colors">
+                              <td className="p-10">
+                                <div className="text-md font-bold text-slate-900 dark:text-white flex items-center gap-4">
+                                  <div className={`w-2 h-2 rounded-full ${op.status === 'verified' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : op.status === 'failed' ? 'bg-red-600' : 'bg-blue-500 animate-pulse'}`} />
+                                  <span className="font-mono tracking-tight uppercase tracking-wider">OP_{op._id.slice(-8)}</span>
+                                </div>
+                                <div className="text-[9px] text-slate-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-50 flex gap-4">
+                                  <span>RULE: {op.ruleId?.name || 'GENERIC_INFRA'}</span>
+                                  <span>STATUS: {op.status}</span>
+                                  {op.txHash && <span className="text-blue-600 dark:text-blue-400">TX: {op.txHash.slice(0, 16)}...</span>}
+                                </div>
+                              </td>
+                              <td className="p-10 text-right">
+                                <button onClick={() => openInspector('Operation Trace', op)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all">Inspect Proof</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </motion.section>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <aside className="space-y-12">
+              <ProfileCard />
+              
+              <section className="rounded-[3rem] glass border-slate-200 dark:border-white/5 overflow-hidden flex flex-col h-[600px] shadow-2xl">
+                <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.01]">
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Protocol Audit logs</h3>
+                </div>
+                <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-slate-100/50 dark:bg-black/20 font-mono text-[9px]" style={{ scrollbarWidth: 'none' }}>
+                  {telemetry.map((log, i) => (
+                    <div key={i} className="flex gap-4 items-start border-l-2 border-slate-200 dark:border-white/5 pl-4 ml-1">
+                      <span className="opacity-30 flex-shrink-0 font-bold">{log.t}</span>
+                      <span className={`${log.c} font-bold leading-relaxed break-all`}>{log.m}</span>
+                    </div>
+                  ))}
+                  {telemetry.length === 0 && <div className="opacity-20 italic text-slate-500">Awaiting stream...</div>}
+                </div>
+                <div className="p-6 bg-red-600/5 text-center mt-auto border-t border-slate-200 dark:border-white/5 font-mono text-[8px] font-bold text-red-600 dark:text-red-500 tracking-wider">
+                  IMMUTABLE_LOG_STREAM: ENABLED
+                </div>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
     </AuthGuard>
   );
 }
