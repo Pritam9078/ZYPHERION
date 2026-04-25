@@ -220,7 +220,7 @@ Beyond standard usability metrics, users were asked:
 3. **Do you think this dApp is able to solve the issue it's targeting (Cross-chain automation)?**
 4. **How intuitive is the Smart Predicate builder for non-technical users?**
 
-### Table 1 — Verified User Directory (Top 5)
+### Table 1 — Verified User Directory (Protocol Testers)
 
 | User Name | User Email | User Wallet Address |
 |---|---|---|
@@ -228,18 +228,22 @@ Beyond standard usability metrics, users were asked:
 | Suchismita Mohanty | msuchismita719@gmail.com | `GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC` |
 | Rakesh Kumar | kurakesh199812@gmail.com | `GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI` |
 | Megha Sahu | meghasahu3125@gmail.com | `GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK` |
+| Prit Das | dpritam0804@gmail.com | `GD67FR4BKWMXRMZTLYYXZTBYSAGU3LW67Z3QGANM2PWM2M64F55WWIA2` |
 | Lohit Mishra | lohitmishra25@gmail.com | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` |
+| Rajiv Dubey | lucky81205login@gmail.com | `GCGEXUG76FMVLCQHMVEUIQ2GPDEZSSNXQZQITISFUR433LZCD4UPGMYT` |
+| HIMANSHU MAHARANA | himanshumaharana46@gmail.com | `GD67FR4BKWMXRMZTLYYXZTBYSAGU3LW67Z3QGANM2PWM2M64F55WWIA2` |
 
 ### Table 2 — Feedback Implementation Log
 
 | User Name | User Email | User Wallet Address | User Feedback | Commit ID / Implementation |
 |---|---|---|---|---|
-| Rajiv Dubey | lucky81205login@gmail.com | `GCGEXUG7...` | "FIX THE SPACING BETWEEN LETTERS (UI FIX)" | `5a083ca` (Standardized tracking across all headers) |
-| Lohit Mishra | lohitmishra25@gmail.com | `GDYWYDOB...` | "Documentation redirecting to nothing — needs a guide" | `5a083ca` (Fixed SDK link & added README guide) |
-| Megha Sahu | meghasahu3125@gmail.com | `GCBOJCFQ...` | "Improve UI — typography is too bold and heavy" | `6d0fa53` (Refined typography from black to bold) |
-| Suchismita Mohanty | msuchismita719@gmail.com | `GA3SFMGC...` | "UI can be more intuitive — especially in dark mode" | `c3e086d` (Theme-aware visibility & contrast fixes) |
-| Rakesh Kumar | kurakesh199812@gmail.com | `GA23DEPE...` | "Add tutorial / guide for Logic Architect" | `dfd0ecb` (Expanded README documentation section) |
-| HIMANSHU MAHARANA | himanshumaharana46@gmail.com | `GD67FR4B...` | "Logic Architect is great, but needs better error states" | `6d0fa53` (Implemented toast notifications for state changes) |
+| Rajiv Dubey | lucky81205login@gmail.com | `GCGEXUG76FMVLCQHMVEUIQ2GPDEZSSNXQZQITISFUR433LZCD4UPGMYT` | "FIX THE SPACING BETWEEN LETTERS (UI FIX)" | `5a083ca` (Standardized tracking across all headers) |
+| Lohit Mishra | lohitmishra25@gmail.com | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` | "Documentation redirecting to nothing — needs a guide" | `5a083ca` (Fixed SDK link & added README guide) |
+| Megha Sahu | meghasahu3125@gmail.com | `GCBOJCFQBP5INN3ACBZYUVOH3RJBMC2IYAGPYFMAM5J3PBFBIOG6GVMK` | "Improve UI — typography is too bold and heavy" | `2a4dc8d` (Standardized typography hierarchy & weights) |
+| Suchismita Mohanty | msuchismita719@gmail.com | `GA3SFMGCV3JJ5UBZAY6OIOQHCCP33N4CDRTRI53KQHJ3DIHZXAGW4NHC` | "UI can be more intuitive — especially in dark mode" | `c3e086d` (Theme-aware visibility & contrast fixes) |
+| Rakesh Kumar | kurakesh199812@gmail.com | `GA23DEPEOPIH6ZU2KC25WE3AAV37BNE2RKCEOLVLAKINFID2XLUEG6BI` | "Add tutorial / guide for Logic Architect" | `dfd0ecb` (Expanded README documentation section) |
+| HIMANSHU MAHARANA | himanshumaharana46@gmail.com | `GD67FR4BKWMXRMZTLYYXZTBYSAGU3LW67Z3QGANM2PWM2M64F55WWIA2` | "All good as i used" | `ad4399b` (General refinement & UI/UX optimizations) |
+| Lohitanshu Das | daslohitanshu@gmail.com | `GB5ZDX52U37QX4YSK4M4KA7LG7D42DXDBCRGRPQ5GPK42MFVBEGGPQQV` | "All good as i used — Good Architecture" | `ad4399b` (Refine Feedback UI/UX and optimize navigation) |
 
 ---
 
