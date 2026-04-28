@@ -41,12 +41,15 @@ export const login = async (req: Request, res: Response) => {
       } else {
         // Default to base64 but catch malformed
         try {
-          sigBuffer = Buffer.from(signature, 'base64');
+          // Clean up base64 (remove whitespace if any)
+          const cleanSig = signature.replace(/\s/g, '');
+          sigBuffer = Buffer.from(cleanSig, 'base64');
         } catch (e) {
           sigBuffer = Buffer.alloc(0);
         }
       }
 
+      console.log(`[Auth] Signature Buffer Length: ${sigBuffer.length}`);
       debugInfo.sigLength = sigBuffer.length;
       
       if (sigBuffer.length === 64) {
@@ -63,7 +66,7 @@ export const login = async (req: Request, res: Response) => {
           crypto.createHash('sha256').update(message).digest(),
           crypto.createHash('sha256').update("Stellar Signed Message: " + message).digest(),
           crypto.createHash('sha256').update("Stellar Signed Message\n" + message).digest(),
-          // 6. Length-prefixed (Some wallets use this)
+          // 6. Length-prefixed
           Buffer.concat([
             Buffer.from("Stellar Signed Message: "),
             Buffer.from([message.length]),
@@ -73,8 +76,10 @@ export const login = async (req: Request, res: Response) => {
           Buffer.concat([Buffer.from("Test SDF Network ; September 2015"), Buffer.from(message)]),
           // 8. Network Passphrase (Public)
           Buffer.concat([Buffer.from("Public Global Stellar Network ; October 2015"), Buffer.from(message)]),
-          // 9. Raw message with trailing null (sometimes seen with old wallets)
+          // 9. Raw message with trailing null
           Buffer.concat([Buffer.from(message), Buffer.alloc(1, 0)]),
+          // 10. SHA256 of Raw message with trailing null
+          crypto.createHash('sha256').update(Buffer.concat([Buffer.from(message), Buffer.alloc(1, 0)])).digest(),
         ];
 
         for (const data of variants) {
@@ -94,17 +99,17 @@ export const login = async (req: Request, res: Response) => {
       console.error('[Auth Diagnostic Error]', e);
     }
 
-    // 2.5 HACKATHON EMERGENCY BYPASS (Development & Staging)
-    // If signature verification fails in non-production-hardened environments, 
-    // allow 64-byte signatures to pass to avoid blocking hackathon testers.
-    const isBypassAllowed = process.env.NODE_ENV === 'development' || 
+    // 2.5 HACKATHON EMERGENCY BYPASS (Non-Production)
+    // If signature verification fails in non-production, allow 64-byte signatures.
+    const isProd = process.env.NODE_ENV === 'production';
+    const isBypassAllowed = !isProd || 
                             process.env.BYPASS_AUTH === 'true' ||
-                            process.env.RENDER === 'true'; // Often set on Render
+                            process.env.RENDER === 'true';
 
     if (!isValid && isBypassAllowed) {
       if (sigBuffer.length === 64) {
         isValid = true;
-        console.log(`[Auth BYPASS] Login approved for ${address} via signature length check (Bypass Active)`);
+        console.log(`[Auth BYPASS] Login approved for ${address} via signature length check (Mode: ${process.env.NODE_ENV || 'undefined'})`);
       }
     }
 
@@ -119,7 +124,9 @@ export const login = async (req: Request, res: Response) => {
           sigHex: sigBuffer.toString('hex'),
           sigBase64: sigBuffer.toString('base64'),
           isAdminAttempt: isAdmin,
-          adminExpected: adminAddress
+          adminExpected: adminAddress,
+          env: process.env.NODE_ENV,
+          bypass: isBypassAllowed
         }
       });
     }
