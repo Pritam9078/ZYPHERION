@@ -150,15 +150,31 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const signResult = await StellarWalletsKit.signMessage(message);
       console.log("[Zypherion Auth] Full Sign Result:", signResult);
       
-      const signatureRaw = (signResult as any).signedMessage || (signResult as any).signature || signResult;
-      const signature = typeof signatureRaw === 'string' ? signatureRaw : Buffer.from(signatureRaw as any).toString('base64');
-      
-      if (!signature) throw new Error("Signing failed.");
+      // Extract signature from result (handles multiple wallet formats)
+      let signature = '';
+      if (typeof signResult === 'string') {
+        signature = signResult;
+      } else if (signResult && typeof signResult === 'object') {
+        // @ts-ignore
+        signature = signResult.signature || signResult.signedMessage || signResult.result || JSON.stringify(signResult);
+      }
+
+      // If it's a Uint8Array or Buffer (unlikely but possible), convert to Base64
+      if (signature && typeof signature !== 'string') {
+        try {
+          signature = Buffer.from(signature as any).toString('base64');
+        } catch (e) {
+          console.warn("[Zypherion Auth] Signature is not a string and Buffer conversion failed", e);
+        }
+      }
+
+      if (!signature) throw new Error("Signing failed: No signature returned.");
       
       console.log("[Zypherion Auth] Diagnostic Payload:", {
         address,
-        sigPrefix: signature.slice(0, 10),
-        sigLength: signature.length
+        sigPrefix: typeof signature === 'string' ? signature.slice(0, 10) : 'not-a-string',
+        sigLength: signature?.length,
+        type: typeof signature
       });
 
       const response = await fetch(`${API_BASE}/api/auth/login`, {
